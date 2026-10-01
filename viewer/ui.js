@@ -73,6 +73,13 @@ export function mountGame(
     GOODS.filter((g) => goods[g])
       .map((g) => metric(g, goods[g]))
       .join("");
+  const playerBadge = (i) => {
+    const badge =
+      preferences.bgs?.players?.[i]?.pro && preferences.bgs.supporterBadge;
+    return badge
+      ? `<img class="supporter-badge" src="${esc(badge.url)}" alt="${esc(badge.label)}" title="${esc(badge.label)}">`
+      : "";
+  };
   const playerMarker = (i, decorative = false) => {
     const colorBlind = preferences.colorBlind === true;
     const shape = colorBlind
@@ -494,7 +501,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>1897 · Special Edition</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map((p, i) => `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}</span><span>${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></button>`).join("")}</div>${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="Light / dark" aria-label="Light / dark">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}<section class="action-panel" aria-live="polite">${allowed() && !["role", "draft", "build", "plant"].includes(state.tasks[0]?.kind) ? `<h2>${title()}</h2>` : ""}${actionPanel()}</section>${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>1897 · Special Edition</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map((p, i) => `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span>${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></button>`).join("")}</div>${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="Light / dark" aria-label="Light / dark">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}<section class="action-panel" aria-live="polite">${allowed() && !["role", "draft", "build", "plant"].includes(state.tasks[0]?.kind) ? `<h2>${title()}</h2>` : ""}${actionPanel()}</section>${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
@@ -863,7 +870,7 @@ export function mountGame(
     },
     setPreferences(p) {
       const previousLocale = t.fr;
-      preferences = { ...preferences, ...p };
+      preferences = { ...preferences, ...p, bgs: p.bgs };
       t = translator(preferences.locale ?? preferences.language ?? "en");
       if (previousLocale !== t.fr) configureChat();
       for (const b of shell.querySelectorAll("[data-close]"))

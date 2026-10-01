@@ -1,2 +1,5 @@
 allowBuilds:
   esbuild: true
+
+minimumReleaseAgeExclude:
+  - "@boardgamers/protocol@0.8.1"

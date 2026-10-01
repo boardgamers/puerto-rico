@@ -12,7 +12,7 @@
     "publish:private": "pnpm build && node scripts/publish-private.mjs"
   },
   "dependencies": {
-    "@boardgamers/protocol": "0.8.0",
+    "@boardgamers/protocol": "0.8.1",
     "@noble/hashes": "2.0.1",
     "morphdom": "2.7.8"
   },
