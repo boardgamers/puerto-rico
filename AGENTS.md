@@ -12,7 +12,7 @@
 - Slug `puerto-rico`, version **1** stays **private** (`public: false`), with **Unlisted off** and English/French supported. Making it public needs an explicit request.
 - Use `pnpm publish:private`; see [README](README.md#private-bgs-publication). It packages, uploads and verifies the engine/viewer and metadata. Admin credentials come from `~/.bgs`; never print or commit the token.
 - Bump the package version for engine changes. Ship `dist/engine.js` and the self-contained `dist/viewer.js` (global `puertorico`), never the local sandbox. Do not register tutorial metadata until playable BGS tutorials exist.
-- Git delivery and BGS publication are separate. Check the configured remote before promising a push.
+- Source repositories are public on Codeberg (`origin`) and GitHub (`github`); push commits to both. Git delivery and BGS publication are separate.
 
 ## Checks
 
