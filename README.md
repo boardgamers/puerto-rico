@@ -1,5 +1,7 @@
 # Puerto Rico: Special Edition
 
+[Play now at boardgamers.space](https://boardgamers.space/boardgame/puerto-rico)
+
 Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.1.1`; English and French are configured in the platform metadata.
 
 ```sh
