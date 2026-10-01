@@ -24,6 +24,7 @@ try {
 } catch {}
 state ??= newGame();
 const ui = mountGame(document.getElementById("game"), {
+  automatedSetup: true,
   async onMove(move) {
     undo.push(structuredClone(state));
     state = engine.move(state, move, 0);

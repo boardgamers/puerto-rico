@@ -1011,7 +1011,7 @@ export function move(state, m, p) {
   const s = clone(state),
     t = s.tasks[0],
     a = s.players[p],
-    extra = {};
+    extra = { phase: t.kind };
   const custom = {
     assign: "assign",
     produce: "produce",
@@ -1028,15 +1028,28 @@ export function move(state, m, p) {
           m.decline.every((id) => optionalPoints(s, p, m).includes(id)),
       );
   } else assert(legal(s, p).some((x) => sameMove(x, m)));
+  if (m.target)
+    extra.targetId =
+      m.target === "reserve" ? "reserve" : tileRef(a, m.target).id;
+  if (Number.isInteger(m.estate)) extra.estateId = a.estates[m.estate]?.id;
   const declined = (id) => m.decline?.includes(id);
   if (t.kind === "produce" && ["produce", "pass"].includes(m.type)) {
     if (active(a, "chapel")) {
       if (citizen(a, "chapel")) {
-        if (!declined("chapel")) vp(s, p, 1);
-      } else a.coins++;
+        if (!declined("chapel")) {
+          vp(s, p, 1);
+          extra.vp = 1;
+        }
+      } else {
+        a.coins++;
+        extra.coins = 1;
+      }
     }
-    if (active(a, "tailorShop"))
-      a.coins += Math.min(citizens(a), s.options.tailorLimit ? 3 : Infinity);
+    if (active(a, "tailorShop")) {
+      const coins = Math.min(citizens(a), s.options.tailorLimit ? 3 : Infinity);
+      a.coins += coins;
+      extra.coins = (extra.coins ?? 0) + coins;
+    }
   }
   const next = () => s.tasks.shift();
   switch (m.type) {
@@ -1066,6 +1079,7 @@ export function move(state, m, p) {
       if (m.type === "hacienda") next();
       else {
         a.coins--;
+        extra.coins = -1;
         t.zoneUsed = true;
       }
       const id = drawEstate(s);
@@ -1090,6 +1104,7 @@ export function move(state, m, p) {
       assert(gainPerson(s, p, "w", true));
       a.reserve.w--;
       a.buildings[t.building].w++;
+      extra.targetId = a.buildings[t.building].id;
       next();
       break;
     case "park":
@@ -1101,11 +1116,13 @@ export function move(state, m, p) {
       if (m.type === "park") next();
       else {
         a.coins++;
+        extra.coins = 1;
         t.zoneUsed = true;
       }
       break;
     }
     case "villa":
+      extra.kind = s.citizenSupply ? "c" : "w";
       assert(gainPerson(s, p, s.citizenSupply ? "c" : "w"));
       next();
       break;
@@ -1159,6 +1176,10 @@ export function move(state, m, p) {
           Object.assign(x, { w: m[key][i].w, c: m[key][i].c }),
         );
       a.reserve = { w: availableW - nw, c: availableC - nc };
+      extra.allocation = [...a.estates, ...a.buildings]
+        .filter((x) => x.w + x.c > 0)
+        .map(({ id, w, c }) => ({ id, w, c }));
+      extra.reserve = { ...a.reserve };
       next();
       break;
     }
@@ -1173,10 +1194,12 @@ export function move(state, m, p) {
       break;
     case "parkReward":
       vp(s, p, 2);
+      extra.vp = 2;
       next();
       break;
     case "assembly":
-      vp(s, p, sum(GOODS.map((g) => Math.floor(a.goods[g] / 2))));
+      extra.vp = sum(GOODS.map((g) => Math.floor(a.goods[g] / 2)));
+      vp(s, p, extra.vp);
       next();
       break;
     case "build": {
@@ -1200,8 +1223,10 @@ export function move(state, m, p) {
       s.market[m.id]--;
       const b = { id: m.id, w: 0, c: 0 };
       a.buildings.push(b);
-      if (church && !declined("church"))
-        vp(s, p, B[m.id].size === 2 ? 2 : B[m.id].vp >= 2 ? 1 : 0);
+      if (church && !declined("church")) {
+        extra.vp = B[m.id].size === 2 ? 2 : B[m.id].vp >= 2 ? 1 : 0;
+        vp(s, p, extra.vp);
+      }
       if (citySize(a) === 12) s.endReason ??= "city";
       next();
       if (school)
@@ -1256,6 +1281,7 @@ export function move(state, m, p) {
       a.goods[m.good]--;
       s.supply[m.good]++;
       vp(s, p, 1);
+      extra.vp = 1;
       t.used.push(m.good);
       if (--t.remaining === 0) next();
       break;
@@ -1286,6 +1312,8 @@ export function move(state, m, p) {
         points = cargo[m.good];
         full = ship.amount === ship.capacity;
         capacity = ship.capacity;
+        extra.shipCapacity = capacity;
+        extra.shipLoad = ship.amount;
       }
       for (const g of GOODS) {
         a.goods[g] -= cargo[g];
@@ -1299,7 +1327,10 @@ export function move(state, m, p) {
           active(a, "publishingHouse") && !declined("publishingHouse") ? 2 : 1;
       }
       vp(s, p, points);
-      if (active(a, "lighthouse")) a.coins++;
+      if (active(a, "lighthouse")) {
+        a.coins++;
+        extra.coins = 1;
+      }
       extra.goods = cargo;
       extra.vp = points;
       t.p = (p + 1) % s.players.length;
@@ -1340,6 +1371,8 @@ export function move(state, m, p) {
           ship.amount > 0,
       );
       const good = ship.good;
+      extra.good = good;
+      extra.shipCapacity = ship.capacity;
       a.goods[good] += m.amount;
       s.supply[good] += ship.amount - m.amount;
       ship.good = null;
@@ -1348,7 +1381,8 @@ export function move(state, m, p) {
       break;
     }
     case "plunder":
-      vp(s, p, s.trade.length);
+      extra.vp = s.trade.length;
+      vp(s, p, extra.vp);
       for (const g of s.trade) s.supply[g]++;
       s.trade = [];
       next();
@@ -1372,6 +1406,7 @@ export function move(state, m, p) {
       break;
     case "capture":
       s.captured = { id: m.id, p };
+      extra.coins = s.roles.find((r) => r.id === m.id).coins;
       a.coins += s.roles.find((r) => r.id === m.id).coins;
       s.roles.find((r) => r.id === m.id).coins = 0;
       next();
