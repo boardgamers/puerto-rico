@@ -324,13 +324,13 @@ export function mountGame(
           n === 0
             ? t("soldOut")
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
-        return `<div class="tile-stack ${n > 1 ? "stacked" : ""} ${n > 2 ? "stacked-deep" : ""}"><button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" ${!n && !m ? 'aria-disabled="true"' : ""}>
+        return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${icon(spriteFor(id), 30)}<strong>${t(id)}</strong></span>
           <span class="bcard-cost"><small>${t("cost")}</small>${metric("coin", price)}</span>
           <span class="bcard-effect">${esc(buildingEffect(id))}</span>
           <span class="bcard-stats"><span class="points-badge" title="${esc(t("printedPoints"))}">${icon("vp", 20)}<b>${b.vp} ${t("shortVP")}</b></span>${buildingSlots(b)}</span>
           <span class="bcard-stock">${b.size === 2 ? `<span class="city-footprint" title="${esc(t("twoCitySpaces"))}">▭▭ ${t("twoCitySpaces")}</span>` : ""}<span>${stock}</span></span>
-        </button></div>`;
+        </button>`;
       })
       .join("")}</div></section>`;
   }
