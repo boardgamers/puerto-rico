@@ -836,6 +836,99 @@ export function legal(s, p = currentPlayer(s)) {
   }
   return moves;
 }
+// Advice is computed before secrets are stripped, using the same action checks
+// as play. It never simulates a move, draws a tile, or changes the position.
+export function roleWarnings(s, p) {
+  if (s.finished || s.tasks[0]?.kind !== "role" || s.tasks[0].p !== p)
+    return {};
+  const warnings = {};
+  for (const choice of phaseLegal(s, s.tasks[0])) {
+    const id = choice.id,
+      role = s.roles.find((r) => r.id === id);
+    const a = { ...s.players[p], coins: s.players[p].coins + role.coins };
+    const preview = {
+      ...s,
+      role: id,
+      owner: p,
+      usedWharves: [],
+      players: s.players.map((other, i) => (i === p ? a : other)),
+    };
+    const can = (kind) =>
+      phaseLegal(preview, { kind, p, acted: false, zoneUsed: false }).some(
+        (m) => m.type !== "pass",
+      );
+    let reason;
+    const bonuses = [];
+    if (id === "craftsman") {
+      const potential = production(a);
+      if (!GOODS.some((g) => potential[g] > 0 && s.supply[g] > 0)) {
+        reason = GOODS.some((g) => potential[g] > 0)
+          ? "warnProductionSupply"
+          : "warnProductionSetup";
+        if (active(a, "chapel"))
+          bonuses.push({
+            building: "chapel",
+            [citizen(a, "chapel") ? "vp" : "coins"]: 1,
+          });
+        if (active(a, "tailorShop") && citizens(a))
+          bonuses.push({
+            building: "tailorShop",
+            coins: Math.min(citizens(a), s.options.tailorLimit ? 3 : Infinity),
+          });
+      }
+    } else if (id === "builder" && !buildOptions(preview, p).length) {
+      const funded = {
+        ...preview,
+        players: preview.players.map((other, i) =>
+          i === p ? { ...a, coins: Number.MAX_SAFE_INTEGER } : other,
+        ),
+      };
+      reason = buildOptions(funded, p).length
+        ? "warnBuildMoney"
+        : "warnBuildSpace";
+    } else if (id === "trader" && !can("trade")) {
+      reason = !GOODS.some((g) => a.goods[g])
+        ? "warnTradeGoods"
+        : s.trade.length >= 4
+          ? "warnTradeFull"
+          : "warnTradeTypes";
+    } else if (id === "captain" && !shipping(preview, p).length) {
+      // These buildings offer genuine actions before loading, so don't warn
+      // that the role has no available action when one of them can be used.
+      const bonusAction =
+        (active(a, "assemblyHall") && GOODS.some((g) => a.goods[g] >= 2)) ||
+        (active(a, "pensionOffice") &&
+          citizens(a) &&
+          GOODS.some((g) => a.goods[g]));
+      if (!bonusAction) {
+        reason = GOODS.some((g) => a.goods[g])
+          ? "warnShipSpace"
+          : "warnShipGoods";
+        if (active(a, "lighthouse"))
+          bonuses.push({ building: "lighthouse", coins: 1 });
+      }
+    } else if (
+      id === "planter" &&
+      !can("plant") &&
+      !(active(a, "hacienda") && can("hacienda")) &&
+      !(active(a, "parkAuthority") && can("park"))
+    ) {
+      reason = a.estates.length >= 12 ? "warnPlantSpace" : "warnPlantSupply";
+    } else if (
+      id === "recruiter" &&
+      !total(s.register) &&
+      !s.workerSupply &&
+      !(active(a, "villa") && s.citizenSupply) &&
+      !(people(a) && spaces(a))
+    ) {
+      reason = "warnRecruitSupply";
+    } else if (id === "smuggler" && !can("smuggle")) {
+      reason = "warnSmugglerTargets";
+    }
+    if (reason) warnings[id] = { reason, coins: role.coins, bonuses };
+  }
+  return warnings;
+}
 function settle(s) {
   for (let guard = 0; guard < 200; guard++) {
     if (s.finished || !s.tasks.length) return;
@@ -1498,6 +1591,7 @@ export function stripSecret(state, p) {
     if (i !== p && !s.finished) s.players[i].vp = null;
   // Logs contain only public moves; historical earned points are public even though totals are concealed.
   s.legal = Number.isInteger(p) ? legal(state, p) : [];
+  s.roleWarnings = Number.isInteger(p) ? roleWarnings(state, p) : {};
   s.historyLength = logLength(state);
   if (s.finished) s.results = s.players.map((_, i) => scoreBreakdown(state, i));
   return s;

@@ -1,6 +1,6 @@
 # Puerto Rico: Special Edition
 
-Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.1.0`; English and French are configured in the platform metadata.
+Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.1.1`; English and French are configured in the platform metadata.
 
 ```sh
 pnpm install
@@ -33,6 +33,7 @@ The engine accepts the optional `costSwap`, `alternativeStart`, `tailorLimit` an
 - Distinct goods pictograms; color is supplementary.
 - Paper, terracotta and sea-green visual theme in light/dark modes; original vector town illustration, larger corn and a repeat-privilege pictogram.
 - Editable worker allocation, goods storage, building details, private shipping, final scoring.
+- Contextual role warnings explain unavailable actions before committing a choice, including role coins and building rewards. They remain advisory; legal strategic choices are preserved.
 - Desktop and mobile layout, incremental DOM updates, native page and modal scrolling.
 - BGS chat and replay, concealed VP totals, server-only randomness and future draws.
 - Deterministic ordinary bots for local testing and BGS bot seats.

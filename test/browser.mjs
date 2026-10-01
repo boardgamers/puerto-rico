@@ -51,6 +51,33 @@ try {
         () => document.documentElement.scrollWidth > innerWidth + 1,
       );
     assert.equal(await overflow(), false, `No page overflow at ${width}`);
+    const craftsman = page.locator('[data-role-id="craftsman"]');
+    assert.equal(await craftsman.locator(".role-warning").count(), 1);
+    await craftsman.click();
+    assert.equal(await page.locator("[data-confirm-role]").count(), 1);
+    assert.deepEqual(await page.evaluate(() => played), []);
+    await page.locator(".modal-body [data-close]").click();
+    assert.deepEqual(await page.evaluate(() => played), []);
+    await craftsman.click();
+    // A newer game state invalidates an open warning; it must not send a stale choice.
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(E.move(original, { type: "role", id: "planter" }, 0), 0),
+    );
+    assert.equal(await page.locator("dialog[open]").count(), 0);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
+    await craftsman.click();
+    await page.locator("[data-confirm-role]").click();
+    assert.deepEqual(await page.evaluate(() => played), [
+      { type: "role", id: "craftsman" },
+    ]);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
     await page.locator('[data-panel="rules"]').click();
     assert.equal(await page.locator("dialog[open]").count(), 1);
     await page.keyboard.press("Escape");

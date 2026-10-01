@@ -107,6 +107,73 @@ const labels = {
   waiting: ["Waiting for", "Au tour de"],
   yourTurn: ["Your turn", "À vous"],
   chooseRole: ["Choose a role", "Choisissez un rôle"],
+  roleWarningTitle: ["Before choosing this role", "Avant de choisir ce rôle"],
+  chooseRoleAnyway: ["Choose anyway", "Choisir quand même"],
+  chooseAnotherRole: ["Choose another role", "Choisir un autre rôle"],
+  roleCoinsStill: [
+    "Coins collected from the role",
+    "Pièces récupérées sur le rôle",
+  ],
+  roleBonusesStill: [
+    "Building bonuses still apply",
+    "Bonus de bâtiments conservés",
+  ],
+  roleWarningOthers: [
+    "Other players can still use this role if able.",
+    "Les autres joueurs pourront utiliser ce rôle s’ils le peuvent.",
+  ],
+  warnProductionSetup: [
+    "You cannot produce any {crates} yet. Your estate and its matching production building must be occupied. {corn} only needs an occupied estate.",
+    "Vous ne pouvez produire aucune {crate}. Le domaine et son bâtiment de production doivent être occupés. Le {corn} n’a besoin que d’un domaine occupé.",
+  ],
+  warnProductionSupply: [
+    "The supply has no {crates} of the types you can produce.",
+    "La réserve ne contient plus de {crates} des types que vous pouvez produire.",
+  ],
+  warnBuildMoney: [
+    "You cannot afford a building, even with the role’s {coins}, your discounts and payment bonuses.",
+    "Vous ne pouvez financer aucun bâtiment, même avec les {coins} du rôle, vos réductions et vos bonus de paiement.",
+  ],
+  warnBuildSpace: [
+    "No available building can be added to your city: check free spaces and buildings you already own.",
+    "Aucun bâtiment disponible ne peut être ajouté à votre ville : vérifiez les cases libres et les bâtiments déjà possédés.",
+  ],
+  warnTradeGoods: [
+    "You have no {crates} to sell.",
+    "Vous n’avez aucune {crate} à vendre.",
+  ],
+  warnTradeFull: [
+    "The trading house is full. You cannot sell any goods.",
+    "Le marché est plein. Vous ne pouvez vendre aucune marchandise.",
+  ],
+  warnTradeTypes: [
+    "The trading house already contains every type you could sell.",
+    "Le marché contient déjà chacun des types que vous pourriez vendre.",
+  ],
+  warnShipGoods: [
+    "You have no {crates} to load.",
+    "Vous n’avez aucune {crate} à charger.",
+  ],
+  warnShipSpace: [
+    "No ship can accept your {crates} right now.",
+    "Aucun bateau ne peut accueillir vos {crates} actuellement.",
+  ],
+  warnPlantSpace: [
+    "Your countryside already fills all 12 spaces. You cannot take another estate.",
+    "Vos 12 cases de campagne sont occupées. Vous ne pouvez prendre aucun domaine supplémentaire.",
+  ],
+  warnPlantSupply: [
+    "No estate or {quarry} is available for you to take.",
+    "Aucun domaine ni aucune {quarry} ne sont disponibles pour vous.",
+  ],
+  warnRecruitSupply: [
+    "Neither recruitment nor worker reassignment is possible for you.",
+    "Ni recrutement ni réaffectation d’ouvriers ne sont possibles pour vous.",
+  ],
+  warnSmugglerTargets: [
+    "There is nothing to raid, plunder or poach, and no role left to capture.",
+    "Aucun pillage ni débauchage n’est possible, et il ne reste aucun rôle à capturer.",
+  ],
   chooseDraft: [
     "Choose a building for the shared market",
     "Choisissez un bâtiment pour le marché commun",

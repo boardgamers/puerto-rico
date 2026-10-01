@@ -416,6 +416,35 @@
   position: relative;
   display: flex;
 }
+.pr-game .role-warning {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  line-height: 0;
+}
+.pr-game .role .role-warning .icon {
+  width: 15px;
+  height: 15px;
+}
+.pr-game .role-warning-heading,
+.pr-game .role-warning-gain,
+.pr-game .role-warning-bonuses > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pr-game .role-warning-heading {
+  font-size: 18px;
+}
+.pr-game .role-warning-bonuses {
+  display: grid;
+  gap: 6px;
+}
+.pr-game .role-warning-note {
+  color: var(--muted);
+  font-size: 12px;
+}
 .pr-game .coin-badge {
   position: absolute;
   right: -12px;

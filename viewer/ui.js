@@ -63,6 +63,7 @@ export function mountGame(
     tool = "w",
     lastFocus,
     modalMode = "",
+    roleConfirmation = null,
     scrollLog = 0;
   const metric = (id, n) =>
     id === "vp"
@@ -132,6 +133,7 @@ export function mountGame(
   }
   function hide(d) {
     d.close();
+    if (d === modal) roleConfirmation = null;
     if (d === chatDialog) chat?.setOpen(false);
     lastFocus?.focus?.();
   }
@@ -366,8 +368,9 @@ export function mountGame(
     return `<section class="shared-board"><div class="roles">${state.roles
       .map((r) => {
         const m = state.legal.find((m) => m.type === "role" && m.id === r.id),
-          selected = r.taken !== null;
-        return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${m ? "available" : ""}" ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}><span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="coin-badge">${r.coins}</span>` : ""}</span><b>${t(r.id)}</b>${selected ? playerMarker(r.taken) : ""}</button>`;
+          selected = r.taken !== null,
+          warning = m && acting ? state.roleWarnings?.[r.id] : null;
+        return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${m ? "available" : ""}" ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="coin-badge">${r.coins}</span>` : ""}</span><b>${t(r.id)}</b>${selected ? playerMarker(r.taken) : ""}</button>`;
       })
       .join(
         "",
@@ -475,6 +478,16 @@ export function mountGame(
   function render(s) {
     if (s) state = s;
     if (!state) return;
+    if (
+      roleConfirmation &&
+      (!enabled ||
+        seat !== roleConfirmation.seat ||
+        state.historyLength !== roleConfirmation.historyLength ||
+        !state.legal.some(
+          (m) => m.type === "role" && m.id === roleConfirmation.move.id,
+        ))
+    )
+      hide(modal);
     view = Math.min(view, state.players.length - 1);
     draftInit();
     shell.classList.toggle(
@@ -498,6 +511,25 @@ export function mountGame(
     const solo = id === "smuggler" || id.startsWith("adventurer");
     const privilege = t.rolePrivilege(id);
     return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small><p>${t.roleActionHtml(id)}</p></div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
+  }
+  function confirmRole(m) {
+    const warning = state.roleWarnings?.[m.id];
+    if (!warning) return false;
+    show(
+      t("roleWarningTitle"),
+      `
+      <div class="role-warning-heading">${icon(m.id, 36)}<strong>${t(m.id)}</strong></div>
+      <p>${t.html(warning.reason)}</p>
+      ${warning.coins ? `<p class="role-warning-gain">${t("roleCoinsStill")} ${metric("coin", warning.coins)}</p>` : ""}
+      ${warning.bonuses.length ? `<div class="role-warning-bonuses"><small>${t("roleBonusesStill")}</small>${warning.bonuses.map((b) => `<div>${t(b.building)} ${b.coins ? metric("coin", b.coins) : ""}${b.vp ? metric("vp", b.vp) : ""}</div>`).join("")}</div>` : ""}
+      ${m.id !== "smuggler" ? `<p class="role-warning-note">${t("roleWarningOthers")}</p>` : ""}
+      <div class="action-choices"><button type="button" class="primary" data-close>${t("chooseAnotherRole")}</button><button type="button" data-confirm-role>${t("chooseRoleAnyway")}</button></div>
+    `,
+      "role-warning",
+    );
+    roleConfirmation = { move: m, seat, historyLength: state.historyLength };
+    body.querySelector("[data-close]").focus();
+    return true;
   }
   function rolesHelp() {
     const roles = [
@@ -690,8 +722,21 @@ export function mountGame(
       )
     )
       return;
+    if (el.hasAttribute("data-confirm-role")) {
+      const confirmation = roleConfirmation;
+      if (
+        !confirmation ||
+        confirmation.historyLength !== state.historyLength ||
+        confirmation.seat !== seat
+      )
+        return;
+      hide(modal);
+      send(confirmation.move);
+      return;
+    }
     if (el.dataset.move) {
       const m = JSON.parse(decodeURIComponent(el.dataset.move));
+      if (m.type === "role" && confirmRole(m)) return;
       if (["smallWharf", "produce"].includes(m.type)) {
         cargoDialog(m);
         return;

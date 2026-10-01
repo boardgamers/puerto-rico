@@ -55,6 +55,8 @@ const paths = {
   governor:
     '<path fill="#d8ba65" d="m2 6 5 4 5-8 5 8 5-4-3 13H5Z"/><path d="M5 22h14"/>',
   help: '<path d="M8 8a4 4 0 1 1 7 3c-2 1-3 2-3 5"/><circle cx="12" cy="21" r="1" fill="currentColor" stroke="none"/>',
+  warning:
+    '<path fill="#ddb568" stroke="#614625" d="M12 2 23 21H1Z"/><path stroke="#49351e" stroke-width="2" d="M12 8v6m0 3v.5"/>',
   rules:
     '<path d="M12 5C8 2 4 2 1 4v17c3-2 7-2 11 1 4-3 8-3 11-1V4c-3-2-7-2-11 1Zm0 0v17"/>',
   journal: '<path d="M5 2h16v20H5ZM1 6h7M1 12h7M1 18h7m2-10h8m-8 5h8m-8 5h5"/>',
