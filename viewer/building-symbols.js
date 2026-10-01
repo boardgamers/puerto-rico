@@ -177,7 +177,7 @@ export function buildingSymbols(id, t) {
         );
         break;
       default:
-        return esc(full);
+        return t.effectHtml(id);
     }
   return `<span class="building-symbols" role="img" aria-label="${esc(full)}" title="${esc(full)}"><span aria-hidden="true">${visual}</span></span>`;
 }

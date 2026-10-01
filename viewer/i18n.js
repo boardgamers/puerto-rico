@@ -1,3 +1,4 @@
+import { plainText, richText } from "./rich-text.js";
 const labels = {
   income: ["Income", "Revenus"],
   draft: ["Market selection", "Choix du marché"],
@@ -208,8 +209,8 @@ const labels = {
     "Développez votre économie, gagnez des points",
   ],
   ruleGoal: [
-    "Win with the most VP: ship goods and develop your city. Coins pay for buildings; goods can be sold for coins or shipped for points.",
-    "Gagnez avec le plus de points de victoire en expédiant des marchandises et en développant votre ville. Les pièces financent les bâtiments ; les marchandises se vendent contre des pièces ou s’expédient contre des points.",
+    "Win with the most VP: ship goods and develop your city. Coins pay for buildings; goods can be sold for {coins} or shipped for points.",
+    "Gagnez avec le plus de points de victoire en expédiant des marchandises et en développant votre ville. Les {coins} financent les bâtiments ; les marchandises se vendent contre des {coins} ou s’expédient contre des points.",
   ],
   ruleRoundTitle: ["How a round works", "Comment se déroule une manche"],
   ruleChooseTitle: ["Choose a role", "Choisir un rôle"],
@@ -219,8 +220,8 @@ const labels = {
   ],
   ruleFollowTitle: ["Everyone takes that action", "Chacun joue cette action"],
   ruleFollow: [
-    "The chooser acts first and gets the privilege (for example, Builder: −1 coin), then everyone follows clockwise with the same action.",
-    "Le joueur qui l’a choisi agit d’abord et reçoit son privilège (par exemple, Bâtisseur : −1 pièce), puis chacun joue la même action dans l’ordre du tour.",
+    "The chooser acts first and gets the privilege (for example, Builder: {coin:−1}), then everyone follows clockwise with the same action.",
+    "Le joueur qui l’a choisi agit d’abord et reçoit son privilège (par exemple, Bâtisseur : {coin:−1}), puis chacun joue la même action dans l’ordre du tour.",
   ],
   ruleNextTitle: ["The next player chooses", "Le joueur suivant choisit"],
   ruleNext: [
@@ -233,12 +234,12 @@ const labels = {
   ],
   ruleResetTitle: ["Prepare the next round", "Préparer la manche suivante"],
   ruleReset: [
-    "Add 1 coin to each unchosen role, return the chosen roles, and pass the Governor to the next player.",
-    "Ajoutez 1 pièce sur chaque rôle non choisi, rendez les rôles choisis, puis passez le Gouverneur au joueur suivant.",
+    "Add {coin:1} to each unchosen role, return the chosen roles, and pass the Governor to the next player.",
+    "Ajoutez {coin:1} sur chaque rôle non choisi, rendez les rôles choisis, puis passez le Gouverneur au joueur suivant.",
   ],
   ruleSmugglerCoin: [
-    "The Smuggler never accumulates coins.",
-    "Le Contrebandier n’accumule jamais de pièces.",
+    "The Smuggler never accumulates {coins}.",
+    "Le Contrebandier n’accumule jamais de {coins}.",
   ],
   ruleOptional: [
     "Actions and privileges are optional, except mandatory shipping. Smuggler and Adventurer, when present, only let their chooser act.",
@@ -255,15 +256,15 @@ const labels = {
   ],
   rulePlantStep: ["Take an estate", "Prendre un domaine"],
   ruleBuildStep: ["Buy a building", "Acheter un bâtiment"],
-  ruleRecruitStep: ["Assign workers", "Affecter les ouvriers"],
-  ruleProduceStep: ["Produce crates", "Produire des caisses"],
+  ruleRecruitStep: ["Assign {workers}", "Affecter les {workers}"],
+  ruleProduceStep: ["Produce {crates}", "Produire des {crates}"],
   ruleProduction: [
-    "Example: an occupied Sugar estate + an occupied sugar-mill slot produce 1 sugar crate during Craftsman. Corn needs no building. Empty tiles neither produce nor activate effects.",
-    "Exemple : un domaine de sucre occupé + une case occupée dans une sucrerie produisent 1 caisse à l’Artisan. Le maïs n’a pas besoin de bâtiment. Sans ouvrier, ni production ni effet.",
+    "Example: an occupied {sugar} estate + an occupied sugar-mill slot produce {sugar:1} during Craftsman. Corn needs no building. Empty tiles neither produce nor activate effects.",
+    "Exemple : un domaine de {sugar} occupé + une case occupée dans une sucrerie produisent {crate:1} à l’Artisan. Le {corn} n’a pas besoin de bâtiment. Sans {worker}, ni production ni effet.",
   ],
   ruleActivation: [
-    "Rearrange all your workers during Recruiter. Occupied quarries discount construction, within the building’s limit.",
-    "Réaffectez tous vos ouvriers au Recruteur. Les carrières occupées réduisent le prix des constructions, dans la limite du bâtiment.",
+    "Rearrange all your {workers} during Recruiter. Occupied {quarries} discount construction, within the building’s limit.",
+    "Réaffectez tous vos {workers} au Recruteur. Les {quarries} occupées réduisent le prix des constructions, dans la limite du bâtiment.",
   ],
   ruleGoodsTitle: [
     "Sell for coins, ship for points",
@@ -271,17 +272,17 @@ const labels = {
   ],
   ruleSellTitle: ["Trader → coins", "Marchand → pièces"],
   ruleSell: [
-    "Sell 1 crate per player. The market has 4 spaces, normally one crate per type. It empties at phase end only if full.",
-    "Vendez 1 caisse par joueur. Le marché a 4 places, normalement une caisse par type. Il se vide en fin de phase uniquement s’il est plein.",
+    "Sell {crate:1} per player. The market has 4 spaces, normally {crate:1} per type. It empties at phase end only if full.",
+    "Vendez {crate:1} par joueur. Le marché a 4 places, normalement {crate:1} par type. Il se vide en fin de phase uniquement s’il est plein.",
   ],
   ruleShipTitle: ["Captain → VP", "Capitaine → points"],
   ruleShip: [
-    "Take turns loading one type for 1 VP per crate. Loading is mandatory when possible: use the ship accepting the most of your chosen type. Repeat until nobody can load.",
-    "Chargez chacun votre tour un type, pour 1 point par caisse. C’est obligatoire si possible : utilisez le bateau acceptant le plus de caisses du type choisi. Répétez jusqu’à ne plus pouvoir charger.",
+    "Take turns loading one type for {vp:1} per crate. Loading is mandatory when possible: use the ship accepting the most of your chosen type. Repeat until nobody can load.",
+    "Chargez chacun votre tour un type, pour {vp:1} par caisse. C’est obligatoire si possible : utilisez le bateau acceptant le plus de caisses du type choisi. Répétez jusqu’à ne plus pouvoir charger.",
   ],
   ruleShipLimits: [
-    "One type per ship; no type on two public ships. After loading, keep 1 crate in total (more with storage buildings) and discard the rest. Full ships then empty; the others keep their cargo.",
-    "Un type par bateau, sans le répartir sur deux bateaux publics. Après les chargements, gardez 1 caisse au total (davantage avec des bâtiments de stockage) et défaussez le reste. Les bateaux pleins se vident ensuite ; les autres gardent leur cargaison.",
+    "One type per ship; no type on two public ships. After loading, keep {crate:1} in total (more with storage buildings) and discard the rest. Full ships then empty; the others keep their cargo.",
+    "Un type par bateau, sans le répartir sur deux bateaux publics. Après les chargements, gardez {crate:1} au total (davantage avec des bâtiments de stockage) et défaussez le reste. Les bateaux pleins se vident ensuite ; les autres gardent leur cargaison.",
   ],
   ruleTimingTitle: ["Timing matters", "Le bon moment compte"],
   ruleTiming: [
@@ -298,16 +299,16 @@ const labels = {
     "Touchez un bâtiment pour consulter son effet et son prix.",
   ],
   ruleCitizens: [
-    "Citizens fill worker slots and score 1 VP each. Some building effects depend on whether a worker or citizen occupies them.",
-    "Les citoyens occupent les cases d’ouvriers et valent chacun 1 point. Certains effets changent selon que l’occupant est un ouvrier ou un citoyen.",
+    "Citizens fill {worker} slots and score {vp:1} each. Some building effects depend on whether a {worker} or {citizen} occupies them.",
+    "Les {citizens} occupent les cases d’{workers} et valent chacun {vp:1}. Certains effets changent selon que l’occupant est un {worker} ou un {citizen}.",
   ],
   ruleSmuggler: [
-    "Raid a ship, plunder the market, poach workers or capture a role. A captured role gives 3 coins if chosen by someone else; otherwise you play it at round end. Another player must choose Smuggler before you can choose it again.",
-    "Pillez un bateau ou le marché, débauchez des ouvriers ou capturez un rôle. Ce dernier rapporte 3 pièces si quelqu’un le choisit ; sinon, vous le jouez en fin de manche. Un autre joueur doit prendre le Contrebandier avant que vous puissiez le reprendre.",
+    "Raid a ship, plunder the market, poach {workers} or capture a role. A captured role gives {coin:3} if chosen by someone else; otherwise you play it at round end. Another player must choose Smuggler before you can choose it again.",
+    "Pillez un bateau ou le marché, débauchez des {workers} ou capturez un rôle. Ce dernier rapporte {coin:3} si quelqu’un le choisit ; sinon, vous le jouez en fin de manche. Un autre joueur doit prendre le Contrebandier avant que vous puissiez le reprendre.",
   ],
   ruleAdventurer: [
-    "Only the chooser gains 1 coin, plus the coins already on this role.",
-    "Seul le joueur qui le choisit gagne 1 pièce, en plus des pièces déjà posées sur ce rôle.",
+    "Only the chooser gains {coin:1}, plus the {coins} already on this role.",
+    "Seul le joueur qui le choisit gagne {coin:1}, en plus des {coins} déjà posées sur ce rôle.",
   ],
   ruleFestival: [
     "The first player to fulfill each shared objective earns its reward automatically. Tap it for the exact condition and reward.",
@@ -320,19 +321,19 @@ const labels = {
   ],
   ruleEndWorkers: [
     "The game also ends if the work register cannot be refilled after Recruiter.",
-    "La partie se termine aussi si le registre d’ouvriers ne peut plus être rempli après le Recruteur.",
+    "La partie se termine aussi si le registre d’{workers} ne peut plus être rempli après le Recruteur.",
   ],
   ruleEndCitizens: [
-    "With Citizens, worker shortage does not end the game.",
-    "Avec les Citoyens, le manque d’ouvriers ne déclenche pas la fin de partie.",
+    "With Citizens, {worker} shortage does not end the game.",
+    "Avec les Citoyens, le manque d’{workers} ne déclenche pas la fin de partie.",
   ],
   ruleScore: [
-    "Score your VP tokens, printed building points (even if empty), and occupied buildings’ endgame bonuses. Ties: most coins + remaining crates.",
-    "Comptez vos jetons de score, les points imprimés des bâtiments (même vides) et les bonus finaux des bâtiments occupés. Égalité : le plus de pièces + caisses restantes.",
+    "Score your VP tokens, printed building points (even if empty), and occupied buildings’ endgame bonuses. Ties: most {coins} + remaining {crates}.",
+    "Comptez vos jetons de score, les points imprimés des bâtiments (même vides) et les bonus finaux des bâtiments occupés. Égalité : le plus de {coins} + {crates} restantes.",
   ],
   ruleScoreCitizens: [
-    "Add 1 VP per citizen you own.",
-    "Ajoutez 1 point par citoyen que vous possédez.",
+    "Add {vp:1} per {citizen} you own.",
+    "Ajoutez {vp:1} par {citizen} que vous possédez.",
   ],
   drawn: ["Drawn from the supply", "Pioché dans la réserve"],
   wholeType: ["whole type", "type complet"],
@@ -434,227 +435,230 @@ const labels = {
   selected: ["Selected", "Choisi"],
 };
 const effects = {
-  smallMarket: ["+1 coin when selling.", "+1 pièce par vente."],
+  smallMarket: ["{coin:+1} when selling.", "{coin:+1} par vente."],
   buildersYard: [
-    "May take a quarry during Planter.",
-    "Permet de prendre une carrière au Planteur.",
+    "May take a {quarry} during {planter}.",
+    "Permet de prendre une {quarry} au {planter}.",
   ],
   hacienda: [
     "Optional extra estate from the bag before choosing.",
     "Un domaine pioché en plus, avant votre choix.",
   ],
   smallWarehouse: [
-    "Store every crate of one type, plus the usual crate.",
-    "Conservez un type complet, plus la caisse habituelle.",
+    "Store every {crate} of one type, plus the usual {crate}.",
+    "Conservez un type complet, plus la {crate} habituelle.",
   ],
   hospital: [
-    "One worker on an estate or quarry gained this phase.",
-    "Un ouvrier sur un domaine ou une carrière acquis cette phase.",
+    "{worker:1} on an estate or {quarry} gained this phase.",
+    "{worker:1} sur un domaine ou une {quarry} acquis cette phase.",
   ],
   office: [
     "May sell a type already in the trading house.",
     "Permet de vendre un type déjà au marché.",
   ],
-  largeMarket: ["+2 coins when selling.", "+2 pièces par vente."],
+  largeMarket: ["{coin:+2} when selling.", "{coin:+2} par vente."],
   largeWarehouse: [
-    "Store every crate of two types, plus the usual crate.",
-    "Conservez deux types complets, plus la caisse habituelle.",
+    "Store every {crate} of two types, plus the usual {crate}.",
+    "Conservez deux types complets, plus la {crate} habituelle.",
   ],
   factory: [
-    "Produce 2/3/4/5 types: +1/2/3/5 coins.",
-    "Produisez 2/3/4/5 types : +1/2/3/5 pièces.",
+    "Produce 2/3/4/5 types: {coin:+1/2/3/5}.",
+    "Produisez 2/3/4/5 types : {coin:+1/2/3/5}.",
   ],
   school: [
-    "A newly built building receives one worker.",
-    "Un ouvrier dans votre nouveau bâtiment.",
+    "A newly built building receives {worker:1}.",
+    "{worker:1} dans votre nouveau bâtiment.",
   ],
-  harbor: ["+1 VP per shipment.", "+1 point par chargement."],
+  harbor: ["{vp:+1} per shipment.", "{vp:+1} par chargement."],
   wharf: [
-    "Once per Captain: ship all crates of one type privately.",
-    "Une fois au Capitaine : expédiez un type complet sur votre bateau privé.",
+    "Once per {captain}: ship all {crates} of one type privately.",
+    "Une fois au {captain} : expédiez un type complet sur votre bateau privé.",
   ],
   fireStation: [
-    "Score 1 VP per small production building, 2 per large.",
-    "1 point par petit bâtiment de production, 2 par grand.",
+    "Score {vp:1} per small production building, {vp:2} per large.",
+    "{vp:1} par petit bâtiment de production, {vp:2} par grand.",
   ],
   residence: [
-    "Score 4/5/6/7 VP for 1–9/10/11/12 countryside tiles.",
-    "4/5/6/7 points pour 1–9/10/11/12 tuiles de campagne.",
+    "Score {vp:4/5/6/7} for 1–9/10/11/12 countryside tiles.",
+    "{vp:4/5/6/7} pour 1–9/10/11/12 tuiles de campagne.",
   ],
   fortress: [
-    "Score 1 VP per three workers and citizens.",
-    "1 point par groupe de trois ouvriers ou citoyens.",
+    "Score {vp:1} per 3 {workers} / {citizens}.",
+    "{vp:1} par groupe de 3 {workers} / {citizens}.",
   ],
   customsHouse: [
-    "Score 1 VP per four VP tokens earned.",
-    "1 point par groupe de quatre points gagnés.",
+    "Score {vp:1} per {vp:4} earned.",
+    "{vp:1} par groupe de {vp:4} gagnés.",
   ],
   cityHall: [
-    "Score 1 VP per commercial building, including this one.",
-    "1 point par bâtiment commercial, celui-ci compris.",
+    "Score {vp:1} per commercial building, including this one.",
+    "{vp:1} par bâtiment commercial, celui-ci compris.",
   ],
   canal: [
-    "Large fruit and sugar buildings can produce one extra crate each.",
-    "Les grands bâtiments de fruits et de sucre produisent chacun une caisse en plus.",
+    "Large {fruit} and {sugar} buildings can produce {crate:1} extra each.",
+    "Les grands bâtiments de {fruit} et de {sugar} produisent chacun {crate:1} en plus.",
   ],
   lumberyard: [
-    "May turn newly gained estates into forests. Two forests reduce building costs by 1.",
-    "Transformez de nouveaux domaines en forêts. Deux forêts réduisent de 1 le coût des bâtiments.",
+    "May turn newly gained estates into {forests}. {forest:2} reduce building costs by {coin:1}.",
+    "Transformez de nouveaux domaines en {forests}. {forest:2} réduisent de {coin:1} le coût des bâtiments.",
   ],
   hiddenMarket: [
-    "If short of cash, return at most one worker, one crate and one VP; each pays 1 coin.",
-    "Si l’argent manque, rendez au plus un ouvrier, une caisse et un point ; chacun paie une pièce.",
+    "If short of cash, return at most {worker:1}, {crate:1} and {vp:1}; each pays {coin:1}.",
+    "Si l’argent manque, rendez au plus {worker:1}, {crate:1} et {vp:1} ; chacun paie {coin:1}.",
   ],
   storehouse: [
-    "Keep three additional crates of any types.",
-    "Gardez trois caisses supplémentaires, de types libres.",
+    "Keep {crate:3} extra, of any types.",
+    "Gardez {crate:3} supplémentaires, de types libres.",
   ],
   bohio: [
-    "Move its workers into empty slots to activate them.",
-    "Déplacez ses ouvriers vers des cases libres pour les activer.",
+    "Move its {workers} into empty slots to activate them.",
+    "Déplacez ses {workers} vers des cases libres pour les activer.",
   ],
   merchantOutpost: [
     "Sell directly to the supply, without market bonuses.",
     "Vendez directement à la réserve, sans bonus des marchés.",
   ],
   church: [
-    "Build a 2/3 VP building: +1 VP. Expanded building: +2 VP.",
-    "Bâtiment de 2/3 points construit : +1 point. Grand bâtiment : +2 points.",
+    "Build a {vp:2/3} building: {vp:+1}. Expanded building: {vp:+2}.",
+    "Bâtiment de {vp:2/3} construit : {vp:+1}. Grand bâtiment : {vp:+2}.",
   ],
   smallWharf: [
-    "Once per Captain: ship any mixed cargo, for 1 VP per two crates.",
-    "Une fois au Capitaine : cargaison mixte, 1 point par deux caisses.",
+    "Once per {captain}: ship any mixed cargo, for {vp:1} per {crate:2}.",
+    "Une fois au {captain} : cargaison mixte, {vp:1} par {crate:2}.",
   ],
   lighthouse: [
-    "+1 coin per shipment; +1 coin if you are Captain.",
-    "+1 pièce par chargement ; +1 pièce si vous êtes Capitaine.",
+    "{coin:+1} per shipment; {coin:+1} if you are {captain}.",
+    "{coin:+1} par chargement ; {coin:+1} si vous êtes {captain}.",
   ],
   distillery: [
-    "Earn coins equal to your largest non-corn production, minus one.",
-    "Votre plus grande production hors maïs rapporte autant de pièces, moins une.",
+    "Earn {coins} equal to your largest non-{corn} production, minus one.",
+    "Votre plus grande production hors {corn} rapporte autant de {coins}, moins une.",
   ],
   publishingHouse: [
-    "Double the chosen role’s privilege. Planter gets a second pick after everyone.",
-    "Double le privilège choisi. Au Planteur, choisissez une seconde tuile après les autres.",
+    "Double the chosen role’s privilege. {planter} gets a second pick after everyone.",
+    "Double le privilège choisi. Au {planter}, choisissez une seconde tuile après les autres.",
   ],
   assemblyHall: [
-    "At Captain start: +1 VP per pair of crates of the same type.",
-    "Au début du Capitaine : +1 point par paire de caisses du même type.",
+    "At {captain} start: {vp:+1} per pair of {crates} of the same type.",
+    "Au début du {captain} : {vp:+1} par paire de {crates} du même type.",
   ],
   monument: [
-    "Worth 8 VP without needing a worker.",
-    "Vaut 8 points, même sans ouvrier.",
+    "Worth {vp:8} without needing a {worker}.",
+    "Vaut {vp:8}, même sans {worker}.",
   ],
   cathedral: [
-    "Sets of three matching countryside tiles score 1/3/6/10 VP for 1/2/3/4 sets.",
-    "1/2/3/4 groupes de trois tuiles identiques : 1/3/6/10 points.",
+    "Sets of three matching countryside tiles score {vp:1/3/6/10} for 1/2/3/4 sets.",
+    "1/2/3/4 groupes de trois tuiles identiques : {vp:1/3/6/10}.",
   ],
   zoningOffice: [
-    "Trader: worker buys a random estate for 1 coin; citizen discards an estate for 1 coin.",
-    "Marchand : l’ouvrier achète un domaine pioché pour 1 pièce ; le citoyen vend un domaine pour 1 pièce.",
+    "{trader}: {worker} buys a random estate for {coin:1}; {citizen} discards an estate for {coin:1}.",
+    "{trader} : l’{worker} achète un domaine pioché pour {coin:1} ; le {citizen} vend un domaine pour {coin:1}.",
   ],
   chapel: [
-    "Craftsman: worker earns 1 coin; citizen earns 1 VP.",
-    "Artisan : l’ouvrier gagne 1 pièce ; le citoyen gagne 1 point.",
+    "{craftsman}: {worker} earns {coin:1}; {citizen} earns {vp:1}.",
+    "{craftsman} : l’{worker} gagne {coin:1} ; le {citizen} gagne {vp:1}.",
   ],
   parkAuthority: [
-    "Planter: worker may discard an estate/forest; citizen earns 2 VP with strictly fewest countryside tiles.",
-    "Planteur : l’ouvrier peut retirer un domaine/forêt ; le citoyen gagne 2 points si vous avez strictement le moins de tuiles de campagne.",
+    "{planter}: {worker} may discard an estate/{forest}; {citizen} earns {vp:2} with strictly fewest countryside tiles.",
+    "{planter} : l’{worker} peut retirer un domaine/{forest} ; le {citizen} gagne {vp:2} si vous avez strictement le moins de tuiles de campagne.",
   ],
   notary: [
-    "Worker: regular buildings cost 1 less. Citizen: expanded buildings cost 2 less.",
-    "Ouvrier : −1 pièce sur les bâtiments simples. Citoyen : −2 sur les grands bâtiments.",
+    "{worker}: regular buildings cost {coin:1} less. {citizen}: expanded buildings cost {coin:2} less.",
+    "{worker} : {coin:−1} sur les bâtiments simples. {citizen} : {coin:−2} sur les grands bâtiments.",
   ],
   pensionOffice: [
-    "Before shipping, exchange distinct goods for 1 VP each, up to your citizen count.",
-    "Avant de charger, échangez des types différents contre 1 point chacun, au plus autant que vos citoyens.",
+    "Before shipping, exchange distinct goods for {vp:1} each, up to your {citizen} count.",
+    "Avant de charger, échangez des types différents contre {vp:1} chacun, au plus autant que vos {citizens}.",
   ],
   villa: [
-    "Recruiter: receive one citizen, or one worker if citizens have run out.",
-    "Recruteur : recevez un citoyen, ou un ouvrier si les citoyens sont épuisés.",
+    "{recruiter}: receive {citizen:1}, or {worker:1} if {citizens} have run out.",
+    "{recruiter} : recevez {citizen:1}, ou {worker:1} si les {citizens} sont épuisés.",
   ],
   tailorShop: [
-    "Craftsman: gain 1 coin per citizen. Counts as a large production building.",
-    "Artisan : 1 pièce par citoyen. Compte comme grand bâtiment de production.",
+    "{craftsman}: gain {coin:1} per {citizen}. Counts as a large production building.",
+    "{craftsman} : {coin:1} par {citizen}. Compte comme grand bâtiment de production.",
   ],
   townSquare: [
-    "Each citizen scores one extra VP.",
-    "Chaque citoyen rapporte un point supplémentaire.",
+    "Each {citizen} scores {vp:1} extra.",
+    "Chaque {citizen} rapporte {vp:1} supplémentaire.",
   ],
 };
 const roleActions = {
   planter: [
-    "Take one estate from the face-up offer.",
-    "Prenez un domaine parmi les tuiles révélées.",
+    "Take {estate:1} from the face-up offer.",
+    "Prenez {estate:1} parmi les tuiles révélées.",
   ],
   recruiter: [
-    "Share the register’s workers, one at a time in turn order, then reassign all your workers and citizens.",
-    "Répartissez les ouvriers du registre un par un dans l’ordre du tour, puis réaffectez tous vos ouvriers et citoyens.",
+    "Share the register’s {workers}, one at a time in turn order, then reassign all your {workers} and {citizens}.",
+    "Répartissez les {workers} du registre un par un dans l’ordre du tour, puis réaffectez tous vos {workers} et {citizens}.",
   ],
   builder: [
-    "You may buy one building. Occupied quarries reduce its price, up to the building’s limit.",
-    "Vous pouvez acheter un bâtiment. Les carrières occupées réduisent son prix, dans la limite du bâtiment.",
+    "You may buy one building. Occupied {quarries} reduce its price, up to the building’s limit.",
+    "Vous pouvez acheter un bâtiment. Les {quarries} occupées réduisent son prix, dans la limite du bâtiment.",
   ],
   craftsman: [
-    "Produce with occupied estates and matching production buildings. Corn needs only an occupied estate.",
-    "Produisez avec les domaines et bâtiments de production correspondants occupés. Le maïs n’a besoin que d’un domaine occupé.",
+    "Produce with occupied estates and matching production buildings. {corn} needs only an occupied estate.",
+    "Produisez avec les domaines et bâtiments de production correspondants occupés. Le {corn} n’a besoin que d’un domaine occupé.",
   ],
   trader: [
-    "You may sell one crate for coins. The trading house holds four crates, all of different types.",
-    "Vous pouvez vendre une caisse contre des pièces. Le marché contient au plus quatre caisses, de types différents.",
+    "You may sell {crate:1} for {coins}. The trading house holds {crate:4}, all of different types.",
+    "Vous pouvez vendre {crate:1} contre des {coins}. Le marché contient au plus {crate:4}, de types différents.",
   ],
   captain: [
-    "Take turns loading one type of good for 1 point per crate. Shipping is mandatory when possible. Keep your allowed storage, then discard the rest.",
-    "Chargez chacun votre tour un type de marchandise : 1 point par caisse. Expédier est obligatoire si possible. Stockez ce que vous pouvez conserver et perdez le reste.",
+    "Take turns loading one type of good for {vp:1} per {crate}. Shipping is mandatory when possible. Keep your allowed storage, then discard the rest.",
+    "Chargez chacun votre tour un type de marchandise : {vp:1} par {crate}. Expédier est obligatoire si possible. Stockez ce que vous pouvez conserver et perdez le reste.",
   ],
   adventurer: [
-    "Gain 1 coin from the supply, plus any coins on this role. Other players do nothing.",
-    "Gagnez 1 pièce de la réserve, en plus des pièces posées sur ce rôle. Les autres joueurs ne font rien.",
+    "Gain {coin:1} from the supply, plus any {coins} on this role. Other players do nothing.",
+    "Gagnez {coin:1} de la réserve, en plus des {coins} posées sur ce rôle. Les autres joueurs ne font rien.",
   ],
   smuggler: [
-    "Raid a ship, plunder the trading house, poach surplus workers, or capture a role. Other players do nothing.",
-    "Pillez un bateau ou le marché, débauchez des ouvriers excédentaires ou capturez un rôle. Les autres joueurs ne font rien.",
+    "Raid a ship, plunder the trading house, poach surplus {workers}, or capture a role. Other players do nothing.",
+    "Pillez un bateau ou le marché, débauchez des {workers} excédentaires ou capturez un rôle. Les autres joueurs ne font rien.",
   ],
 };
 const rolePrivileges = {
   planter: [
-    "You may choose a quarry instead of an estate.",
-    "Vous pouvez choisir une carrière à la place du domaine.",
+    "You may choose a {quarry} instead of an estate.",
+    "Vous pouvez choisir une {quarry} à la place du domaine.",
   ],
   recruiter: [
-    "You may take one extra worker from the supply before sharing the register.",
-    "Vous pouvez prendre un ouvrier supplémentaire de la réserve avant le partage du registre.",
+    "You may take {worker:1} extra from the supply before sharing the register.",
+    "Vous pouvez prendre {worker:1} supplémentaire de la réserve avant le partage du registre.",
   ],
   builder: [
-    "Your building costs 1 coin less.",
-    "Votre bâtiment coûte 1 pièce de moins.",
+    "Your building costs {coin:1} less.",
+    "Votre bâtiment coûte {coin:1} de moins.",
   ],
   craftsman: [
-    "After everyone produces, take one extra crate of a type you produced, if available.",
-    "Après la production de tous, prenez une caisse supplémentaire d’un type que vous avez produit, si disponible.",
+    "After everyone produces, take {crate:1} extra of a type you produced, if available.",
+    "Après la production de tous, prenez {crate:1} supplémentaire d’un type que vous avez produit, si disponible.",
   ],
   trader: [
-    "Your sale earns 1 extra coin.",
-    "Votre vente rapporte 1 pièce supplémentaire.",
+    "Your sale earns {coin:+1}.",
+    "Votre vente rapporte {coin:1} supplémentaire.",
   ],
   captain: [
-    "Your first shipment earns 1 extra point.",
-    "Votre premier chargement rapporte 1 point supplémentaire.",
+    "Your first shipment earns {vp:+1}.",
+    "Votre premier chargement rapporte {vp:1} supplémentaire.",
   ],
   smuggler: [
-    "A captured role pays 3 coins if another player chooses it; otherwise you play it at round end. Someone else must choose Smuggler before you can choose it again.",
-    "Un rôle capturé rapporte 3 pièces si un autre joueur le choisit ; sinon vous le jouez en fin de manche. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
+    "A captured role pays {coin:3} if another player chooses it; otherwise you play it at round end. Someone else must choose Smuggler before you can choose it again.",
+    "Un rôle capturé rapporte {coin:3} si un autre joueur le choisit ; sinon vous le jouez en fin de manche. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
   ],
 };
 export function translator(locale = "en") {
   const fr = locale.toLowerCase().startsWith("fr");
-  const t = (key) => labels[key]?.[fr ? 1 : 0] ?? key;
-  t.effect = (id) => effects[id]?.[fr ? 1 : 0] ?? "";
-  t.roleAction = (id) =>
-    roleActions[id === "adventurer2" ? "adventurer" : id]?.[fr ? 1 : 0] ?? "";
-  t.rolePrivilege = (id) =>
-    rolePrivileges[id === "adventurer2" ? "adventurer" : id]?.[fr ? 1 : 0] ??
-    "";
+  const pick = (pair) => pair?.[fr ? 1 : 0] ?? "";
+  const roleId = (id) => (id === "adventurer2" ? "adventurer" : id);
+  const t = (key) => plainText(labels[key]?.[fr ? 1 : 0] ?? key, fr);
+  t.html = (key) => richText(labels[key]?.[fr ? 1 : 0] ?? key, fr);
+  t.effectHtml = (id) => richText(pick(effects[id]), fr);
+  t.roleActionHtml = (id) => richText(pick(roleActions[roleId(id)]), fr);
+  t.rolePrivilegeHtml = (id) => richText(pick(rolePrivileges[roleId(id)]), fr);
+  t.effect = (id) => plainText(pick(effects[id]), fr);
+  t.roleAction = (id) => plainText(pick(roleActions[roleId(id)]), fr);
+  t.rolePrivilege = (id) => plainText(pick(rolePrivileges[roleId(id)]), fr);
   t.fr = fr;
   return t;
 }
