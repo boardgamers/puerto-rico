@@ -1,0 +1,11 @@
+{
+  "name": "Puerto Rico: Special Edition",
+  "players": [2, 3, 4, 5],
+  "topLevelVariable": "puertorico",
+  "options": [],
+  "expansions": [],
+  "preferences": [],
+  "settings": [],
+  "status": "local-preview",
+  "locales": ["en", "fr"]
+}

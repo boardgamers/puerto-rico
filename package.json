@@ -1,0 +1,23 @@
+{
+  "name": "@boardgamers/puerto-rico",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Puerto Rico 1897 Special Edition for Boardgamers Space",
+  "scripts": {
+    "test": "node --test test/*.test.js",
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "test:browser": "node test/browser.mjs"
+  },
+  "dependencies": {
+    "@boardgamers/protocol": "0.8.0",
+    "@noble/hashes": "2.0.1",
+    "morphdom": "2.7.8"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "playwright": "1.62.1",
+    "prettier": "3.6.2"
+  }
+}
