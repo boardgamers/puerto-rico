@@ -85,7 +85,7 @@ const labels = {
   reserve: ["Reserve", "Réserve"],
   vp: ["Victory points", "Points de victoire"],
   coins: ["Coins", "Pièces"],
-  round: ["Round", "Manche"],
+  round: ["Round", "Tour"],
   governor: ["Governor", "Gouverneur"],
   you: ["You", "Vous"],
   rules: ["How to play", "Comment jouer"],
@@ -113,6 +113,7 @@ const labels = {
   ],
   choosePlant: ["Choose an estate", "Choisissez un domaine"],
   chooseBuild: ["Choose a building", "Choisissez un bâtiment"],
+  emptyCity: ["No buildings yet", "Aucun bâtiment"],
   chooseRecruit: ["Choose a worker", "Choisissez un ouvrier"],
   assign: ["Assign workers", "Affectez les ouvriers"],
   autoAssign: ["Suggest allocation", "Proposer une répartition"],
@@ -212,7 +213,7 @@ const labels = {
     "Win with the most VP: ship goods and develop your city. Coins pay for buildings; goods can be sold for {coins} or shipped for points.",
     "Gagnez avec le plus de points de victoire en expédiant des marchandises et en développant votre ville. Les {coins} financent les bâtiments ; les marchandises se vendent contre des {coins} ou s’expédient contre des points.",
   ],
-  ruleRoundTitle: ["How a round works", "Comment se déroule une manche"],
+  ruleRoundTitle: ["How a round works", "Comment se déroule un tour de table"],
   ruleChooseTitle: ["Choose a role", "Choisir un rôle"],
   ruleChoose: [
     "The Governor chooses an available role and takes its coins. That role becomes the next phase; there is no fixed role order.",
@@ -226,13 +227,16 @@ const labels = {
   ruleNextTitle: ["The next player chooses", "Le joueur suivant choisit"],
   ruleNext: [
     "After the phase, the next player chooses a different role. Repeat until everyone has chosen once. Used roles stay unavailable this round.",
-    "Après la phase, le joueur suivant choisit un autre rôle. Continuez jusqu’à ce que chacun ait choisi une fois. Les rôles utilisés restent indisponibles cette manche.",
+    "Après la phase, le joueur suivant choisit un autre rôle. Continuez jusqu’à ce que chacun ait choisi une fois. Les rôles utilisés restent indisponibles jusqu’au prochain tour de table.",
   ],
   ruleNextTwo: [
     "After each phase, alternate choosing different roles until you have each chosen three. Used roles stay unavailable this round.",
-    "Après chaque phase, choisissez alternativement un autre rôle, jusqu’à trois choix chacun. Les rôles utilisés restent indisponibles cette manche.",
+    "Après chaque phase, choisissez alternativement un autre rôle, jusqu’à trois choix chacun. Les rôles utilisés restent indisponibles jusqu’au prochain tour de table.",
   ],
-  ruleResetTitle: ["Prepare the next round", "Préparer la manche suivante"],
+  ruleResetTitle: [
+    "Prepare the next round",
+    "Préparer le tour de table suivant",
+  ],
   ruleReset: [
     "Add {coin:1} to each unchosen role, return the chosen roles, and pass the Governor to the next player.",
     "Ajoutez {coin:1} sur chaque rôle non choisi, rendez les rôles choisis, puis passez le Gouverneur au joueur suivant.",
@@ -304,7 +308,7 @@ const labels = {
   ],
   ruleSmuggler: [
     "Raid a ship, plunder the market, poach {workers} or capture a role. A captured role gives {coin:3} if chosen by someone else; otherwise you play it at round end. Another player must choose Smuggler before you can choose it again.",
-    "Pillez un bateau ou le marché, débauchez des {workers} ou capturez un rôle. Ce dernier rapporte {coin:3} si quelqu’un le choisit ; sinon, vous le jouez en fin de manche. Un autre joueur doit prendre le Contrebandier avant que vous puissiez le reprendre.",
+    "Pillez un bateau ou le marché, débauchez des {workers} ou capturez un rôle. Ce dernier rapporte {coin:3} si quelqu’un le choisit ; sinon, vous le jouez en fin de tour de table. Un autre joueur doit prendre le Contrebandier avant que vous puissiez le reprendre.",
   ],
   ruleAdventurer: [
     "Only the chooser gains {coin:1}, plus the {coins} already on this role.",
@@ -316,12 +320,12 @@ const labels = {
   ],
   ruleEndTitle: ["End of the game", "Fin de la partie"],
   ruleEnd: [
-    "Finish the current round when a city fills its 12 spaces or the VP token supply runs out.",
-    "Terminez la manche en cours lorsqu’une ville remplit ses 12 cases ou que la réserve de jetons de score est épuisée.",
+    "A full city (12 spaces) or an empty VP token supply triggers the end of the game. Finish the current round’s remaining role phases, then count points.",
+    "Une ville pleine (12 cases) ou une réserve de jetons de score vide déclenche la fin de partie. Terminez les phases de rôles du tour de table en cours, puis comptez les points.",
   ],
   ruleEndWorkers: [
-    "The game also ends if the work register cannot be refilled after Recruiter.",
-    "La partie se termine aussi si le registre d’{workers} ne peut plus être rempli après le Recruteur.",
+    "Being unable to refill the work register after Recruiter also triggers the end of the game, at the end of that round.",
+    "Si le registre d’{workers} ne peut plus être rempli après le Recruteur, la partie se termine aussi à la fin du tour de table en cours.",
   ],
   ruleEndCitizens: [
     "With Citizens, {worker} shortage does not end the game.",
@@ -644,7 +648,7 @@ const rolePrivileges = {
   ],
   smuggler: [
     "A captured role pays {coin:3} if another player chooses it; otherwise you play it at round end. Someone else must choose Smuggler before you can choose it again.",
-    "Un rôle capturé rapporte {coin:3} si un autre joueur le choisit ; sinon vous le jouez en fin de manche. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
+    "Un rôle capturé rapporte {coin:3} si un autre joueur le choisit ; sinon vous le jouez en fin de tour de table. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
   ],
 };
 export function translator(locale = "en") {
