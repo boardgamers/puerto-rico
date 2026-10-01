@@ -1,6 +1,6 @@
 # Puerto Rico: Special Edition
 
-Local implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Nothing has been uploaded or published.
+Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.1.0`; English and French are configured in the platform metadata.
 
 ```sh
 pnpm install
@@ -31,6 +31,7 @@ The engine accepts the optional `costSwap`, `alternativeStart`, `tailorLimit` an
 
 - French and English, using the platform locale; no language controls.
 - Distinct goods pictograms; color is supplementary.
+- Paper, terracotta and sea-green visual theme in light/dark modes; original vector town illustration, larger corn and a repeat-privilege pictogram.
 - Editable worker allocation, goods storage, building details, private shipping, final scoring.
 - Desktop and mobile layout, incremental DOM updates, native page and modal scrolling.
 - BGS chat and replay, concealed VP totals, server-only randomness and future draws.
@@ -45,3 +46,9 @@ pnpm test:browser   # 320/390/768/1440px, real viewer events, chat/journal scrol
 ```
 
 The implementation remains a preview pending playtesting, the missing card data, and the rule ambiguity noted above. Original vector UI artwork is in `viewer/icons.js`; reference scans in `.local/` are ignored and never bundled.
+
+## Private BGS publication
+
+`pnpm publish:private` builds the bundles, packages only the self-contained engine and its manifest, checks complete 2–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, refuses to replace a public version, and verifies the private/listed flags and CDN bytes. It grants beta access to `coyotte508` if needed. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
+
+The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Tutorials are not yet registered.
