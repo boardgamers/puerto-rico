@@ -411,6 +411,7 @@
 .pr-game .estates {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-auto-rows: 1fr;
   gap: 5px;
 }
 .pr-game .estate {
@@ -428,7 +429,6 @@
 .pr-game .empty-estate {
   background: transparent;
   border-style: dashed;
-  min-height: 36px;
 }
 .pr-game .worker-slots {
   display: flex;
@@ -577,15 +577,47 @@
   font-size: 20px;
   line-height: 1.2;
 }
-.pr-game .bcard-cost small {
-  font-size: 10px;
-  color: var(--muted);
-  margin-bottom: 3px;
-}
 .pr-game .bcard-effect {
   grid-column: 1/-1;
   font-size: 12px;
   line-height: 1.45;
+}
+.pr-game .building-symbols,
+.pr-game .building-symbols > span {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.pr-game .effect-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 28px;
+}
+.pr-game .effect-quantity,
+.pr-game .effect-options {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.pr-game .effect-caption {
+  font-size: 11px;
+  line-height: 1.35;
+}
+.pr-game .move.compact-action {
+  min-height: 44px;
+  min-width: 48px;
+  padding: 8px 12px;
+}
+.pr-game .compact-action .metric {
+  font-size: 16px;
+}
+.pr-game .compact-action .metric .icon {
+  width: 27px;
+  height: 27px;
 }
 .pr-game .bcard-stats {
   grid-column: 1/-1;
@@ -1225,9 +1257,6 @@
   }
   .pr-game .estate {
     min-height: 59px;
-  }
-  .pr-game .empty-estate {
-    min-height: 32px;
   }
   .pr-game .modal-body {
     padding: 14px;

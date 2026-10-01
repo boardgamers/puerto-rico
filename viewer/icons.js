@@ -20,6 +20,22 @@ const paths = {
   vp: '<path fill="#60a0bb" d="m12 2 9 5v10l-9 5-9-5V7Z"/><path stroke="#fff" d="m6 12 4 4 8-8"/>',
   building:
     '<path fill="#d6b994" d="M4 10h16v12H4Z"/><path fill="#b16b4e" d="m2 10 10-8 10 8Z"/><path d="M10 22v-7h4v7M7 13v3m10-3v3"/>',
+  crate:
+    '<rect x="3" y="4" width="18" height="17" rx="2" fill="#c8a77a"/><path d="M3 8h18M3 17h18M7 4v17M17 4v17m-7-9h4"/>',
+  storage:
+    '<path fill="#b6b69a" d="M3 9h18v13H3Z"/><path fill="#9b7555" d="m1 9 11-7 11 7Z"/><rect x="8" y="13" width="8" height="9" fill="#d4b989"/><path d="M8 17h8"/>',
+  estate:
+    '<path fill="#8eab6b" d="m3 8 9-5 9 5v11l-9 3-9-3Z"/><path d="m3 8 9 4 9-4m-9 4v10M6 13l3 1m-3 3 3 1m6-4 3-1m-3 5 3-1"/>',
+  space:
+    '<rect x="3" y="3" width="18" height="18" rx="3" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>',
+  citySpace:
+    '<rect x="2" y="5" width="9" height="15" rx="2"/><rect x="13" y="5" width="9" height="15" rx="2"/>',
+  scoring:
+    '<path d="M5 22V2m0 1h15v11H5"/><path d="m5 3 5 5 5-5 5 5m-15 0 5 6 5-6 5 6"/>',
+  noWorker:
+    '<circle cx="12" cy="5" r="3" fill="#dec594"/><path fill="#dec594" d="M8 10h8l4 11H4Z"/><path stroke-width="3" d="m2 22 20-20"/>',
+  autoAssign:
+    '<path d="m4 21 12-12m-2-6 1-3 1 3 3 1-3 1-1 3-1-3-3-1 3-1ZM4 9l1-3 1 3 3 1-3 1-1 3-1-3-3-1 3-1m16 5 1-2 1 2 2 1-2 1-1 2-1-2-2-1 2-1"/>',
   planter:
     '<path d="M12 22V10"/><path fill="#72a47b" d="M12 12C3 12 2 7 3 4c6 0 9 3 9 8Zm0-2c7 0 10-4 9-8-6 0-9 3-9 8Z"/>',
   recruiter:

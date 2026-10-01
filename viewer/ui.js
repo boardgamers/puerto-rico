@@ -11,6 +11,7 @@ import {
 import { translator } from "./i18n.js";
 import { icon } from "./icons.js";
 import { journalContent } from "./journal.js";
+import { buildingSymbols } from "./building-symbols.js";
 import css from "./style.css";
 
 const esc = (x) =>
@@ -89,8 +90,14 @@ export function mountGame(
   }
   configureChat();
   const allowed = () => enabled && !pending && seat === state?.tasks[0]?.p;
-  const moveButton = (m, label, pictogram, classes = "") =>
-    `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${m.decline?.length ? `<small>${t("withoutBonus")} · ${m.decline.map((id) => t(id)).join(", ")}</small>` : ""}</span></button>`;
+  const moveButton = (m, label, pictogram, classes = "", description = "") => {
+    const hint =
+      description +
+      (description && m.decline?.length
+        ? ` · ${t("withoutBonus")} : ${m.decline.map((id) => t(id)).join(", ")}`
+        : "");
+    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" aria-label="${esc(hint)}"` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${m.decline?.length ? `<small>${t("withoutBonus")} · ${m.decline.map((id) => t(id)).join(", ")}</small>` : ""}</span></button>`;
+  };
   function show(title, html, mode = "") {
     lastFocus = document.activeElement;
     modalMode = mode;
@@ -203,6 +210,52 @@ export function mountGame(
       (b) => b.id === id && b.w + b.c > 0,
     );
   }
+  function compactAction(m) {
+    const arrow = icon("arrow", 20);
+    switch (m.type) {
+      case "trade": {
+        const value =
+          GOODS.indexOf(m.good) +
+          (seat === state.owner ? (has("publishingHouse") ? 2 : 1) : 0) +
+          (m.outpost
+            ? 0
+            : (has("smallMarket") ? 1 : 0) + (has("largeMarket") ? 2 : 0));
+        return [
+          `${metric(m.good, 1)}${arrow}${metric("coin", value)}${m.outpost ? `<small>${t("outpost")}</small>` : ""}`,
+          `${t("trade")} : ${t(m.good)} → ${value} ${t("coins")}${m.outpost ? ` · ${t("outpost")}` : ""}`,
+        ];
+      }
+      case "ship": {
+        const ownShip = m.ship === "wharf";
+        const ship = ownShip ? null : state.ships[m.ship];
+        const amount = Math.min(
+          state.players[seat].goods[m.good],
+          ownShip ? Infinity : ship.capacity - ship.amount,
+        );
+        return [
+          `${metric(m.good, amount)}${arrow}${ownShip ? `${icon("ship", 27)}<small>${t("wharfShip")}</small>` : metric("ship", `${ship.amount}/${ship.capacity}`)}`,
+          `${t("ship")} : ${amount} ${t(m.good)} → ${ownShip ? t("wharfShip") : `${t("journalShipCapacity")} ${ship.capacity} (${ship.amount}/${ship.capacity})`}`,
+        ];
+      }
+      case "produceBonus":
+        return [metric(m.good, "+1"), `${t("produceBonus")} : ${t(m.good)}`];
+      case "recruit":
+      case "discardWorker": {
+        const person = m.kind === "c" ? "citizen" : "worker";
+        return [
+          metric(person, m.type === "recruit" ? "+1" : "−1"),
+          `${t(m.type === "recruit" ? "chooseRecruit" : "discardWorker")} : ${t(m.kind === "c" ? "citizens" : "workers")}`,
+        ];
+      }
+      case "pension":
+        return [
+          `${metric(m.good, 1)}${arrow}${metric("vp", 1)}`,
+          `${t("pensionOffice")} : ${t(m.good)} → 1 ${t("vp")}`,
+        ];
+      default:
+        return null;
+    }
+  }
   function actionPanel() {
     if (!allowed()) return "";
     const task = state.tasks[0],
@@ -210,10 +263,33 @@ export function mountGame(
         (m) => m.type !== "bohio" && (m.type !== "pass" || m.decline?.length),
       );
     if (task.kind === "assign")
-      return `<div class="assignment-tools" role="group" aria-label="${esc(t("workers"))}">${["w", "c", "erase"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}">${icon(k === "w" ? "worker" : k === "c" ? "citizen" : "erase")}${k === "erase" ? "" : remaining()[k]}</button>`).join("")}<button data-auto>${t("autoAssign")}</button><span>${t("workerTool")}</span></div>`;
+      return `<div class="assignment-tools" role="group" aria-label="${esc(t("workers"))}">${["w", "c", "erase"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}" aria-label="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}" title="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}">${icon(k === "w" ? "worker" : k === "c" ? "citizen" : "erase")}${k === "erase" ? "" : remaining()[k]}</button>`).join("")}<button class="icon-button" data-auto title="${esc(t("autoAssign"))}" aria-label="${esc(t("autoAssign"))}">${icon("autoAssign")}</button><span>${t("workerTool")}</span></div>`;
     if (task.kind === "store") return storageEditor();
     if (["role", "draft", "build", "plant"].includes(task.kind)) return "";
-    return `<div class="action-choices">${moves.map((m) => moveButton(m, moveLabel(m), m.good ?? { recruit: m.kind === "c" ? "citizen" : "worker", produce: "craftsman", hacienda: "planter", villa: "citizen", recruitBonus: "worker", raid: "smuggler", plunder: "smuggler", poach: "recruiter", capture: m.id, forest: m.forest ? "forest" : task.id }[m.type])).join("")}</div>`;
+    return `<div class="action-choices">${moves
+      .map((m) => {
+        const compact = compactAction(m);
+        return compact
+          ? moveButton(m, compact[0], null, "compact-action", compact[1])
+          : moveButton(
+              m,
+              moveLabel(m),
+              m.good ??
+                {
+                  recruit: m.kind === "c" ? "citizen" : "worker",
+                  produce: "craftsman",
+                  hacienda: "planter",
+                  villa: "citizen",
+                  recruitBonus: "worker",
+                  raid: "smuggler",
+                  plunder: "smuggler",
+                  poach: "recruiter",
+                  capture: m.id,
+                  forest: m.forest ? "forest" : task.id,
+                }[m.type],
+            );
+      })
+      .join("")}</div>`;
   }
   function remaining() {
     const a = state.players[seat];
@@ -237,7 +313,7 @@ export function mountGame(
     )
       .map(
         (g) =>
-          `<div>${icon(g, 28)}<strong>${t(g)}</strong>${slots ? `<button data-storetype="${g}" class="${draft.types.includes(g) ? "selected" : ""}" aria-pressed="${draft.types.includes(g)}">${t("full")}</button>` : ""}<button class="icon-button" data-qty="${g}:-1" aria-label="${esc(t("minus"))}">${icon("minus")}</button><b>${draft.goods[g]} / ${state.players[seat].goods[g]}</b><button class="icon-button" data-qty="${g}:1" aria-label="${esc(t("plus"))}">${icon("plus")}</button></div>`,
+          `<div>${icon(g, 28)}<strong>${t(g)}</strong>${slots ? `<button data-storetype="${g}" class="${draft.types.includes(g) ? "selected" : ""}" aria-pressed="${draft.types.includes(g)}" title="${esc(t("totalStorage"))}" aria-label="${esc(t("totalStorage"))}">${icon("storage", 24)}</button>` : ""}<button class="icon-button" data-qty="${g}:-1" aria-label="${esc(t("minus"))}">${icon("minus")}</button><b>${draft.goods[g]} / ${state.players[seat].goods[g]}</b><button class="icon-button" data-qty="${g}:1" aria-label="${esc(t("plus"))}">${icon("plus")}</button></div>`,
       )
       .join("")}</div>`;
   }
@@ -326,10 +402,10 @@ export function mountGame(
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
         return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${icon(spriteFor(id), 30)}<strong>${t(id)}</strong></span>
-          <span class="bcard-cost"><small>${t("cost")}</small>${metric("coin", price)}</span>
-          <span class="bcard-effect">${esc(buildingEffect(id))}</span>
+          <span class="bcard-cost" title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>
+          <span class="bcard-effect">${buildingSymbols(id, t)}</span>
           <span class="bcard-stats"><span class="points-badge" title="${esc(t("printedPoints"))}">${icon("vp", 20)}<b>${b.vp} ${t("shortVP")}</b></span>${buildingSlots(b)}</span>
-          <span class="bcard-stock">${b.size === 2 ? `<span class="city-footprint" title="${esc(t("twoCitySpaces"))}">▭▭ ${t("twoCitySpaces")}</span>` : ""}<span>${stock}</span></span>
+          <span class="bcard-stock">${b.size === 2 ? `<span class="city-footprint" title="${esc(t("twoCitySpaces"))}" aria-label="${esc(t("twoCitySpaces"))}">${icon("citySpace", 22)}</span>` : ""}<span>${stock}</span></span>
         </button>`;
       })
       .join("")}</div></section>`;
