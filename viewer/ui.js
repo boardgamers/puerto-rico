@@ -81,11 +81,16 @@ export function mountGame(
       : "";
   };
   const playerMarker = (i, decorative = false) => {
+    const custom = preferences.bgs?.playerColors?.[i];
+    const color =
+      custom && /^#[a-f0-9]{6}$/i.test(custom)
+        ? custom
+        : playerColors[i % playerColors.length];
     const colorBlind = preferences.colorBlind === true;
     const shape = colorBlind
       ? playerShapes[i % playerShapes.length]
       : playerMeeple;
-    return `<span class="player-marker${colorBlind ? " player-marker-shaped" : ""}" style="--player-color:${playerColors[i % playerColors.length]}" ${decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(state.players[i].name)}"`} title="${esc(state.players[i].name)}"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="#ffffffbb" stroke-width="1.5" stroke-linejoin="round">${shape}</svg></span>`;
+    return `<span class="player-marker${colorBlind ? " player-marker-shaped" : ""}" style="--player-color:${color}" ${decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(state.players[i].name)}"`} title="${esc(state.players[i].name)}"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="#ffffffbb" stroke-width="1.5" stroke-linejoin="round">${shape}</svg></span>`;
   };
   const pointsBadge = (n) =>
     `<span class="points-badge" role="img" title="${esc(t("printedPoints"))} : ${n}" aria-label="${esc(t("printedPoints"))} : ${n}">${scoreToken(n, 28)}</span>`;
