@@ -338,10 +338,10 @@ const labels = {
   drawn: ["Drawn from the supply", "Pioché dans la réserve"],
   wholeType: ["whole type", "type complet"],
   commercialOnly: ["Commercial buildings", "Bâtiments commerciaux"],
-  oncePerCaptain: ["Once per Captain", "Une fois au Capitaine"],
+  oncePerCaptain: ["Once per {captain}", "Une fois au {captain}"],
   mixedOncePerCaptain: [
-    "Mixed · once per Captain",
-    "Mixte · une fois au Capitaine",
+    "Mixed · once per {captain}",
+    "Mixte · une fois au {captain}",
   ],
   largeProductionOnly: [
     "Large production buildings",
@@ -354,7 +354,7 @@ const labels = {
     "Vente directe · sans bonus de marché",
   ],
   privilege: ["Privilege", "Privilège"],
-  captainStart: ["At Captain start", "Au début du Capitaine"],
+  captainStart: ["At {captain} start", "Au début du {captain}"],
   sameType: ["Of the same type", "Du même type"],
   workerIfEmpty: [
     "Worker if no citizens remain",

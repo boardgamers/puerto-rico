@@ -14,9 +14,10 @@ const quantity = (id, n) =>
     : `<span class="effect-quantity">${icon(id, 24)}<b>${n}</b></span>`;
 const arrow = () => icon("arrow", 18);
 const row = (...parts) => `<span class="effect-row">${parts.join("")}</span>`;
-const caption = (text) => `<small class="effect-caption">${esc(text)}</small>`;
 
 export function buildingSymbols(id, t) {
+  const caption = (key) =>
+    `<small class="effect-caption">${t.html(key)}</small>`;
   const b = B[id];
   const full =
     b.good && b.good !== "tailor"
@@ -40,7 +41,7 @@ export function buildingSymbols(id, t) {
         break;
       case "hacienda":
         visual =
-          row(icon("planter"), quantity("estate", "+1")) + caption(t("drawn"));
+          row(icon("planter"), quantity("estate", "+1")) + caption("drawn");
         break;
       case "smallWarehouse":
       case "largeWarehouse":
@@ -66,7 +67,7 @@ export function buildingSymbols(id, t) {
       case "wharf":
         visual =
           row(icon("ship", 28), `<b>1 ${t("wholeType")}</b>`) +
-          caption(t("oncePerCaptain"));
+          caption("oncePerCaptain");
         break;
       case "customsHouse":
         visual = row(
@@ -83,12 +84,12 @@ export function buildingSymbols(id, t) {
             icon("building"),
             arrow(),
             quantity("vp", "+1"),
-          ) + caption(t("commercialOnly"));
+          ) + caption("commercialOnly");
         break;
       case "canal":
         visual =
           row(quantity("fruit", "+1"), quantity("sugar", "+1")) +
-          caption(t("largeProductionOnly"));
+          caption("largeProductionOnly");
         break;
       case "lumberyard":
         visual =
@@ -97,13 +98,13 @@ export function buildingSymbols(id, t) {
         break;
       case "hiddenMarket":
         visual =
-          caption(t("ifShortOfCash")) +
+          caption("ifShortOfCash") +
           row(
             `<span class="effect-options">${icon("worker")}/${icon("crate")}/${icon("vp")}</span>`,
             arrow(),
             quantity("coin", 1),
           ) +
-          caption(t("oneOfEachMax"));
+          caption("oneOfEachMax");
         break;
       case "storehouse":
         visual = row(icon("storage", 28), quantity("crate", "+3"));
@@ -114,12 +115,12 @@ export function buildingSymbols(id, t) {
       case "merchantOutpost":
         visual =
           row(icon("trader"), icon("crate"), arrow(), icon("coin")) +
-          caption(t("directSale"));
+          caption("directSale");
         break;
       case "smallWharf":
         visual =
           row(quantity("crate", 2), arrow(), quantity("vp", 1)) +
-          caption(t("mixedOncePerCaptain"));
+          caption("mixedOncePerCaptain");
         break;
       case "publishingHouse":
         visual =
@@ -128,9 +129,9 @@ export function buildingSymbols(id, t) {
         break;
       case "assemblyHall":
         visual =
-          caption(t("captainStart")) +
+          caption("captainStart") +
           row(quantity("crate", 2), arrow(), quantity("vp", "+1")) +
-          caption(t("sameType"));
+          caption("sameType");
         break;
       case "monument":
         visual = row(icon("scoring"), icon("noWorker", 28));
@@ -158,7 +159,7 @@ export function buildingSymbols(id, t) {
       case "villa":
         visual =
           row(icon("recruiter"), arrow(), quantity("citizen", "+1")) +
-          caption(t("workerIfEmpty"));
+          caption("workerIfEmpty");
         break;
       case "tailorShop":
         visual = row(
