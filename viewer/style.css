@@ -206,12 +206,12 @@
   width: 17px;
   height: 17px;
   flex: 0 0 17px;
-  border: 1px solid #ffffff99;
-  border-radius: 50%;
-  background: var(--player-color);
-  color: #fff;
-  font: 700 10px/1 system-ui;
-  letter-spacing: normal;
+  color: var(--player-color);
+}
+.pr-game .player-marker svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .pr-game .player-board > header h2 {
   display: flex;

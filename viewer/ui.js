@@ -26,6 +26,15 @@ const esc = (x) =>
 const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 const encode = (m) => esc(encodeURIComponent(JSON.stringify(m)));
 const playerColors = ["#316f9a", "#a35625", "#795694", "#477347", "#a14564"];
+const playerMeeple =
+  '<path d="M9 4a3 3 0 0 1 6 0v2l7 4-3 4-3-2 3 10h-6l-1-6-1 6H5l3-10-3 2-3-4 7-4Z"/>';
+const playerShapes = [
+  '<circle cx="12" cy="12" r="10"/>',
+  '<path d="M12 2 23 21H1Z"/>',
+  '<rect x="3" y="3" width="18" height="18" rx="1"/>',
+  '<path d="m12 1 11 11-11 11L1 12Z"/>',
+  '<path d="M8 2h8v6h6v8h-6v6H8v-6H2V8h6Z"/>',
+];
 const spriteFor = (id) =>
   B[id]?.good && B[id].good !== "tailor" ? B[id].good : "building";
 export function mountGame(
@@ -62,8 +71,13 @@ export function mountGame(
     GOODS.filter((g) => goods[g])
       .map((g) => metric(g, goods[g]))
       .join("");
-  const playerMarker = (i, decorative = false) =>
-    `<span class="player-marker" style="--player-color:${playerColors[i % playerColors.length]}" ${decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(state.players[i].name)}"`} title="${esc(state.players[i].name)}">${i + 1}</span>`;
+  const playerMarker = (i, decorative = false) => {
+    const colorBlind = preferences.colorBlind === true;
+    const shape = colorBlind
+      ? playerShapes[i % playerShapes.length]
+      : playerMeeple;
+    return `<span class="player-marker${colorBlind ? " player-marker-shaped" : ""}" style="--player-color:${playerColors[i % playerColors.length]}" ${decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(state.players[i].name)}"`} title="${esc(state.players[i].name)}"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="#ffffffbb" stroke-width="1.5" stroke-linejoin="round">${shape}</svg></span>`;
+  };
   const pointsBadge = (n) =>
     `<span class="points-badge" role="img" title="${esc(t("printedPoints"))} : ${n}" aria-label="${esc(t("printedPoints"))} : ${n}">${scoreToken(n, 28)}</span>`;
   let chatView;
