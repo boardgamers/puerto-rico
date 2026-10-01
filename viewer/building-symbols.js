@@ -1,5 +1,5 @@
 import { BUILDINGS as B } from "../engine/catalog.js";
-import { icon } from "./icons.js";
+import { icon, scoreToken } from "./icons.js";
 const esc = (text) =>
   String(text).replace(
     /[&<>"']/g,
@@ -9,7 +9,9 @@ const esc = (text) =>
       ],
   );
 const quantity = (id, n) =>
-  `<span class="effect-quantity">${icon(id, 24)}<b>${n}</b></span>`;
+  id === "vp"
+    ? scoreToken(n, 28)
+    : `<span class="effect-quantity">${icon(id, 24)}<b>${n}</b></span>`;
 const arrow = () => icon("arrow", 18);
 const row = (...parts) => `<span class="effect-row">${parts.join("")}</span>`;
 const caption = (text) => `<small class="effect-caption">${esc(text)}</small>`;

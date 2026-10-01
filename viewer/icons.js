@@ -17,7 +17,6 @@ const paths = {
   citizen:
     '<circle cx="12" cy="7" r="3" fill="#d19c48"/><path fill="#d19c48" d="M7 12h10l3 10H4ZM7 2h10v3H7Z"/>',
   coin: '<circle fill="#e7be63" cx="12" cy="12" r="10"/><path d="M12 6v12m3-10c-6-4-8 4-3 4s3 8-3 4"/>',
-  vp: '<path fill="#60a0bb" d="m12 2 9 5v10l-9 5-9-5V7Z"/><path stroke="#fff" d="m6 12 4 4 8-8"/>',
   building:
     '<path fill="#d6b994" d="M4 10h16v12H4Z"/><path fill="#b16b4e" d="m2 10 10-8 10 8Z"/><path d="M10 22v-7h4v7M7 13v3m10-3v3"/>',
   crate:
@@ -55,6 +54,7 @@ const paths = {
   ship: '<path fill="#bb8d60" d="m2 16 4 6h13l3-6Z"/><path fill="#f3e6c9" d="M12 2v13H3Zm2 2v11h7Z"/>',
   governor:
     '<path fill="#d8ba65" d="m2 6 5 4 5-8 5 8 5-4-3 13H5Z"/><path d="M5 22h14"/>',
+  help: '<path d="M8 8a4 4 0 1 1 7 3c-2 1-3 2-3 5"/><circle cx="12" cy="21" r="1" fill="currentColor" stroke="none"/>',
   rules:
     '<path d="M12 5C8 2 4 2 1 4v17c3-2 7-2 11 1 4-3 8-3 11-1V4c-3-2-7-2-11 1Zm0 0v17"/>',
   journal: '<path d="M5 2h16v20H5ZM1 6h7M1 12h7M1 18h7m2-10h8m-8 5h8m-8 5h5"/>',
@@ -73,6 +73,19 @@ const paths = {
   erase: '<path d="m4 14 11-11 7 7-11 11H8Zm3-3 7 7m-3 3h12"/>',
   dark: '<path fill="#d8ba65" d="M18 2C6-1-1 14 8 21c5 4 13 1 15-5C12 18 7 9 18 2Z"/>',
 };
+// Simplified numbered blue wooden token from the Special Edition components (p. 4).
+export function scoreToken(value, size = 26) {
+  const label = String(value).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ],
+  );
+  const length = String(value).length;
+  return `<svg class="icon score-token" width="${size}" height="${size}" viewBox="0 0 28 26" aria-hidden="true"><path fill="#6b5542" d="M7 4h14l6 10-6 11H7L1 14Z"/><path fill="#287eb4" stroke="#b8dced" stroke-width="1.1" stroke-linejoin="round" d="M7 1h14l6 10-6 11H7L1 11Z"/><text x="14" y="12" dy=".35em" text-anchor="middle" fill="#fff" stroke="none" font-family="Georgia, serif" font-weight="bold" font-size="${length > 3 ? 9 : length > 2 ? 11 : 16}">${label}</text></svg>`;
+}
 export function icon(id, size = 24) {
+  if (id === "vp") return scoreToken(1, size);
   return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[id] ?? paths.building}</svg>`;
 }

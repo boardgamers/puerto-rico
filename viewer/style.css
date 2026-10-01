@@ -262,6 +262,56 @@
   min-width: 0;
   min-height: 65px;
 }
+.pr-game .role-help {
+  justify-content: center;
+  background: transparent;
+  border-style: dashed;
+}
+.pr-game .modal-body .roles-help-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+.pr-game .role-reference-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.pr-game .role-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.pr-game .role-reference h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  margin: 0;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.pr-game .role-reference small {
+  display: block;
+  color: var(--muted);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.pr-game .modal-body .role-reference p {
+  margin: 0;
+  line-height: 1.5;
+}
+.pr-game .role-privilege {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+@media (max-width: 600px) {
+  .pr-game .role-reference-list {
+    grid-template-columns: 1fr;
+  }
+}
 .pr-game .role b {
   font-weight: 600;
 }
@@ -1096,6 +1146,10 @@
   .pr-game .player-tab .icon {
     width: 16px;
     height: 16px;
+  }
+  .pr-game .player-tab .score-token {
+    width: 24px;
+    height: 24px;
   }
   .pr-game .player-tab .metric + .metric {
     margin-left: 3px;

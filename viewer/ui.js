@@ -9,7 +9,7 @@ import {
   citySize,
 } from "../engine/index.js";
 import { translator } from "./i18n.js";
-import { icon } from "./icons.js";
+import { icon, scoreToken } from "./icons.js";
 import { journalContent } from "./journal.js";
 import { buildingSymbols } from "./building-symbols.js";
 import css from "./style.css";
@@ -24,12 +24,6 @@ const esc = (x) =>
   );
 const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 const encode = (m) => esc(encodeURIComponent(JSON.stringify(m)));
-const metric = (id, n) =>
-  `<span class="metric">${icon(id, 20)}<b>${esc(n)}</b></span>`;
-const goodsRow = (goods) =>
-  GOODS.filter((g) => goods[g])
-    .map((g) => metric(g, goods[g]))
-    .join("");
 const spriteFor = (id) =>
   B[id]?.good && B[id].good !== "tailor" ? B[id].good : "building";
 export function mountGame(
@@ -58,6 +52,16 @@ export function mountGame(
     lastFocus,
     modalMode = "",
     scrollLog = 0;
+  const metric = (id, n) =>
+    id === "vp"
+      ? `<span class="metric" role="img" title="${esc(t("vp"))}" aria-label="${esc(t("vp"))} : ${esc(n)}">${scoreToken(n)}</span>`
+      : `<span class="metric">${icon(id, 20)}<b>${esc(n)}</b></span>`;
+  const goodsRow = (goods) =>
+    GOODS.filter((g) => goods[g])
+      .map((g) => metric(g, goods[g]))
+      .join("");
+  const pointsBadge = (n) =>
+    `<span class="points-badge" role="img" title="${esc(t("printedPoints"))} : ${n}" aria-label="${esc(t("printedPoints"))} : ${n}">${scoreToken(n, 28)}</span>`;
   let chatView;
   function configureChat() {
     if (!chat) return;
@@ -332,7 +336,7 @@ export function mountGame(
   }
   function playerBoard() {
     const a = state.players[view];
-    return `<section class="player-board panel" id="own-board"><header><h2>${esc(a.name)}</h2><div>${metric("coin", a.coins)}${metric("vp", a.vp ?? "?")}${metric("worker", a.reserve.w)}${a.reserve.c ? metric("citizen", a.reserve.c) : ""}</div></header><div class="inventory">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div><h3>${t("countryside")} <small>${a.estates.length}/12</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, 12 - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${citySize(a)}/12</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span><span class="points-badge">${icon("vp", 20)}<b>${B[x.id].vp} ${t("shortVP")}</b></span></button>${peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${icon("building", 40)}<span>${t("chooseBuild")}</span></div>`}</div><button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
+    return `<section class="player-board panel" id="own-board"><header><h2>${esc(a.name)}</h2><div>${metric("coin", a.coins)}${metric("vp", a.vp ?? "?")}${metric("worker", a.reserve.w)}${a.reserve.c ? metric("citizen", a.reserve.c) : ""}</div></header><div class="inventory">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div><h3>${t("countryside")} <small>${a.estates.length}/12</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, 12 - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${citySize(a)}/12</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span>${pointsBadge(B[x.id].vp)}</button>${peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${icon("building", 40)}<span>${t("chooseBuild")}</span></div>`}</div><button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
   }
   function shipGraphic(sh) {
     return `<svg class="ship-art" viewBox="0 0 200 112" aria-hidden="true"><path fill="#edf0d4" stroke="#b6a37b" d="M96 6v58H42Zm10 9v49h43Z"/><path fill="#80614b" d="m12 66 17 31q75 22 143-3l18-28Z"/><path fill="none" stroke="#d7ac75" stroke-width="3" d="m28 77 144 0m-70-74v65"/>${Array.from({ length: sh.capacity }, (_, i) => `<rect x="${22 + i * (155 / sh.capacity)}" y="72" width="${Math.min(18, 140 / sh.capacity)}" height="17" rx="2" fill="${i < sh.amount ? "#e6c06f" : "#483e38"}" stroke="#bfa587"/>`).join("")}<path d="M5 105q20-10 40 0t40 0t40 0t40 0t30 0" fill="none" stroke="#9bbebc" stroke-width="2"/></svg>`;
@@ -348,7 +352,7 @@ export function mountGame(
       })
       .join(
         "",
-      )}</div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply))}${metric("worker", state.register.w)}${state.register.c ? metric("citizen", state.register.c) : ""}</div></header><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div><div class="estate-offer">${state.offer
+      )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply))}${metric("worker", state.register.w)}${state.register.c ? metric("citizen", state.register.c) : ""}</div></header><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div><div class="estate-offer">${state.offer
       .map((id, i) => {
         const m = state.legal.find(
           (m) => m.type === "plant" && m.id === id && !m.forest,
@@ -404,7 +408,7 @@ export function mountGame(
           <span class="bcard-title">${icon(spriteFor(id), 30)}<strong>${t(id)}</strong></span>
           <span class="bcard-cost" title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>
           <span class="bcard-effect">${buildingSymbols(id, t)}</span>
-          <span class="bcard-stats"><span class="points-badge" title="${esc(t("printedPoints"))}">${icon("vp", 20)}<b>${b.vp} ${t("shortVP")}</b></span>${buildingSlots(b)}</span>
+          <span class="bcard-stats">${pointsBadge(b.vp)}${buildingSlots(b)}</span>
           <span class="bcard-stock">${b.size === 2 ? `<span class="city-footprint" title="${esc(t("twoCitySpaces"))}" aria-label="${esc(t("twoCitySpaces"))}">${icon("citySpace", 22)}</span>` : ""}<span>${stock}</span></span>
         </button>`;
       })
@@ -466,6 +470,19 @@ export function mountGame(
       body.innerHTML = journal();
       body.scrollTop = scrollLog;
     }
+  }
+  function roleReference(id) {
+    const solo = id === "smuggler" || id.startsWith("adventurer");
+    const privilege = t.rolePrivilege(id);
+    return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small><p>${t.roleAction(id)}</p></div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${privilege}</p></div>` : ""}</article>`;
+  }
+  function rolesHelp() {
+    const roles = [
+      ...new Set(
+        state.roles.map(({ id }) => (id === "adventurer2" ? "adventurer" : id)),
+      ),
+    ];
+    return `<p class="roles-help-intro">${t("rolesHelpIntro")}</p><div class="role-reference-list">${roles.map(roleReference).join("")}</div>`;
   }
   function journal() {
     return journalContent(state, t, { automatedSetup });
@@ -608,8 +625,12 @@ export function mountGame(
       show(t("rules"), howToPlay(), "rules");
       return;
     }
+    if (el.hasAttribute("data-roles-help")) {
+      show(t("rolesHelp"), rolesHelp(), "roles");
+      return;
+    }
     if (el.dataset.role) {
-      show(t(el.dataset.role), `<p>${t.role(el.dataset.role)}</p>`);
+      show(t(el.dataset.role), roleReference(el.dataset.role));
       return;
     }
     if (el.dataset.building) {

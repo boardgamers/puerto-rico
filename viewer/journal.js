@@ -1,5 +1,5 @@
 import { GOODS } from "../engine/catalog.js";
-import { icon } from "./icons.js";
+import { icon, scoreToken } from "./icons.js";
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -11,7 +11,9 @@ const esc = (value) =>
 
 export function journalContent(state, t, { automatedSetup = false } = {}) {
   const metric = (id, n, signed = false) =>
-    `<span class="metric" title="${esc(t(id === "coin" ? "coins" : id === "worker" ? "workers" : id === "citizen" ? "citizens" : id))}">${icon(id, 20)}<b>${signed && n > 0 ? "+" : ""}${esc(n)}</b></span>`;
+    id === "vp"
+      ? `<span class="metric" role="img" title="${esc(t("vp"))}" aria-label="${esc(t("vp"))} : ${signed && n > 0 ? "+" : ""}${esc(n)}">${scoreToken(`${signed && n > 0 ? "+" : ""}${n}`)}</span>`
+      : `<span class="metric" title="${esc(t(id === "coin" ? "coins" : id === "worker" ? "workers" : id === "citizen" ? "citizens" : id))}">${icon(id, 20)}<b>${signed && n > 0 ? "+" : ""}${esc(n)}</b></span>`;
   const goods = (items = {}) =>
     GOODS.filter((g) => items[g])
       .map((g) => metric(g, items[g]))
