@@ -1,13 +1,18 @@
 .pr-game {
-  --paper: #f4efe2;
-  --panel: #fffaf0;
-  --ink: #254c4e;
-  --muted: #738280;
-  --line: #d9d9c6;
-  --sea: #e0eeee;
-  --gold: #cb9b3d;
-  --selected: #e1ecd9;
-  --shadow: #233b3b12;
+  --paper: #e8dcc1;
+  --panel: #f7edda;
+  --ink: #3e392b;
+  --muted: #716754;
+  --line: #c6b58e;
+  --sea: #bfd4c9;
+  --gold: #c89737;
+  --selected: #e0e5c4;
+  --shadow: #49372018;
+  --terra: #ac6045;
+  --foliage: #71814c;
+  --grain: #76522009;
+  --card: #fbf3e2;
+  --port-ink: #294d49;
   font-family:
     system-ui,
     -apple-system,
@@ -15,7 +20,9 @@
     "Segoe UI",
     sans-serif;
   color: var(--ink);
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: radial-gradient(var(--grain) 0.7px, transparent 0.7px);
+  background-size: 5px 5px;
   font-size: 14px;
   line-height: 1.4;
   min-height: 100vh;
@@ -24,15 +31,20 @@
   color-scheme: light;
 }
 .pr-game.dark {
-  --paper: #152c30;
-  --panel: #1d373b;
-  --ink: #f1e9d5;
-  --muted: #acbcb8;
-  --line: #3b5354;
-  --sea: #203f45;
-  --gold: #dbb15d;
-  --selected: #344e41;
+  --paper: #242723;
+  --panel: #34352c;
+  --ink: #f4e8cc;
+  --muted: #c0b89f;
+  --line: #626047;
+  --sea: #284b48;
+  --gold: #ddb568;
+  --selected: #424c33;
   --shadow: #0002;
+  --terra: #c98766;
+  --foliage: #9eac75;
+  --grain: #ecd9a708;
+  --card: #3b382e;
+  --port-ink: #ebecd8;
   color-scheme: dark;
 }
 .pr-game * {
@@ -48,7 +60,7 @@
   touch-action: manipulation;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 9px;
+  border-radius: 3px;
   min-height: 42px;
   padding: 7px 12px;
   display: inline-flex;
@@ -122,7 +134,9 @@
   margin: 0;
 }
 .pr-game h2 {
-  font-size: 17px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: normal;
 }
 .pr-game h3 {
   font-size: 12px;
@@ -143,11 +157,12 @@
   margin: 0 auto;
 }
 .pr-game .game-header {
+  position: relative;
   height: 78px;
   display: flex;
   align-items: center;
   gap: 25px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 3px double var(--gold);
 }
 .pr-game .wordmark {
   display: flex;
@@ -155,6 +170,7 @@
   font-family: Georgia, serif;
   font-size: 24px;
   letter-spacing: 0.12em;
+  color: var(--ink);
 }
 .pr-game .wordmark small {
   font: 10px system-ui;
@@ -175,6 +191,7 @@
   white-space: nowrap;
 }
 .pr-game .round-indicator b {
+  font-family: Georgia, serif;
   font-size: 23px;
   margin-left: 5px;
 }
@@ -192,6 +209,9 @@
   justify-content: space-between;
   border-bottom-width: 3px;
   gap: 4px;
+  background: transparent;
+  border-width: 0 0 3px;
+  border-radius: 0;
 }
 .pr-game .player-tab.turn {
   border-bottom-color: var(--gold);
@@ -276,7 +296,7 @@
 .pr-game .panel {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 3px;
   padding: 15px;
 }
 .pr-game .panel > header {
@@ -307,6 +327,21 @@
   font-size: 11px;
   min-width: 0;
   min-height: 65px;
+  border-top: 3px solid var(--role-accent, var(--gold));
+  background: var(--card);
+  box-shadow: 0 2px 0 var(--line);
+}
+.pr-game .role[data-role-id="planter"] {
+  --role-accent: var(--foliage);
+}
+.pr-game .role[data-role-id="builder"] {
+  --role-accent: var(--terra);
+}
+.pr-game .role[data-role-id="captain"] {
+  --role-accent: #78a8ae;
+}
+.pr-game .role[data-role-id="smuggler"] {
+  --role-accent: #a594af;
 }
 .pr-game .role-help {
   justify-content: center;
@@ -327,7 +362,7 @@
   flex-direction: column;
   gap: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 2px;
   padding: 12px;
 }
 .pr-game .role-reference h3 {
@@ -362,8 +397,8 @@
   font-weight: 600;
 }
 .pr-game .role.available {
-  border-color: #8fab99;
-  background: var(--selected);
+  border-top-color: var(--role-accent, var(--gold));
+  background: var(--card);
 }
 .pr-game .role.taken {
   background: transparent;
@@ -402,7 +437,18 @@
   white-space: nowrap;
 }
 .pr-game .port {
-  background: var(--sea);
+  color: var(--port-ink);
+  --ink: var(--port-ink);
+  --muted: var(--port-ink);
+  background-color: var(--sea);
+  background-image: repeating-linear-gradient(
+    174deg,
+    transparent 0 29px,
+    #92bfb819 30px 31px,
+    transparent 32px 60px
+  );
+  border-top: 3px solid #71958b;
+  border-bottom: 3px double #71958b;
 }
 .pr-game .ships {
   display: grid;
@@ -445,7 +491,7 @@
 }
 .pr-game .trade-slot {
   border: 1px solid #8aa9a5;
-  border-radius: 6px;
+  border-radius: 2px;
   width: 38px;
   height: 34px;
   display: grid;
@@ -486,6 +532,8 @@
   min-width: 0;
   background: transparent;
   border-style: dashed;
+  border-width: 0 0 1px;
+  border-radius: 0;
 }
 .pr-game .festival > span:first-of-type {
   flex-basis: calc(100% - 26px);
@@ -512,6 +560,20 @@
 .pr-game .inventory .metric {
   margin: 0;
 }
+.pr-game .inventory .icon-corn {
+  width: 24px;
+  height: 24px;
+}
+.pr-game .player-board {
+  border-top: 3px solid var(--foliage);
+  background-image: linear-gradient(110deg, #c6b3760d, transparent 60%);
+}
+.pr-game .player-board h3 {
+  color: var(--foliage);
+}
+.pr-game .player-board h3:last-of-type {
+  color: var(--terra);
+}
 .pr-game .estates {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -520,7 +582,7 @@
 }
 .pr-game .estate {
   min-height: 66px;
-  border-radius: 7px;
+  border-radius: 2px;
   background: var(--selected);
   border: 1px solid var(--line);
   display: flex;
@@ -567,7 +629,8 @@
 }
 .pr-game .owned-building {
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 2px;
+  border-top: 3px solid var(--terra);
   padding: 5px 4px;
   min-height: 98px;
   background: var(--paper);
@@ -602,6 +665,12 @@
   justify-content: center;
   color: var(--muted);
   gap: 8px;
+}
+.pr-game .town-vignette {
+  display: block;
+  width: 220px;
+  max-width: 100%;
+  height: 62px;
 }
 .pr-game .action-panel:empty {
   display: none;
@@ -640,6 +709,13 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 7px;
 }
+.pr-game .building-market {
+  background: transparent;
+  border-width: 3px 0 0;
+  border-style: double;
+  border-radius: 0;
+  padding-inline: 0;
+}
 .pr-game .bcard {
   position: relative;
   width: 100%;
@@ -652,11 +728,16 @@
   text-align: left;
   padding: 12px;
   font-size: 13px;
-  background: var(--paper);
+  background: var(--card);
+  border-top: 3px solid var(--terra);
+  box-shadow: 0 2px 0 var(--shadow);
   align-items: start;
 }
+.pr-game .bcard.production {
+  border-top-color: var(--foliage);
+}
 .pr-game .bcard.affordable {
-  border-color: #839c75;
+  border-color: var(--foliage);
   background: var(--selected);
 }
 .pr-game .bcard-title {
@@ -668,6 +749,9 @@
   padding-right: 46px;
 }
 .pr-game .bcard-title strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 600;
   line-height: 1.3;
   overflow-wrap: anywhere;
 }
@@ -749,7 +833,7 @@
   width: 23px;
   height: 24px;
   border: 1px dashed var(--muted);
-  border-radius: 5px;
+  border-radius: 2px;
 }
 .pr-game .capacity-slots .icon {
   opacity: 0.65;
@@ -789,7 +873,7 @@
   right: 0;
   z-index: 20;
   background: var(--panel);
-  border-top: 1px solid var(--line);
+  border-top: 3px double var(--gold);
   box-shadow: 0 -4px 16px var(--shadow);
   padding: 9px max(16px, calc((100vw - 1368px) / 2))
     max(9px, env(safe-area-inset-bottom));
@@ -846,7 +930,8 @@
   color: var(--ink);
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 14px;
+  border-radius: 3px;
+  border-top: 3px solid var(--gold);
   padding: 0;
   width: min(620px, calc(100vw - 24px));
   max-height: calc(100dvh - 32px);
@@ -921,7 +1006,7 @@
   padding: 12px;
   margin: 12px 0;
   background: var(--selected);
-  border-radius: 8px;
+  border-radius: 2px;
 }
 .pr-game .rules-chain li {
   display: flex;

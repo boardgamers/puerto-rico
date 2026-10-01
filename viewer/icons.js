@@ -1,5 +1,5 @@
 const paths = {
-  corn: '<path fill="#e9b74b" d="M12 5c-4 0-5 4-5 8s2 6 5 6 5-2 5-6-1-8-5-8Z"/><path d="m6 12 6 9 6-9M10 8h4m-4 4h4m-4 4h4"/>',
+  corn: '<path fill="#f5ca4f" stroke="#95661d" stroke-width="1" d="M12 1C7 1 6 6 6 12c0 5 2 8 6 9 4-1 6-4 6-9 0-6-1-11-6-11Z"/><path stroke="#b88726" stroke-width="1" d="M10 3v13m4-13v13M7 6h10M6 10h12M7 14h10"/><path fill="#6d9954" stroke="#395d38" stroke-width="1" d="M12 22C5 21 2 16 2 10c5 2 9 6 10 12ZM12 22c7-1 10-6 10-12-5 2-9 6-10 12Z"/><path stroke="#bad28a" stroke-width="1" d="m5 14 7 8 7-8"/>',
   fruit:
     '<path fill="#79a965" d="M12 7C3 2 1 18 10 21c2 1 2-1 4 0 9-3 7-19-2-14Z"/><path d="M12 7V3m0 2c4 0 5-2 5-3"/>',
   sugar:
@@ -69,6 +69,8 @@ const paths = {
   festival:
     '<path fill="#d8ba65" d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1Z"/>',
   reset: '<path d="M3 10a9 9 0 1 1 2 9M3 3v7h7"/>',
+  retrigger:
+    '<path d="M4 8h11a6 6 0 0 1 0 12h-3M4 8l5-5M4 8l5 5"/><path d="M5 16v6m-3-3h6"/>',
   arrow: '<path d="M2 12h19m-7-7 7 7-7 7"/>',
   erase: '<path d="m4 14 11-11 7 7-11 11H8Zm3-3 7 7m-3 3h12"/>',
   dark: '<path fill="#d8ba65" d="M18 2C6-1-1 14 8 21c5 4 13 1 15-5C12 18 7 9 18 2Z"/>',
@@ -87,5 +89,5 @@ export function scoreToken(value, size = 26) {
 }
 export function icon(id, size = 24) {
   if (id === "vp") return scoreToken(1, size);
-  return `<svg class="icon" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[id] ?? paths.building}</svg>`;
+  return `<svg class="icon icon-${id}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[id] ?? paths.building}</svg>`;
 }

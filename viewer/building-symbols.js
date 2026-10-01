@@ -123,7 +123,7 @@ export function buildingSymbols(id, t) {
         break;
       case "publishingHouse":
         visual =
-          row(`<b>${t("privilege")} ×2</b>`) +
+          row(icon("retrigger", 27), `<b>${t("privilege")}</b>`) +
           row(icon("planter"), quantity("estate", "+1"));
         break;
       case "assemblyHall":
