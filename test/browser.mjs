@@ -1,3 +1,4 @@
+import { PLAYER_SYMBOLS } from "@boardgamers/protocol/player-symbols";
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
 import { createServer } from "node:http";
@@ -46,6 +47,38 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    await page.evaluate(() =>
+      host.emit("preferences", {
+        locale: "fr",
+        colorBlind: true,
+        bgs: {
+          players: [],
+          playerColors: [],
+          playerSymbols: ["star", "hexagon", "cross"],
+        },
+      }),
+    );
+    const firstMarker = page.locator(".player-marker-shaped svg path").first();
+    assert.equal(await firstMarker.getAttribute("d"), PLAYER_SYMBOLS.star.path);
+    await page.evaluate(() =>
+      host.emit("preferences", {
+        locale: "fr",
+        colorBlind: true,
+        bgs: {
+          players: [],
+          playerColors: [],
+          playerSymbols: ["diamond", "hexagon", "cross"],
+        },
+      }),
+    );
+    assert.equal(
+      await firstMarker.getAttribute("d"),
+      PLAYER_SYMBOLS.diamond.path,
+    );
+    await page.evaluate(() =>
+      host.emit("preferences", { locale: "fr", colorBlind: false }),
+    );
+    assert.equal(await page.locator(".player-marker-shaped").count(), 0);
     const overflow = () =>
       page.evaluate(
         () => document.documentElement.scrollWidth > innerWidth + 1,

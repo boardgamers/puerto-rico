@@ -1,3 +1,7 @@
+import {
+  PLAYER_SYMBOLS,
+  isPlayerSymbol,
+} from "@boardgamers/protocol/player-symbols";
 import morphdom from "morphdom";
 import { mountChat } from "@boardgamers/protocol/chat/dom";
 import { BUILDINGS as B, GOODS } from "../engine/catalog.js";
@@ -87,8 +91,11 @@ export function mountGame(
         ? custom
         : playerColors[i % playerColors.length];
     const colorBlind = preferences.colorBlind === true;
+    const preferred = preferences.bgs?.playerSymbols?.[i];
     const shape = colorBlind
-      ? playerShapes[i % playerShapes.length]
+      ? isPlayerSymbol(preferred)
+        ? `<path d="${PLAYER_SYMBOLS[preferred].path}"/>`
+        : playerShapes[i % playerShapes.length]
       : playerMeeple;
     return `<span class="player-marker${colorBlind ? " player-marker-shaped" : ""}" style="--player-color:${color}" ${decorative ? 'aria-hidden="true"' : `role="img" aria-label="${esc(state.players[i].name)}"`} title="${esc(state.players[i].name)}"><svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor" stroke="#ffffffbb" stroke-width="1.5" stroke-linejoin="round">${shape}</svg></span>`;
   };
