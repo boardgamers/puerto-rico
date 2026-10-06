@@ -212,6 +212,10 @@
   background: transparent;
   border-width: 0 0 3px;
   border-radius: 0;
+  border-style: solid;
+  border-color: var(--line);
+  cursor: pointer;
+  touch-action: manipulation;
 }
 .pr-game .player-tab.turn {
   border-bottom-color: var(--gold);
@@ -247,6 +251,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 650;
+}
+.pr-game button.player-name {
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  justify-content: flex-start;
+}
+.pr-game .score-button {
+  padding: 0;
+  min-height: 28px;
+  min-width: 28px;
+  border: 0;
+  background: transparent;
+  border-radius: 4px;
+}
+.pr-game .score-button:hover {
+  background: var(--selected);
+  box-shadow: 0 0 0 1px var(--gold);
 }
 .pr-game .player-tab > .metric {
   font-size: 12px;
@@ -406,6 +430,31 @@
 .pr-game .role.taken > .role-icon,
 .pr-game .role.taken > b {
   opacity: 0.58;
+}
+.pr-game .role.current {
+  background: var(--selected);
+  border-color: var(--gold);
+  box-shadow:
+    inset 0 0 0 1px var(--gold),
+    0 2px 0 var(--gold);
+  padding-top: 14px;
+}
+.pr-game .role.current > .role-icon,
+.pr-game .role.current > b {
+  opacity: 1;
+}
+.pr-game .role.current .role-icon > .icon {
+  width: 26px;
+  height: 26px;
+}
+.pr-game .role-status {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 9px;
+  font-weight: 750;
+  line-height: 12px;
+  color: var(--ink);
 }
 .pr-game .role > .player-marker {
   position: absolute;
@@ -1091,6 +1140,11 @@
   justify-content: space-between;
   padding: 12px 16px;
   border-bottom: 1px solid var(--line);
+  gap: 12px;
+}
+.pr-game dialog > header h2 {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .pr-game .modal-body {
   overflow: auto;
@@ -1302,6 +1356,72 @@
 .pr-game .scores {
   display: grid;
   gap: 12px;
+}
+.pr-game .score-detail {
+  display: grid;
+  gap: 22px;
+}
+.pr-game .score-detail section > header,
+.pr-game .score-total,
+.pr-game .score-lines > li,
+.pr-game .score-building-list > li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.pr-game .score-detail h3 {
+  margin: 0;
+  font-size: 15px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+.pr-game .score-detail .score-note,
+.pr-game .score-hint {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.pr-game .score-lines,
+.pr-game .score-building-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+.pr-game .score-lines > li {
+  align-items: flex-start;
+  padding: 9px 0;
+  border-top: 1px solid var(--line);
+}
+.pr-game .score-lines .score-label {
+  flex: 1;
+  min-width: 0;
+}
+.pr-game .score-value {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+.pr-game .score-building-list {
+  margin-right: 6px;
+}
+.pr-game .score-building-list > li {
+  padding: 3px 0;
+}
+.pr-game .score-building-list .score-token {
+  width: 22px;
+  height: 22px;
+}
+.pr-game .score-history summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pr-game .score-total {
+  background: var(--selected);
+  border-top: 2px solid var(--gold);
+  padding: 12px;
 }
 .pr-game .scores article {
   border: 1px solid var(--line);

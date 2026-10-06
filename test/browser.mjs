@@ -91,6 +91,76 @@ try {
       0,
     );
     assert.equal(await page.locator(".player-board .inventory").count(), 0);
+    const scoreState = structuredClone(resourceCards);
+    scoreState.players[0].vp = 4;
+    scoreState.players[0].buildings = [{ id: "smallSugar", w: 0, c: 0 }];
+    scoreState.events.push({
+      type: "ship",
+      p: 0,
+      round: 1,
+      goods: { corn: 3 },
+      vp: 4,
+    });
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(scoreState, 0),
+    );
+    assert.equal(
+      await page.locator('.player-strip [data-score="1"]').count(),
+      0,
+    );
+    await page.locator('[data-player="1"] .player-name').click();
+    await page.locator('.player-strip [data-score="0"]').press("Enter");
+    assert.equal(await page.locator(".score-detail").count(), 1);
+    assert.match(
+      await page.locator(".score-detail").innerText(),
+      /Marchandises expédiées/,
+    );
+    assert.match(
+      await page.locator(".score-detail").innerText(),
+      /Bonus d’expédition/,
+    );
+    assert.match(
+      await page.locator(".score-detail").innerText(),
+      /Petite sucrerie/,
+    );
+    assert.equal(
+      await page.locator('[data-player="1"].selected').count(),
+      1,
+      "opening VP details does not switch boards",
+    );
+    assert.deepEqual(await page.evaluate(() => played), []);
+    const total = E.scoreBreakdown(scoreState, 0).total;
+    assert.equal(
+      await page
+        .locator(".score-total .score-value")
+        .getAttribute("aria-label"),
+      `${total} Points de victoire`,
+    );
+    await page.locator(".score-history summary").click();
+    scoreState.players[0].vp++;
+    scoreState.events.push({
+      type: "produce",
+      p: 0,
+      round: 2,
+      goods: {},
+      vp: 1,
+    });
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(scoreState, 0),
+    );
+    assert.match(await page.locator(".score-detail").innerText(), /Chapelle/);
+    assert.equal(await page.locator(".score-history").getAttribute("open"), "");
+    assert.equal(
+      await page
+        .locator(".pr-modal")
+        .evaluate((el) => el.scrollWidth > el.clientWidth),
+      false,
+    );
+    await page.screenshot({ path: `.local/qa/${width}-score-detail.png` });
+    await page.keyboard.press("Escape");
+    await page.locator('[data-player="0"] .player-name').click();
     await page.evaluate(
       (s) => host.emit("state", s),
       E.stripSecret(original, 0),
@@ -176,6 +246,25 @@ try {
     while (s.tasks[0].kind !== "recruit") s = E.moveAI(s);
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     await page.evaluate(() => scrollTo(0, 0));
+    assert.equal(
+      await page
+        .locator('.role[aria-current="step"]')
+        .getAttribute("data-role-id"),
+      "recruiter",
+    );
+    assert.match(await page.locator(".role.current").innerText(), /En cours/);
+    const betweenRoles = structuredClone(s);
+    betweenRoles.tasks = [{ kind: "role", p: 1 }];
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(betweenRoles, 0),
+    );
+    assert.equal(
+      await page.locator('.role[aria-current="step"]').count(),
+      0,
+      "last role is not marked current during the next role choice",
+    );
+    await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     const recruitButtons = page.locator(".action-dock [data-move]");
     assert.equal(await recruitButtons.count(), 2);
     for (const button of await recruitButtons.all()) {
@@ -420,6 +509,8 @@ try {
     await page.locator("[data-scores]").click();
     assert.equal(await overflow(), false);
     assert.ok((await page.locator(".scores article").count()) === 3);
+    await page.locator('.scores [data-score="1"]').click();
+    assert.match(await page.locator(".score-total").innerText(), /Total final/);
     await page.keyboard.press("Escape");
     // Scroll starts on disabled controls without interception.
     await page.evaluate(

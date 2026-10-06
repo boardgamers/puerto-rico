@@ -329,6 +329,64 @@ const labels = {
   bohioMove: ["Move a Bohío worker", "Déplacer un ouvrier du Bohío"],
   outpost: ["Outpost", "Relais"],
   finalScore: ["Final scores", "Scores finaux"],
+  scoreDetails: ["Victory point breakdown", "Détail des points de victoire"],
+  scoreHidden: [
+    "This player's VP tokens stay hidden until game end.",
+    "Les jetons PV de ce joueur restent cachés jusqu’à la fin de la partie.",
+  ],
+  scoreEarned: ["VP tokens earned", "Jetons PV gagnés"],
+  scoreCounterHint: [
+    "These are the points shown on the player card.",
+    "Ce sont les points affichés sur la carte joueur.",
+  ],
+  scoreNoTokens: [
+    "No VP tokens earned yet.",
+    "Aucun jeton PV gagné pour le moment.",
+  ],
+  scoreShipping: ["Goods shipped", "Marchandises expédiées"],
+  scoreShippingBonus: ["Shipping bonuses", "Bonus d’expédition"],
+  scoreShippingBonusHint: [
+    "Captain privilege and building effects.",
+    "Privilège du Capitaine et effets des bâtiments.",
+  ],
+  scoreOther: ["Other rewards", "Autres récompenses"],
+  scoreUnrecorded: [
+    "Points not detailed in the saved history",
+    "Points non détaillés dans l’historique sauvegardé",
+  ],
+  scoreSpent: [
+    "VP tokens spent on construction.",
+    "Jetons PV dépensés pour construire.",
+  ],
+  scoreHistory: ["VP history", "Historique des PV"],
+  scoreEndGame: ["Added at game end", "À ajouter en fin de partie"],
+  scoreEstimateHint: [
+    "Based on the current board; separate from the VP token counter. Building bonuses require an occupied building.",
+    "Selon le plateau actuel, en plus du compteur de jetons PV. Les bonus des bâtiments nécessitent un bâtiment occupé.",
+  ],
+  scoreFinalHint: [
+    "These points are added to the VP tokens earned.",
+    "Ces points s’ajoutent aux jetons PV gagnés.",
+  ],
+  scoreBuildings: ["Printed building points", "Points imprimés des bâtiments"],
+  scoreCitizensHint: [
+    "1 VP per citizen, including those in reserve.",
+    "1 PV par citoyen, y compris ceux en réserve.",
+  ],
+  scoreNoAchievements: [
+    "No completed Achievements yet.",
+    "Aucun objectif personnel accompli pour le moment.",
+  ],
+  scoreSoloAchievements: [
+    "In solo play, incomplete human Achievements score for Puertomas only.",
+    "En solo, les objectifs humains non accomplis rapportent des points uniquement aux Puertomas.",
+  ],
+  scoreFinalTotal: ["Final total", "Total final"],
+  scoreEstimateTotal: [
+    "Total if the game ended now",
+    "Total si la partie finissait maintenant",
+  ],
+  currentRole: ["In progress", "En cours"],
   tie: ["Coins + goods (tiebreak)", "Pièces + marchandises (départage)"],
   tokens: ["VP tokens", "Jetons de score"],
   bonuses: ["Bonifications", "Bonus"],

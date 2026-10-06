@@ -14,6 +14,7 @@ import {
 import { translator } from "./i18n.js";
 import { icon, scoreToken } from "./icons.js";
 import { journalContent } from "./journal.js";
+import { scoreContent } from "./score.js";
 import { buildingSymbols } from "./building-symbols.js";
 import { richText } from "./rich-text.js";
 import { town } from "./town.js";
@@ -73,6 +74,7 @@ export function mountGame(
     tool = "w",
     lastFocus,
     modalMode = "",
+    scorePlayer = null,
     actionContext = "",
     roleConfirmation = null,
     scrollLog = 0;
@@ -112,6 +114,10 @@ export function mountGame(
   };
   const pointsBadge = (n) =>
     `<span class="points-badge" role="img" title="${esc(t("printedPoints"))} : ${n}" aria-label="${esc(t("printedPoints"))} : ${n}">${scoreToken(n, 28)}</span>`;
+  const scoreButton = (i, n = state.players[i].vp) =>
+    Number.isFinite(n)
+      ? `<button type="button" class="score-button" data-score="${i}" title="${esc(t("scoreDetails"))}" aria-label="${esc(`${t("scoreDetails")} · ${state.players[i].name} : ${n}`)}">${scoreToken(n)}</button>`
+      : `<span title="${esc(t("scoreHidden"))}">${metric("vp", "?")}</span>`;
   let chatView;
   function configureChat() {
     if (!chat) return;
@@ -484,12 +490,19 @@ export function mountGame(
   function sharedBoard() {
     const acting = allowed(),
       task = state.tasks[0];
+    const currentRole =
+      !state.finished && task && task.kind !== "role"
+        ? state.role === "adventurer"
+          ? state.events.filter((e) => e.type === "role").at(-1)?.id
+          : state.role
+        : null;
     return `<section class="shared-board"><div class="roles">${state.roles
       .map((r) => {
         const m = state.legal.find((m) => m.type === "role" && m.id === r.id),
           selected = r.taken !== null,
+          current = r.id === currentRole,
           warning = m && acting ? state.roleWarnings?.[r.id] : null;
-        return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${m ? "available" : ""}" ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="coin-badge">${r.coins}</span>` : ""}</span><b>${t(r.id)}</b>${selected ? playerMarker(r.taken) : ""}</button>`;
+        return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="coin-badge">${r.coins}</span>` : ""}</span><b>${t(r.id)}</b>${selected ? playerMarker(r.taken) : ""}</button>`;
       })
       .join(
         "",
@@ -538,7 +551,7 @@ export function mountGame(
     const stock = goods.length
       ? `<span class="player-card-goods" title="${esc(t("stockLabel"))}">${goods.map((g) => metric(g, p.goods[g])).join("")}</span>`
       : "";
-    return `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span class="player-card-score">${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</button>`;
+    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" aria-pressed="${i === view}">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</button><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</div>`;
   }
   function playerSummary() {
     const a = state.players[seat];
@@ -546,7 +559,7 @@ export function mountGame(
     const reserve = playerReserve(a, seat);
     const stat = (id, n, label) =>
       `<span class="summary-stat" title="${esc(`${t(label)} : ${n}`)}" aria-label="${esc(`${t(label)} : ${n}`)}">${metric(id, n)}</span>`;
-    return `<aside class="player-summary" hidden aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${stat("worker", reserve.w, "reserveWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "reserveCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
+    return `<aside class="player-summary" hidden aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${scoreButton(seat)}${stat("worker", reserve.w, "reserveWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "reserveCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
   }
   function market() {
     const task = state.tasks[0],
@@ -731,6 +744,23 @@ export function mountGame(
       body.innerHTML = journal();
       body.scrollTop = scrollLog;
     }
+    if (modal.open && modalMode === "score") {
+      if (!Number.isFinite(state.players[scorePlayer]?.vp)) hide(modal);
+      else {
+        modal.querySelector("h2").textContent =
+          `${t("vp")} · ${state.players[scorePlayer].name}`;
+        morphdom(
+          body,
+          `<div class="modal-body">${scoreContent(state, scorePlayer, t)}</div>`,
+          {
+            childrenOnly: true,
+            onBeforeElUpdated(from, to) {
+              if (from.tagName === "DETAILS" && from.open) to.open = true;
+            },
+          },
+        );
+      }
+    }
   }
   function roleReference(id) {
     const solo = id === "smuggler" || id.startsWith("adventurer");
@@ -826,7 +856,7 @@ export function mountGame(
       `<div class="scores">${(state.results ?? [])
         .map(
           (r, i) =>
-            `<article><header><h3>${esc(state.players[i].name)}</h3>${metric("vp", r.total)}</header><p>${t("tokens")} <b>${r.tokens}</b></p><p>${t("market")} <b>${r.buildings}</b></p><p>${t("citizens")} <b>${r.citizens}</b></p>${Object.entries(
+            `<article><header><h3>${esc(state.players[i].name)}</h3>${scoreButton(i, r.total)}</header><p>${t("tokens")} <b>${r.tokens}</b></p><p>${t("market")} <b>${r.buildings}</b></p><p>${t("citizens")} <b>${r.citizens}</b></p>${Object.entries(
               r.bonus,
             )
               .map(([id, n]) => `<p>${t(id)} <b>${n}</b></p>`)
@@ -921,6 +951,22 @@ export function mountGame(
   }
   function click(event) {
     const el = event.target.closest("button");
+    if (el?.hasAttribute("data-score")) {
+      scorePlayer = Number(el.dataset.score);
+      if (Number.isFinite(state.players[scorePlayer]?.vp))
+        show(
+          `${t("vp")} · ${state.players[scorePlayer].name}`,
+          scoreContent(state, scorePlayer, t),
+          "score",
+        );
+      return;
+    }
+    const card = event.target.closest("[data-player]");
+    if (card) {
+      view = Number(card.dataset.player);
+      render();
+      return;
+    }
     if (!el || el.disabled) return;
     if (el.hasAttribute("data-close")) {
       hide(el.closest("dialog"));
@@ -974,11 +1020,6 @@ export function mountGame(
     }
     if (el.dataset.festival !== undefined) {
       festivalInfo(Number(el.dataset.festival));
-      return;
-    }
-    if (el.dataset.player !== undefined) {
-      view = Number(el.dataset.player);
-      render();
       return;
     }
     if (el.dataset.local) {
