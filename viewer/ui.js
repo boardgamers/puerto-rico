@@ -520,20 +520,33 @@ export function mountGame(
     }
     return html ? t.effectHtml(id) : t.effect(id);
   }
+  function playerReserve(p, i) {
+    return i === seat &&
+      draft &&
+      state.tasks[0]?.kind === "assign" &&
+      state.tasks[0]?.p === seat
+      ? remaining()
+      : p.reserve;
+  }
   function playerCard(p, i) {
     const goods = GOODS.filter((g) => p.goods[g] > 0);
-    return `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span class="player-card-score">${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></span>${goods.length ? `<span class="player-card-goods"><small class="stock-label">${t("stockLabel")}</small>${goods.map((g) => `<span title="${esc(`${t(g)} : ${p.goods[g]}`)}" aria-label="${esc(`${t(g)} : ${p.goods[g]}`)}">${metric(g, p.goods[g])}</span>`).join("")}</span>` : ""}</button>`;
+    const reserve = playerReserve(p, i);
+    const people =
+      !p.puertoma && (i === seat || reserve.w || reserve.c)
+        ? `<span class="player-card-reserve">${metric("worker", reserve.w, "reserveWorkers")}${reserve.c ? metric("citizen", reserve.c, "reserveCitizens") : ""}</span>`
+        : "";
+    const stock = goods.length
+      ? `<span class="player-card-goods" title="${esc(t("stockLabel"))}">${goods.map((g) => metric(g, p.goods[g])).join("")}</span>`
+      : "";
+    return `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span class="player-card-score">${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</button>`;
   }
   function playerSummary() {
     const a = state.players[seat];
     if (!a) return "";
-    const reserve =
-      draft && state.tasks[0]?.kind === "assign" && state.tasks[0]?.p === seat
-        ? remaining()
-        : a.reserve;
+    const reserve = playerReserve(a, seat);
     const stat = (id, n, label) =>
       `<span class="summary-stat" title="${esc(`${t(label)} : ${n}`)}" aria-label="${esc(`${t(label)} : ${n}`)}">${metric(id, n)}</span>`;
-    return `<aside class="player-summary" hidden aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${stat("worker", reserve.w, "availableWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "availableCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
+    return `<aside class="player-summary" hidden aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${stat("worker", reserve.w, "reserveWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "reserveCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
   }
   function market() {
     const task = state.tasks[0],

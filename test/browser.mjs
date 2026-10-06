@@ -50,10 +50,18 @@ try {
     );
     const resourceCards = structuredClone(original);
     resourceCards.players[0].goods.corn = 2;
+    resourceCards.players[0].reserve = { w: 2, c: 1 };
     resourceCards.players[1].goods.sugar = 3;
     await page.evaluate(
       (s) => host.emit("state", s),
       E.stripSecret(resourceCards, 0),
+    );
+    assert.deepEqual(
+      await page
+        .locator('.player-strip [data-player="0"] .player-card-reserve .metric')
+        .allTextContents(),
+      ["2", "1"],
+      "unassigned workers and citizens are visible separately from goods",
     );
     assert.equal(
       await page
@@ -61,6 +69,15 @@ try {
         .innerText(),
       "2",
     );
+    if (width >= 768) {
+      const reserveBox = await page
+        .locator('.player-strip [data-player="0"] .player-card-reserve')
+        .boundingBox();
+      const goodsBox = await page
+        .locator('.player-strip [data-player="0"] .player-card-goods')
+        .boundingBox();
+      assert.equal(reserveBox.y, goodsBox.y, "reserve shares the stock row");
+    }
     assert.equal(
       await page
         .locator('.player-strip [data-player="1"] .player-card-goods .metric')
@@ -188,6 +205,10 @@ try {
     s.players[0].reserve = { w: 1, c: 0 };
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     await page.locator("[data-confirm-assign]").waitFor({ state: "visible" });
+    const reserveCount = page.locator(
+      '.player-strip [data-player="0"] .player-card-reserve .metric',
+    );
+    assert.equal(await reserveCount.innerText(), "1");
     assert.equal(
       await page.locator("[data-slot].w").count(),
       0,
@@ -199,6 +220,11 @@ try {
     );
     await page.locator('[data-slot="e0:0"]').click();
     assert.equal(
+      await reserveCount.innerText(),
+      "0",
+      "the card follows the draft allocation",
+    );
+    assert.equal(
       await page
         .locator('[data-production-good="corn"] .production-output')
         .innerText(),
@@ -208,6 +234,11 @@ try {
     assert.equal(await page.locator('[data-slot="e1:0"]').isEnabled(), false);
     assert.equal(await page.locator('[data-slot="e1:0"]').innerText(), "·");
     await page.locator('[data-slot="e0:0"]').click();
+    assert.equal(
+      await reserveCount.innerText(),
+      "1",
+      "removing a worker returns it to the displayed reserve",
+    );
     assert.equal(
       await page
         .locator('[data-production-good="corn"] .production-output')

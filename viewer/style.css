@@ -1833,26 +1833,45 @@
   align-items: center;
   flex-shrink: 0;
 }
-.pr-game .player-card-goods {
+.pr-game .player-card-resources,
+.pr-game .player-card-goods,
+.pr-game .player-card-reserve {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 4px 10px;
   font-size: 12px;
 }
-.pr-game .player-card-goods .metric {
+.pr-game .player-card-reserve {
+  flex-wrap: nowrap;
+}
+.pr-game .player-card-reserve + .player-card-goods {
+  border-left: 1px solid var(--line);
+  padding-left: 10px;
+}
+.pr-game .player-card-resources .metric {
   margin: 0;
 }
-.pr-game .player-card-goods .icon {
+.pr-game .player-card-goods .icon,
+.pr-game .player-card-reserve .icon {
   width: 18px;
   height: 18px;
 }
 @media (max-width: 600px) {
-  .pr-game .player-tab .player-card-goods {
-    gap: 4px 6px;
+  .pr-game .player-tab .player-card-resources,
+  .pr-game .player-tab .player-card-goods,
+  .pr-game .player-tab .player-card-reserve {
+    gap: 4px;
     font-size: 11px;
   }
-  .pr-game .player-card-goods .icon {
+  .pr-game .player-card-reserve + .player-card-goods {
+    padding-left: 4px;
+  }
+  .pr-game .player-card-resources .metric {
+    gap: 2px;
+  }
+  .pr-game .player-card-goods .icon,
+  .pr-game .player-card-reserve .icon {
     width: 16px;
     height: 16px;
   }

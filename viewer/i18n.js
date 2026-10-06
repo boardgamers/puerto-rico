@@ -164,6 +164,14 @@ const labels = {
   workers: ["Workers", "Ouvriers"],
   citizens: ["Citizens", "Citoyens"],
   reserve: ["Reserve", "Réserve"],
+  reserveWorkers: [
+    "Unassigned workers in reserve",
+    "Ouvriers en réserve, non affectés",
+  ],
+  reserveCitizens: [
+    "Unassigned citizens in reserve",
+    "Citoyens en réserve, non affectés",
+  ],
   vp: ["Victory points", "Points de victoire"],
   coins: ["Coins", "Pièces"],
   playerSummary: ["Your resources", "Vos ressources"],
