@@ -398,7 +398,7 @@ export function mountGame(
     return `<section class="achievements"><h3>${t("achievements")}<button type="button" class="icon-button" data-achievements-help title="${esc(t("achievementHelpTitle"))}" aria-label="${esc(t("achievementHelpTitle"))}">${icon("help", 14)}</button></h3><div>${a.achievements
       .map((x) => {
         const c = achievementText(x.id, t);
-        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : metric("vp", c.vp)}<small>${c.html}</small></article>`;
+        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong><small>${c.html}</small>${c.vp === undefined ? "" : `<footer class="achievement-reward"><span>${t("reward")}</span>${metric("vp", c.vp)}</footer>`}</article>`;
       })
       .join("")}</div></section>`;
   }

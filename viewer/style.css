@@ -1624,6 +1624,9 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
 }
 .achievement-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 0.6rem;
   border: 1px solid var(--line);
   border-radius: 0.4rem;
@@ -1671,4 +1674,19 @@
   content: "";
   position: absolute;
   inset: -7px;
+}
+
+.pr-game .achievement-reward {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+}
+.pr-game .achievement-reward .metric {
+  margin: 0;
 }
