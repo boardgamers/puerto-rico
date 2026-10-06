@@ -14,6 +14,8 @@ const quantity = (id, n) =>
     : `<span class="effect-quantity">${icon(id, 24)}<b>${n}</b></span>`;
 const arrow = () => icon("arrow", 18);
 const row = (...parts) => `<span class="effect-row">${parts.join("")}</span>`;
+const staffed = (id) =>
+  `<span class="staffed-icon">${icon(id, 28)}${icon("worker", 15)}</span>`;
 
 export function buildingSymbols(id, t) {
   const caption = (key) =>
@@ -21,11 +23,20 @@ export function buildingSymbols(id, t) {
   const b = B[id];
   const full =
     b.good && b.good !== "tailor"
-      ? `${t("produce")} : ${t(b.good)}.`
+      ? `${t("productionCapacity")} : ${b.workers} ${t(b.good)}. ${t("matchingWorkers")}`
       : t.effect(id);
   let visual;
   if (b.good && b.good !== "tailor")
-    visual = row(icon("craftsman"), arrow(), icon(b.good, 28));
+    visual =
+      row(
+        staffed(`field-${b.good}`),
+        "<b>+</b>",
+        staffed(`workshop-${b.good}`),
+        arrow(),
+        icon(b.good, 26),
+      ) +
+      `<small class="effect-caption">${t("productionCapacity")} : <b>${b.workers}</b></small>` +
+      caption("bothStaffed");
   else
     switch (id) {
       case "smallMarket":

@@ -1803,3 +1803,240 @@
     height: 16px;
   }
 }
+
+/* A field tile, a workshop and a loose product have distinct silhouettes. */
+.pr-game .plantation-supply {
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--foliage);
+  background: var(--panel);
+}
+.pr-game .plantation-supply > header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.pr-game .plantation-supply h3 {
+  margin: 0;
+}
+.pr-game .plantation-supply .estate-offer {
+  margin-top: 8px;
+}
+.pr-game .plantation-supply .offer {
+  width: auto;
+  min-width: 48px;
+  min-height: 62px;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  padding: 5px;
+  background: var(--selected);
+  font-size: 10px;
+}
+.pr-game .estate-name {
+  font-size: 10px;
+  line-height: 1.2;
+}
+.pr-game .building-kind {
+  display: block;
+  margin-top: 3px;
+  font: 600 10px system-ui;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pr-game .staffed-icon {
+  position: relative;
+  display: inline-flex;
+  padding-right: 8px;
+  padding-bottom: 3px;
+}
+.pr-game .staffed-icon > .icon-worker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background: var(--card);
+  border-radius: 50%;
+}
+.pr-game .stock-label {
+  color: var(--muted);
+  font-size: 10px;
+}
+.pr-game .inline-symbol .symbol-word {
+  font-size: 0.9em;
+  line-height: 1;
+  margin-left: 2px;
+}
+.pr-game .inline-symbol:has(.symbol-word) {
+  height: auto;
+}
+.pr-game .production-overview {
+  margin: 10px 0 16px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--card);
+}
+.pr-game .production-overview > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 9px;
+}
+.pr-game .player-board .production-overview h3 {
+  margin: 0 0 3px;
+  color: var(--ink);
+}
+.pr-game .production-overview header small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.pr-game .production-help {
+  min-height: 26px;
+  height: 26px;
+  width: 26px;
+  padding: 4px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: transparent;
+}
+.pr-game .production-line + .production-line {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  margin-top: 8px;
+}
+.pr-game .production-good {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+.pr-game .production-flow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 12px minmax(0, 1fr) 18px auto;
+  align-items: center;
+  gap: 5px;
+}
+.pr-game .production-step {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 46px;
+  padding: 5px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+}
+.pr-game .production-step > .icon {
+  flex-shrink: 0;
+}
+.pr-game .production-step small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.pr-game .production-step > span > small:first-child {
+  display: block;
+}
+.pr-game .production-step.not-needed {
+  background: transparent;
+  border-style: dashed;
+  justify-content: center;
+  text-align: center;
+}
+.pr-game .production-join {
+  text-align: center;
+  color: var(--muted);
+}
+.pr-game .production-output {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 5px;
+  min-width: 42px;
+  text-align: center;
+}
+.pr-game .production-line.blocked .production-output {
+  color: var(--muted);
+}
+.pr-game .production-line.ready .production-output {
+  background: var(--selected);
+  border-radius: 4px;
+}
+.pr-game .production-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  margin-top: 6px;
+}
+.pr-game .production-destination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  border-top: 1px solid var(--line);
+  margin-top: 10px;
+  padding-top: 8px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.pr-game .production-destination > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.pr-game .production-or {
+  margin: 0 3px;
+}
+.pr-game .production-guide-flow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+}
+.pr-game .production-guide-flow > span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  text-align: center;
+}
+.pr-game .production-guide p + p {
+  margin-top: 12px;
+}
+@media (max-width: 600px) {
+  .pr-game .production-overview {
+    padding: 9px;
+  }
+  .pr-game .production-flow {
+    grid-template-columns: minmax(0, 1fr) 9px minmax(0, 1fr) 14px auto;
+    gap: 3px;
+  }
+  .pr-game .production-step {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 2px;
+  }
+  .pr-game .production-step > .icon {
+    width: 25px;
+    height: 25px;
+  }
+  .pr-game .production-output {
+    font-size: 16px;
+    min-width: 36px;
+    padding: 3px;
+  }
+  .pr-game .production-guide-flow {
+    gap: 5px;
+  }
+  .pr-game .production-guide-flow > span > .icon {
+    max-width: 38px;
+  }
+}

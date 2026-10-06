@@ -55,9 +55,9 @@ export function achievementText(id, t) {
     productionSet:
       "Have at least 1 {sugar}, 1 {tobacco}, and 1 {coffee} Production Building.",
     cheapExpanded: "Build an expanded Building paying a maximum of {coin:6}.",
-    goods: "Have at least {crate:7} of one Good.",
+    goods: "Have at least {crate:7} of one type.",
     store: "Store at least 2 different Goods at the end of a {captain} phase.",
-    shipAmount: "Load at least {crate:5} of the same Good at once.",
+    shipAmount: "Load at least {crate:5} of the same type at once.",
     captainPoints: "Gain at least {vp:7} during one {captain} phase.",
     tradeCoins: "Sell a Good to the Trading House for at least {coin:6}.",
     productionCount:
@@ -85,12 +85,12 @@ export function achievementText(id, t) {
     estates: "Posséder 12 tuiles de campagne.",
     cheapExpanded:
       "Construire un bâtiment étendu en payant au maximum {coin:6}.",
-    goods: "Posséder au moins {crate:7} d’une même marchandise.",
+    goods: "Posséder au moins {crate:7} d’un même type.",
     store:
       "Conserver au moins 2 marchandises différentes à la fin d’une phase de {captain}.",
     commercial: "Posséder au moins 7 bâtiments commerciaux ordinaires.",
     shipAmount:
-      "Charger au moins {crate:5} d’une même marchandise en une seule action.",
+      "Charger au moins {crate:5} d’un même type en une seule action.",
     captainPoints: "Gagner au moins {vp:7} durant une même phase de {captain}.",
     tradeCoins: "Vendre une marchandise au comptoir pour au moins {coin:6}.",
     productionCount:
@@ -115,16 +115,16 @@ export const abilityTexts = {
     "+1 ouvrier après une construction.",
   ],
   storage: [
-    "Store all of the best Good and one other Crate.",
-    "Conserver toutes les caisses de la meilleure marchandise et une autre caisse.",
+    "Store all goods of the best type and one other good.",
+    "Conserver toutes les marchandises du meilleur type et une marchandise supplémentaire.",
   ],
   buildCoin: [
     "+1 Coin when able to build.",
     "+1 pièce lorsqu’une construction est possible.",
   ],
   produceCrate: [
-    "+1 Crate of the best produced Good after production.",
-    "+1 caisse de la meilleure marchandise produite après la production.",
+    "+1 good of the best type produced after production.",
+    "+1 marchandise du meilleur type produit après la production.",
   ],
   produceCoins: [
     "+1 Coin per produced Goods type.",
@@ -135,8 +135,8 @@ export const abilityTexts = {
     "+1 ouvrier après le recrutement.",
   ],
   plantCrate: [
-    "+1 Crate matching a new Estate.",
-    "+1 caisse correspondant à la plantation choisie.",
+    "+1 good matching the chosen plantation.",
+    "+1 marchandise correspondant à la plantation choisie.",
   ],
   goodsPoints: [
     "+1 VP per Goods type before storage.",
@@ -144,7 +144,7 @@ export const abilityTexts = {
   ],
   discardPoints: [
     "Discard up to 2 of the worst Good for 1 VP each before storage.",
-    "Défausser jusqu’à 2 caisses de la moins bonne marchandise pour 1 PV chacune avant le stockage.",
+    "Défausser jusqu’à 2 marchandises du moins bon type pour 1 PV chacune avant le stockage.",
   ],
   recruitCoins: [
     "+1 Coin per Worker gained during recruitment.",

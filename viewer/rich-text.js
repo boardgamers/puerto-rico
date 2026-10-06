@@ -16,7 +16,7 @@ const symbols = {
     ["point de victoire", "points de victoire"],
   ],
   coin: ["coin", ["coin", "coins"], ["pièce", "pièces"]],
-  crate: ["crate", ["crate", "crates"], ["caisse", "caisses"]],
+  crate: ["crate", ["good", "goods"], ["marchandise", "marchandises"]],
   worker: ["worker", ["worker", "workers"], ["ouvrier", "ouvriers"]],
   citizen: ["citizen", ["citizen", "citizens"], ["citoyen", "citoyens"]],
   estate: ["estate", ["estate", "estates"], ["domaine", "domaines"]],
@@ -77,7 +77,7 @@ function format(message, fr, html) {
               .split("/")
               .map((n) => scoreToken(n, 24))
               .join('<span class="symbol-separator">/</span>')
-          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}`;
+          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}${id === "crate" ? `<span class="symbol-word">${escape((fr ? french : en)[plural ? 1 : 0])}</span>` : ""}`;
       result += `<span class="inline-symbol${amount?.includes("/") ? " symbol-range" : ""}" role="img" aria-label="${escape(label)}" title="${escape(label)}"><span aria-hidden="true">${visual}</span></span>`;
     } else result += label;
     end = match.index + marker.length;

@@ -19,12 +19,10 @@ const paths = {
   coin: '<circle fill="#e7be63" cx="12" cy="12" r="10"/><path d="M12 6v12m3-10c-6-4-8 4-3 4s3 8-3 4"/>',
   building:
     '<path fill="#d6b994" d="M4 10h16v12H4Z"/><path fill="#b16b4e" d="m2 10 10-8 10 8Z"/><path d="M10 22v-7h4v7M7 13v3m10-3v3"/>',
-  crate:
-    '<rect x="3" y="4" width="18" height="17" rx="2" fill="#c8a77a"/><path d="M3 8h18M3 17h18M7 4v17M17 4v17m-7-9h4"/>',
   storage:
     '<path fill="#b6b69a" d="M3 9h18v13H3Z"/><path fill="#9b7555" d="m1 9 11-7 11 7Z"/><rect x="8" y="13" width="8" height="9" fill="#d4b989"/><path d="M8 17h8"/>',
   estate:
-    '<path fill="#8eab6b" d="m3 8 9-5 9 5v11l-9 3-9-3Z"/><path d="m3 8 9 4 9-4m-9 4v10M6 13l3 1m-3 3 3 1m6-4 3-1m-3 5 3-1"/>',
+    '<path fill="#78965c" d="m1 15 11-7 11 7-11 8Z"/><path stroke="#d7e2ad" d="m5 15 7 5m-4-7 7 5m-4-7 7 5"/><path d="M12 12V5"/><path fill="#a8c478" d="M12 8C7 8 6 5 6 2c4 0 6 2 6 6Zm0-2c5 0 7-2 7-5-4 0-7 2-7 5Z"/>',
   space:
     '<rect x="3" y="3" width="18" height="18" rx="3" stroke-dasharray="3 3"/><circle cx="12" cy="12" r="2" fill="currentColor" stroke="none"/>',
   citySpace:
@@ -42,7 +40,7 @@ const paths = {
   builder:
     '<path fill="#b87955" d="m4 18 10-11 3 3L7 21Z"/><path fill="#abbac0" d="m10 5 4-4 9 8-5 4Z"/>',
   craftsman:
-    '<path fill="#d6b994" d="M3 7h18v14H3Z"/><path d="M3 12h18M8 7v14m8-14v14m-9-17h10"/>',
+    '<path fill="#9ca9b0" d="m14 2 3 1-1 5-3 2-3-1-6 11-3-2 7-10-1-3 2-3 1 4 3 1Z"/><path fill="#cfa474" d="m13 14 3-3 7 9-3 2Z"/>',
   trader:
     '<path fill="#d6b994" d="M5 9h14v13H5Z"/><path fill="#c27952" d="M2 3h20v6H2Z"/><path d="M8 3v6m8-6v6M10 22v-8h4v8"/>',
   captain:
@@ -91,5 +89,15 @@ export function scoreToken(value, size = 26) {
 }
 export function icon(id, size = 24) {
   if (id === "vp") return scoreToken(1, size);
-  return `<svg class="icon icon-${id}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${paths[id] ?? paths.building}</svg>`;
+  const crop = id.split("-")[1];
+  let drawing = paths[id] ?? paths.building;
+  if (id === "crate")
+    drawing = `<g transform="translate(0 1) scale(.65)">${paths.corn}</g><g transform="translate(10 2) scale(.58)">${paths.coffee}</g><g transform="translate(7 10) scale(.6)">${paths.fruit}</g>`;
+  if (["corn", "fruit", "sugar", "tobacco", "coffee"].includes(crop)) {
+    if (id.startsWith("field-"))
+      drawing = `<path fill="#78965c" d="m1 15 11-7 11 7-11 8Z"/><path stroke="#d7e2ad" d="m5 15 7 5m-4-7 7 5m-4-7 7 5"/><g transform="translate(6 0) scale(.5)">${paths[crop]}</g>`;
+    if (id.startsWith("workshop-"))
+      drawing = `<path fill="#d6b994" d="M3 10h18v12H3Z"/><path fill="#b16b4e" d="m1 10 11-8 11 8Z"/><g transform="translate(7 10) scale(.42)">${paths[crop]}</g>`;
+  }
+  return `<svg class="icon icon-${id}" width="${size}" height="${size}" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${drawing}</svg>`;
 }

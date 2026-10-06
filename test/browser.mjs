@@ -57,13 +57,13 @@ try {
     );
     assert.equal(
       await page
-        .locator('.player-strip [data-player="0"] .player-card-goods')
+        .locator('.player-strip [data-player="0"] .player-card-goods .metric')
         .innerText(),
       "2",
     );
     assert.equal(
       await page
-        .locator('.player-strip [data-player="1"] .player-card-goods')
+        .locator('.player-strip [data-player="1"] .player-card-goods .metric')
         .innerText(),
       "3",
     );
@@ -173,11 +173,44 @@ try {
       false,
     );
     await page.locator('[data-slot="e0:0"]').click();
+    assert.equal(
+      await page
+        .locator('[data-production-good="corn"] .production-output')
+        .innerText(),
+      "1",
+      "preview includes an assigned corn worker before confirmation",
+    );
     assert.equal(await page.locator('[data-slot="e1:0"]').isEnabled(), false);
     assert.equal(await page.locator('[data-slot="e1:0"]').innerText(), "·");
     await page.locator('[data-slot="e0:0"]').click();
+    assert.equal(
+      await page
+        .locator('[data-production-good="corn"] .production-output')
+        .innerText(),
+      "0",
+      "removing the worker updates production immediately",
+    );
     assert.equal(await page.locator('[data-slot="e1:0"]').isEnabled(), true);
     await page.locator('[data-slot="e1:0"]').click();
+    assert.equal(
+      await page
+        .locator('[data-production-good="fruit"] .production-output')
+        .innerText(),
+      "0",
+    );
+    assert.match(
+      await page
+        .locator('[data-production-good="fruit"] .production-status')
+        .innerText(),
+      /Construisez le bâtiment/,
+      "fruit still needs a production building",
+    );
+    const beforeHelp = await page.evaluate(() => played.length);
+    await page.locator("[data-production-help]").click();
+    assert.match(await page.locator(".production-guide").innerText(), /maïs/);
+    assert.equal(await overflow(), false, `Production help at ${width}`);
+    await page.keyboard.press("Escape");
+    assert.equal(await page.evaluate(() => played.length), beforeHelp);
     assert.equal(await page.locator('[data-slot="e0:0"]').isEnabled(), false);
     await page.locator("[data-confirm-assign]").click();
     const allocation = await page.evaluate(() => played.at(-1));
@@ -188,6 +221,26 @@ try {
       path: `.local/qa/${width}-board.png`,
       fullPage: true,
     });
+    const buildingChoice = E.move(original, { type: "role", id: "builder" }, 0);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(buildingChoice, 0),
+    );
+    await page.locator(".action-dock [data-market]").click();
+    const productionCard = page.locator(
+      '.pr-modal .bcard[data-building="smallFruit"]',
+    );
+    assert.equal(await productionCard.locator(".staffed-icon").count(), 2);
+    assert.match(await productionCard.innerText(), /PRODUCTION/i);
+    assert.equal(await overflow(), false, `Building choice at ${width}`);
+    await page.screenshot({ path: `.local/qa/${width}-market.png` });
+    await productionCard.click();
+    assert.match(
+      await page.locator(".modal-body").innerText(),
+      /Un ouvrier sur une plantation/,
+    );
+    await page.keyboard.press("Escape");
+    await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     // Identical state notifications preserve the SVG/board nodes instead of redrawing them.
     await page.evaluate(
       (s) => {
