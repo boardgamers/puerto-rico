@@ -253,6 +253,29 @@ const labels = {
   objective: ["Objective", "Objectif"],
   reward: ["Reward", "Récompense"],
   claimed: ["Completed by", "Remporté par"],
+  sharedObjective: ["Shared objective", "Objectif commun"],
+  festivalEstates: ["Own these plantations:", "Posséder ces plantations :"],
+  festivalProduce: [
+    "Produce in a single Craftsman phase:",
+    "Produire durant une même phase Artisan :",
+  ],
+  festivalBuild: ["Build this building:", "Construire ce bâtiment :"],
+  festivalShip: [
+    "Ship in a single Captain phase:",
+    "Charger durant une même phase Capitaine :",
+  ],
+  festivalTrade: [
+    "Sell the fourth good to fill the trading house:",
+    "Vendre la quatrième marchandise qui remplit le comptoir :",
+  ],
+  festivalBigShip: [
+    "Complete the largest cargo ship’s load with:",
+    "Compléter le chargement du plus grand navire avec :",
+  ],
+  festivalSmallShip: [
+    "Complete the smallest cargo ship’s load with:",
+    "Compléter le chargement du plus petit navire avec :",
+  ],
   weightOff: ["Crop weight-off", "Concours des récoltes"],
   cocktail: ["Carnival cocktail", "Cocktail du carnaval"],
   closingShops: ["Closing time", "Dernière vente"],
@@ -382,8 +405,8 @@ const labels = {
     "Seul le joueur qui le choisit gagne {coin:1}, en plus des {coins} déjà posées sur ce rôle.",
   ],
   ruleFestival: [
-    "The first player to fulfill each shared objective earns its reward automatically. Tap it for the exact condition and reward.",
-    "Le premier à remplir chaque objectif commun reçoit sa récompense automatiquement. Touchez-le pour voir sa condition et son gain.",
+    "The first player to fulfill each shared objective earns its reward automatically.",
+    "Le premier à remplir chaque objectif commun reçoit sa récompense automatiquement.",
   ],
   ruleEndTitle: ["End of the game", "Fin de la partie"],
   ruleEnd: [

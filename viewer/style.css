@@ -549,33 +549,99 @@
 .pr-game .festival-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 5px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 16px;
 }
 .pr-game .festival {
-  font-size: 10px;
-  padding: 7px 4px;
-  flex-wrap: wrap;
-  gap: 4px;
-  align-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 12px;
   min-width: 0;
-  background: transparent;
-  border-style: dashed;
-  border-width: 0 0 1px;
-  border-radius: 0;
-}
-.pr-game .festival > span:first-of-type {
-  flex-basis: calc(100% - 26px);
+  font-size: 12px;
+  line-height: 1.45;
   text-align: left;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--gold);
+  border-radius: 8px;
+  box-shadow:
+    0 3px 0 var(--line),
+    0 5px 10px var(--shadow);
 }
-.pr-game .festival.claimed {
-  opacity: 0.6;
-}
-.pr-game .festival-target {
+.pr-game .festival-heading {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
+  gap: 8px;
+}
+.pr-game .festival-heading > .icon {
+  flex-shrink: 0;
+}
+.pr-game .festival-heading small {
+  display: block;
+  color: var(--muted);
+  font-size: 10px;
+}
+.pr-game .festival-heading strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.25;
+}
+.pr-game .festival-condition {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pr-game .festival-requirement {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pr-game .festival-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+.pr-game .festival-targets > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.pr-game .festival-targets .icon {
+  flex-shrink: 0;
+}
+.pr-game .festival-reward {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+.pr-game .festival-reward > small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.pr-game .festival-reward > span {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.pr-game .festival-reward .metric {
+  margin: 0;
+}
+.pr-game .festival.claimed {
+  border-top-color: var(--foliage);
+}
+.pr-game .festival-claimed {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
 }
 .pr-game .inventory {
   display: flex;
@@ -1394,22 +1460,7 @@
     min-height: 36px;
   }
   .pr-game .festival-strip {
-    gap: 4px;
-  }
-  .pr-game .festival {
-    font-size: 9px;
-    padding: 5px 3px;
-  }
-  .pr-game .festival > span:first-of-type {
-    flex-basis: 100%;
-    text-align: center;
-  }
-  .pr-game .festival > .icon {
-    display: none;
-  }
-  .pr-game .festival-target .icon {
-    width: 19px;
-    height: 19px;
+    grid-template-columns: 1fr;
   }
   .pr-game .market-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));

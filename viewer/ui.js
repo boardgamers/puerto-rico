@@ -433,7 +433,7 @@ export function mountGame(
         (m) => m.type === "plant" && m.id === "quarry",
       );
       return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : "disabled"} title="${esc(t("quarry"))}">${icon("quarry", 28)}<small>${state.quarries}</small></button>`;
-    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests>${icon("forest")} ${t("forest")}</button>` : ""}</div></div>${state.festivals.length ? `<section class="festival-strip">${state.festivals.map((f, i) => `<button data-festival="${i}" class="festival ${f.claimed !== undefined ? "claimed" : ""}">${icon(f.claimed !== undefined ? "check" : "festival", 20)}<span>${t(f.id)}</span><span class="festival-target">${[...f.targets.goods, ...f.targets.estates].map((g) => icon(g, 22)).join("")}${f.targets.building ? icon("building", 22) : ""}</span></button>`).join("")}</section>` : ""}</section>`;
+    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests>${icon("forest")} ${t("forest")}</button>` : ""}</div></div>${state.festivals.length ? `<section class="festival-strip" aria-label="${t("festival")}">${state.festivals.map((f, i) => `<button data-festival="${i}" class="festival ${f.claimed !== undefined ? "claimed" : ""}"><span class="festival-heading">${icon("festival", 22)}<span><small>${t("sharedObjective")}</small><strong>${t(f.id)}</strong></span></span><span class="festival-condition">${festivalCondition(f)}</span><span class="festival-reward"><small>${t("reward")}</small><span>${festivalReward(f)}</span></span>${f.claimed !== undefined ? `<span class="festival-claimed">${icon("check", 16)}${t("claimed")} ${esc(state.players[f.claimed].name)}</span>` : ""}</button>`).join("")}</section>` : ""}</section>`;
   }
   function buildingSlots(b) {
     return `<span class="capacity-slots" title="${esc(`${t("workerSpaces")} : ${b.workers}`)}" aria-label="${esc(`${t("workerSpaces")} : ${b.workers}`)}">${Array.from({ length: b.workers }, () => `<span>${icon("worker", 17)}</span>`).join("")}</span>`;
@@ -599,21 +599,46 @@ export function mountGame(
       `<div class="building-detail">${icon(spriteFor(id), 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
     );
   }
+  function festivalCondition(f) {
+    const targets = (ids, amounts) => {
+      const counts = {};
+      ids.forEach((id, i) => {
+        counts[id] = (counts[id] ?? 0) + (amounts?.[i] ?? f.amount ?? 1);
+      });
+      return `<span class="festival-targets">${Object.entries(counts)
+        .map(
+          ([id, n]) => `<span>${icon(id, 20)}<b>${n}</b> ${esc(t(id))}</span>`,
+        )
+        .join("")}</span>`;
+    };
+    const goods = targets(f.targets.goods, f.amounts);
+    const estates = targets(f.targets.estates);
+    const row = (label, content) =>
+      `<span class="festival-requirement"><span>${t(label)}</span>${content}</span>`;
+    if (f.goal === "estates") return row("festivalEstates", estates);
+    if (f.goal === "produce") return row("festivalProduce", goods);
+    if (f.goal === "farmProduce")
+      return row("festivalEstates", estates) + row("festivalProduce", goods);
+    if (f.goal === "build")
+      return row(
+        "festivalBuild",
+        `<span class="festival-targets"><span>${icon(spriteFor(f.targets.building), 24)}<b>${esc(t(f.targets.building))}</b></span></span>`,
+      );
+    if (f.goal === "ship") return row("festivalShip", goods);
+    if (f.goal === "tradeFull") return row("festivalTrade", goods);
+    return row(
+      f.goal === "dispatchBig" ? "festivalBigShip" : "festivalSmallShip",
+      goods,
+    );
+  }
+  function festivalReward(f) {
+    return `${f.reward.coins ? metric("coin", f.reward.coins) : ""}${f.reward.vp ? metric("vp", f.reward.vp) : ""}${f.reward.workers ? metric("worker", f.reward.workers) : ""}`;
+  }
   function festivalInfo(i) {
-    const f = state.festivals[i],
-      goals = {
-        produce: t("produce"),
-        estates: t("countryside"),
-        farmProduce: `${t("countryside")} + ${t("produce")}`,
-        build: t("builder"),
-        tradeFull: `${t("trade")} · 4 / 4`,
-        ship: t("ship"),
-        dispatchBig: `${t("dispatch")} · ${Math.max(...state.ships.map((s) => s.capacity))}`,
-        dispatchSmall: `${t("dispatch")} · ${Math.min(...state.ships.map((s) => s.capacity))}`,
-      };
+    const f = state.festivals[i];
     show(
       t(f.id),
-      `<p>${goals[f.goal]}</p><div class="festival-details">${f.targets.estates.map((g) => metric(g, f.amount ?? 1)).join("")}${f.targets.goods.map((g, j) => metric(g, f.amounts?.[j] ?? f.amount ?? 1)).join("")}${f.targets.building ? t(f.targets.building) : ""}</div><h3>${t("reward")}</h3><div>${f.reward.coins ? metric("coin", f.reward.coins) : ""}${f.reward.vp ? metric("vp", f.reward.vp) : ""}${f.reward.workers ? metric("worker", f.reward.workers) : ""}</div>${f.claimed !== undefined ? `<p>${t("claimed")} ${esc(state.players[f.claimed].name)}</p>` : ""}`,
+      `<div class="festival-condition">${festivalCondition(f)}</div><h3>${t("reward")}</h3><div>${festivalReward(f)}</div>${f.claimed !== undefined ? `<p>${t("claimed")} ${esc(state.players[f.claimed].name)}</p>` : ""}`,
     );
   }
   function scores() {
