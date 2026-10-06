@@ -3,6 +3,7 @@ import { BUILDINGS as B } from "../engine/catalog.js";
 import { achievementText, abilityTexts } from "./achievement-text.js";
 import { journalContent } from "./journal.js";
 import { icon, scoreToken } from "./icons.js";
+import { buildingSprite } from "./building-symbols.js";
 
 const esc = (value) =>
   String(value ?? "").replace(
@@ -74,7 +75,9 @@ export function scoreContent(state, player, t) {
     history.push(e);
   }
   const buildings = a.buildings
-    .map((b) => row(`${icon("building", 16)} ${esc(t(b.id))}`, B[b.id].vp))
+    .map((b) =>
+      row(`${icon(buildingSprite(b.id), 16)} ${esc(t(b.id))}`, B[b.id].vp),
+    )
     .join("");
   const completed = (a.achievements ?? []).filter((c) => c.completed);
   const bonuses = Object.entries(score.bonus)

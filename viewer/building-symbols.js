@@ -17,6 +17,15 @@ const row = (...parts) => `<span class="effect-row">${parts.join("")}</span>`;
 const staffed = (id) =>
   `<span class="staffed-icon">${icon(id, 28)}${icon("worker", 15)}</span>`;
 
+export const buildingSprite = (id) =>
+  B[id]?.size === 2
+    ? "expandedBuilding"
+    : B[id]?.good && B[id].good !== "tailor"
+      ? `workshop-${B[id].good}`
+      : ["smallWarehouse", "largeWarehouse", "storehouse"].includes(id)
+        ? "storage"
+        : "building";
+
 export function buildingSymbols(id, t) {
   const caption = (key) =>
     `<small class="effect-caption">${t.html(key)}</small>`;
@@ -165,7 +174,11 @@ export function buildingSymbols(id, t) {
       case "notary":
         visual =
           row(icon("worker"), icon("building"), quantity("coin", "−1")) +
-          row(icon("citizen"), icon("citySpace"), quantity("coin", "−2"));
+          row(
+            icon("citizen"),
+            icon("expandedBuilding"),
+            quantity("coin", "−2"),
+          );
         break;
       case "villa":
         visual =

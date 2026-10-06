@@ -627,6 +627,7 @@ const labels = {
   workerSpaces: ["Worker slots", "Places d’ouvriers"],
   citySpaces: ["City spaces", "Cases de ville"],
   twoCitySpaces: ["2 city spaces", "2 cases de ville"],
+  expandedBuilding: ["Expanded building", "Bâtiment étendu"],
   printedPoints: ["Points at game end", "Points en fin de partie"],
   journalSetup: ["Setup", "Mise en place"],
   journalPreviewSetup: [
@@ -779,8 +780,8 @@ const effects = {
     "Vendez directement à la réserve, sans bonus des marchés.",
   ],
   church: [
-    "Build a {vp:2/3} building: {vp:+1}. Expanded building: {vp:+2}.",
-    "Bâtiment de {vp:2/3} construit : {vp:+1}. Grand bâtiment : {vp:+2}.",
+    "Build a {vp:2/3} building: {vp:+1}. Build an {expanded}: {vp:+2}.",
+    "Bâtiment de {vp:2/3} construit : {vp:+1}. Un {expanded} : {vp:+2}.",
   ],
   smallWharf: [
     "Once per {captain}: ship any mixed cargo, for {vp:1} per {crate:2}.",
@@ -823,8 +824,8 @@ const effects = {
     "{planter} : l’{worker} peut retirer un domaine/{forest} ; le {citizen} gagne {vp:2} si vous avez strictement le moins de tuiles de campagne.",
   ],
   notary: [
-    "{worker}: regular buildings cost {coin:1} less. {citizen}: expanded buildings cost {coin:2} less.",
-    "{worker} : {coin:−1} sur les bâtiments simples. {citizen} : {coin:−2} sur les grands bâtiments.",
+    "{worker}: regular buildings cost {coin:1} less. {citizen}: {expandedbuildings} cost {coin:2} less.",
+    "{worker} : {coin:−1} sur les bâtiments simples. {citizen} : {coin:−2} sur les {expandedbuildings}.",
   ],
   pensionOffice: [
     "Before shipping, exchange distinct goods for {vp:1} each, up to your {citizen} count.",

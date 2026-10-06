@@ -812,6 +812,12 @@
 .pr-game .building-face .metric {
   font-size: 10px;
 }
+.pr-game .building-type-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  vertical-align: middle;
+}
 .pr-game .building-face .metric .icon {
   width: 14px;
   height: 14px;

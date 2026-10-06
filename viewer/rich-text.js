@@ -20,6 +20,11 @@ const symbols = {
   worker: ["worker", ["worker", "workers"], ["ouvrier", "ouvriers"]],
   citizen: ["citizen", ["citizen", "citizens"], ["citoyen", "citoyens"]],
   estate: ["estate", ["estate", "estates"], ["domaine", "domaines"]],
+  expanded: [
+    "expandedBuilding",
+    ["expanded building", "expanded buildings"],
+    ["bâtiment étendu", "bâtiments étendus"],
+  ],
   quarry: ["quarry", ["quarry", "quarries"], ["carrière", "carrières"]],
   forest: ["forest", ["forest", "forests"], ["forêt", "forêts"]],
   corn: ["corn", ["corn", "corn"], ["maïs", "maïs"]],
@@ -46,6 +51,7 @@ const plurals = {
   workers: "worker",
   citizens: "citizen",
   estates: "estate",
+  expandedbuildings: "expanded",
   quarries: "quarry",
   forests: "forest",
   ships: "ship",
@@ -68,6 +74,10 @@ function format(message, fr, html) {
         ? !!plurals[key]
         : Math.abs(Number(amount.replace("−", "-"))) !== 1;
     const label = `${amount === undefined ? "" : `${amount} `}${(fr ? french : en)[plural ? 1 : 0]}`;
+    const hint =
+      id === "expandedBuilding"
+        ? `${label} · ${fr ? "2 cases de ville par bâtiment" : "2 city spaces per building"}`
+        : label;
     const before = text.slice(end, match.index);
     result += html ? escape(before) : before;
     if (html) {
@@ -77,8 +87,8 @@ function format(message, fr, html) {
               .split("/")
               .map((n) => scoreToken(n, 24))
               .join('<span class="symbol-separator">/</span>')
-          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}${id === "crate" ? `<span class="symbol-word">${escape((fr ? french : en)[plural ? 1 : 0])}</span>` : ""}`;
-      result += `<span class="inline-symbol${amount?.includes("/") ? " symbol-range" : ""}" role="img" aria-label="${escape(label)}" title="${escape(label)}"><span aria-hidden="true">${visual}</span></span>`;
+          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}${["crate", "expandedBuilding"].includes(id) ? `<span class="symbol-word">${escape((fr ? french : en)[plural ? 1 : 0])}</span>` : ""}`;
+      result += `<span class="inline-symbol${amount?.includes("/") ? " symbol-range" : ""}" role="img" aria-label="${escape(hint)}" title="${escape(hint)}"><span aria-hidden="true">${visual}</span></span>`;
     } else result += label;
     end = match.index + marker.length;
   }

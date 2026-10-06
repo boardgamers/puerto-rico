@@ -1,6 +1,7 @@
 import { achievementText, abilityTexts } from "./achievement-text.js";
 import { GOODS } from "../engine/catalog.js";
 import { icon, scoreToken } from "./icons.js";
+import { buildingSprite } from "./building-symbols.js";
 const esc = (value) =>
   String(value ?? "").replace(
     /[&<>"']/g,
@@ -76,7 +77,7 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
           text = `${t(e.id === "quarry" ? "journalQuarry" : e.id === "forest" ? "journalForest" : "journalEstate")} ${icon(e.id, 22)} ${name(e.id)}`;
           break;
         case "build":
-          text = `${t("journalBuild")} <button class="journal-building" data-building="${e.id}">${icon("building", 20)}${name(e.id)}</button>${e.good ? ` − ${metric(e.good, 1)}` : ""}${e.worker ? ` − ${metric(e.worker.kind === "c" ? "citizen" : "worker", 1)}` : ""}${e.point ? ` − ${metric("vp", e.point)}` : ""}`;
+          text = `${t("journalBuild")} <button class="journal-building" data-building="${e.id}">${icon(buildingSprite(e.id), 20)}${name(e.id)}</button>${e.good ? ` − ${metric(e.good, 1)}` : ""}${e.worker ? ` − ${metric(e.worker.kind === "c" ? "citizen" : "worker", 1)}` : ""}${e.point ? ` − ${metric("vp", e.point)}` : ""}`;
           break;
         case "produce":
           text = goods(e.goods)

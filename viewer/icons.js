@@ -19,6 +19,8 @@ const paths = {
   coin: '<circle fill="#e7be63" cx="12" cy="12" r="10"/><path d="M12 6v12m3-10c-6-4-8 4-3 4s3 8-3 4"/>',
   building:
     '<path fill="#d6b994" d="M4 10h16v12H4Z"/><path fill="#b16b4e" d="m2 10 10-8 10 8Z"/><path d="M10 22v-7h4v7M7 13v3m10-3v3"/>',
+  expandedBuilding:
+    '<path fill="#c7b3cf" d="M2 9h20v8H2Z"/><path fill="#947aa5" d="m1 9 11-7 11 7Z"/><path d="M6 12v2m12-2v2m-8 3v-5h4v5"/><rect x="1" y="19" width="10" height="4" rx=".5" fill="#d8c8de"/><rect x="13" y="19" width="10" height="4" rx=".5" fill="#d8c8de"/>',
   storage:
     '<path fill="#b6b69a" d="M3 9h18v13H3Z"/><path fill="#9b7555" d="m1 9 11-7 11 7Z"/><rect x="8" y="13" width="8" height="9" fill="#d4b989"/><path d="M8 17h8"/>',
   estate:
