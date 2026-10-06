@@ -534,7 +534,7 @@ export function mountGame(
       enabled && !pending && state.legal.some((m) => m.type === "bohio")
         ? `<button class="icon-button" data-bohio title="${esc(t("bohioMove"))}">${icon("worker")}</button>`
         : "";
-    return `<div class="action-dock"><div>${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div>${special}${pass && can ? moveButton(pass, t(task?.kind === "trade" && task.acted ? "finish" : "pass"), "pass", "quiet") : ""}${confirm}</div>`;
+    return `<div class="action-dock"><div>${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div>${special}${confirm}${pass && can ? moveButton(pass, t(task?.kind === "trade" && task.acted ? "finish" : "pass"), "pass", "quiet") : ""}</div>`;
   }
   function render(s) {
     if (s) state = s;
