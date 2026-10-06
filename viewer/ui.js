@@ -19,6 +19,8 @@ import { buildingSymbols } from "./building-symbols.js";
 import { richText } from "./rich-text.js";
 import { town } from "./town.js";
 import css from "./style.css";
+import { achievementText, abilityTexts } from "./achievement-text.js";
+import { estateCapacity } from "../engine/puertoma.js";
 
 const esc = (x) =>
   String(x ?? "").replace(
@@ -174,6 +176,8 @@ export function mountGame(
     const task = state.tasks[0];
     return t(
       {
+        achievementChoose: "achievementChoose",
+        achievementDraft: "achievementDraft",
         role: "chooseRole",
         draft: "chooseDraft",
         plant: "choosePlant",
@@ -306,6 +310,17 @@ export function mountGame(
       moves = state.legal.filter(
         (m) => m.type !== "bohio" && (m.type !== "pass" || m.decline?.length),
       );
+    if (["achievementChoose", "achievementDraft"].includes(task.kind))
+      return `<p>${t(task.kind)} · ${state.players[seat].achievements.length}/4</p><div class="achievement-choices">${moves
+        .map((m) => {
+          const c = achievementText(m.id, t);
+          return moveButton(
+            m,
+            `<strong>${esc(c.name)}</strong>${metric("vp", c.vp)}<small>${esc(c.text)}</small>`,
+            "check",
+          );
+        })
+        .join("")}</div>`;
     if (task.kind === "assign")
       return `<div class="assignment-tools" role="group" aria-label="${esc(t("workers"))}">${["w", "c", "erase"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}" aria-label="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}" title="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}">${icon(k === "w" ? "worker" : k === "c" ? "citizen" : "erase")}${k === "erase" ? "" : remaining()[k]}</button>`).join("")}<button class="icon-button" data-auto title="${esc(t("autoAssign"))}" aria-label="${esc(t("autoAssign"))}">${icon("autoAssign")}</button><span>${t("workerTool")}</span></div>`;
     if (task.kind === "store") return storageEditor();
@@ -376,7 +391,20 @@ export function mountGame(
   }
   function playerBoard() {
     const a = state.players[view];
-    return `<section class="player-board panel" id="own-board"><header><h2>${playerMarker(view, true)}${esc(a.name)}</h2><div>${metric("coin", a.coins)}${metric("vp", a.vp ?? "?")}${metric("worker", a.reserve.w)}${a.reserve.c ? metric("citizen", a.reserve.c) : ""}</div></header><div class="inventory">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div><h3>${t("countryside")} <small>${a.estates.length}/12</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, 12 - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${citySize(a)}/12</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span>${pointsBadge(B[x.id].vp)}</button>${peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div><button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
+    return `<section class="player-board panel" id="own-board"><header><h2>${playerMarker(view, true)}${esc(a.name)}</h2><div>${metric("coin", a.coins)}${metric("vp", a.vp ?? "?")}${metric("worker", a.reserve.w)}${a.reserve.c ? metric("citizen", a.reserve.c) : ""}</div></header><div class="inventory">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div><h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span>${pointsBadge(B[x.id].vp)}</button>${a.puertoma ? `<small>${t.fr ? "Niveau" : "Level"} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>${achievements(a)}${puertomaBoard(a)}<button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
+  }
+  function achievements(a) {
+    if (!a.achievements) return "";
+    return `<section class="achievements"><h3>${t("achievements")}</h3><p>${t(state.puertoma ? "puertomaHelp" : "achievementHelp")}</p><div>${a.achievements
+      .map((x) => {
+        const c = achievementText(x.id, t);
+        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : metric("vp", c.vp)}<small>${esc(c.text)}</small></article>`;
+      })
+      .join("")}</div></section>`;
+  }
+  function puertomaBoard(a) {
+    if (!a.puertoma) return "";
+    return `<section class="puertoma-board"><h3>Puertoma · ${t(state.puertoma.tracker)}</h3><p>${t("puertomaHelp")}</p><div>${metric("worker", a.puertoma.unused.w)}${metric("citizen", a.puertoma.unused.c)}<small>${t("unusedWorkers")}</small></div>${a.puertoma.reserved ? `<p>${t("reservedBuilding")}: ${t(a.puertoma.reserved)}</p>` : ""}${a.puertoma.abilities.map((x) => `<p>${t("ability")} ${x.level} · ${x.active ? icon("check", 18) : ""}${esc(x.id ? abilityTexts[x.id][t.fr ? 1 : 0] : t("secretAbility"))}</p>`).join("")}</section>`;
   }
   function shipGraphic(sh) {
     return `<svg class="ship-art" viewBox="0 0 200 112" aria-hidden="true"><path fill="#edf0d4" stroke="#b6a37b" d="M96 6v58H42Zm10 9v49h43Z"/><path fill="#80614b" d="m12 66 17 31q75 22 143-3l18-28Z"/><path fill="none" stroke="#d7ac75" stroke-width="3" d="m28 77 144 0m-70-74v65"/>${Array.from({ length: sh.capacity }, (_, i) => `<rect x="${22 + i * (155 / sh.capacity)}" y="72" width="${Math.min(18, 140 / sh.capacity)}" height="17" rx="2" fill="${i < sh.amount ? "#e6c06f" : "#483e38"}" stroke="#bfa587"/>`).join("")}<path d="M5 105q20-10 40 0t40 0t40 0t40 0t30 0" fill="none" stroke="#9bbebc" stroke-width="2"/></svg>`;
@@ -568,7 +596,7 @@ export function mountGame(
       );
     show(
       t(id),
-      `<div class="building-detail">${icon(spriteFor(id), 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
+      `<div class="building-detail">${icon(spriteFor(id), 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
     );
   }
   function festivalInfo(i) {
@@ -636,6 +664,16 @@ export function mountGame(
         : "",
       adventurer
         ? section("adventurer", "adventurer", paragraph("ruleAdventurer"))
+        : "",
+      hasExpansion("achievements")
+        ? section(
+            "vp",
+            "achievements",
+            paragraph(state.puertoma ? "puertomaHelp" : "achievementHelp"),
+          )
+        : "",
+      state.puertoma
+        ? section("worker", "puertoma", paragraph("puertomaHelp"))
         : "",
       state.festivals.length
         ? section("festival", "festival", paragraph("ruleFestival"))

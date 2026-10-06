@@ -96,6 +96,7 @@ export const EXPANSIONS = [
   "smuggler",
   "festival",
   "festival-cards",
+  "achievements",
 ];
 export const FESTIVALS = [
   {

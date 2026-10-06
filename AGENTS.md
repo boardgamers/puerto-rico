@@ -3,7 +3,7 @@
 ## Product decisions
 
 - Target **Puerto Rico 1897: Special Edition**, including the June 2026 errata. Keep one fixed release configuration (`release-config.js`); expansion switches are internal, with no expansion picker in BGS or the viewer.
-- Read [source notes](docs/sources.md) before changing rules. Achievements lacks the exact deck, Puertoma is not implemented, and Festival's unique-building reservation is an explicit interpretation. Do not invent missing components or call ordinary bots Puertoma.
+- Read [source notes](docs/sources.md) before changing rules. Achievements and Puertoma use the sourced decks documented there. Festival's unique-building reservation remains an explicit interpretation. Keep local Puertoma separate from ordinary hosted bot seats, and do not invent components.
 - Use BGS locale and color-blind preferences, without duplicate controls. Favor readable pictograms with tooltips; colors must not be the only identifiers. Role warnings remain advisory, never forbidding a legal strategic choice.
 - The local preview skips the market draft and saves progress in the browser. Preserve the user's session; use a separate browser context for destructive playtests.
 

@@ -202,6 +202,50 @@ try {
     const composer = await page.locator(".chat-composer").boundingBox();
     assert.ok(composer.y + composer.height <= 844);
     await page.keyboard.press("Escape");
+    // Achievement selection sends a real legal move; opponents see card backs.
+    let solo = E.init(
+      3,
+      RELEASE.expansions,
+      { puertoma: { humans: 1 } },
+      "browser-solo",
+    );
+    await page.evaluate((s) => host.emit("state", s), E.stripSecret(solo, 0));
+    assert.equal(await page.locator(".achievement-choices button").count(), 6);
+    await page.locator(".achievement-choices button").first().click();
+    const card = await page.evaluate(() => played.at(-1));
+    assert.equal(card.type, "achievementChoose");
+    solo = E.move(solo, card, 0);
+    while (["achievementChoose", "draft"].includes(solo.tasks[0]?.kind))
+      solo = E.moveAI(solo);
+    await page.evaluate((s) => host.emit("state", s), E.stripSecret(solo, 0));
+    assert.equal(await page.locator(".achievement-card").count(), 4);
+    assert.equal(await overflow(), false, `Achievement layout at ${width}`);
+    await page.locator('[data-player="1"]').click();
+    assert.equal(await page.locator(".puertoma-board").count(), 1);
+    assert.equal(
+      await page
+        .locator(".puertoma-board")
+        .innerText()
+        .then((x) => x.includes("Capacité cachée")),
+      true,
+    );
+    assert.equal(await overflow(), false, `Puertoma layout at ${width}`);
+    await page.screenshot({
+      path: `.local/qa/${width}-puertoma.png`,
+      fullPage: true,
+    });
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
+    assert.equal(await page.locator(".achievement-card").count(), 4);
+    assert.equal(
+      await page
+        .locator(".achievements")
+        .innerText()
+        .then((x) => x.includes("Objectif secret")),
+      true,
+    );
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(
       `Browser ${width}px: actions, allocation, layout, journal, chat and scrolling OK`,

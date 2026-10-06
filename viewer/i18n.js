@@ -718,6 +718,28 @@ const rolePrivileges = {
     "Un rôle capturé rapporte {coin:3} si un autre joueur le choisit ; sinon vous le jouez en fin de tour de table. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
   ],
 };
+Object.assign(labels, {
+  achievements: ["Achievements", "Objectifs"],
+  achievementChoose: ["Choose 4 Achievements", "Choisissez 4 objectifs"],
+  achievementDraft: ["Draft an Achievement", "Choisissez un objectif à passer"],
+  expanded: ["Expanded Building bonuses", "Bonus des bâtiments étendus"],
+  unusedWorkers: ["Unused Workers", "Ouvriers inutilisés"],
+  quarries: ["Quarries", "Carrières"],
+  activePairs: ["Active Estate pairs", "Paires de plantations actives"],
+  wealth: ["Coins and Goods", "Pièces et marchandises"],
+  puertoma: ["Puertoma", "Puertoma"],
+  ability: ["Ability", "Capacité"],
+  secretAbility: ["Hidden ability", "Capacité cachée"],
+  reservedBuilding: ["Reserved Building", "Bâtiment réservé"],
+  achievementHelp: [
+    "Complete your four secret objectives at any point. Completed cards are revealed and score at game end without taking VP tokens.",
+    "Accomplissez vos quatre objectifs secrets à tout moment. Les cartes accomplies sont révélées et rapportent leurs PV en fin de partie, sans prendre de jetons PV.",
+  ],
+  puertomaHelp: [
+    "Puertoma uses its own estate slots, permanent workers, building levels and unlocked abilities. Uncompleted human Achievements score for every Puertoma; completed ones score no points for humans.",
+    "Puertoma utilise ses propres emplacements de plantations, ouvriers permanents, niveaux de bâtiments et capacités débloquées. Les objectifs humains non accomplis rapportent leurs PV à chaque Puertoma ; les objectifs accomplis ne rapportent aucun PV aux humains.",
+  ],
+});
 export function translator(locale = "en") {
   const fr = locale.toLowerCase().startsWith("fr");
   const pick = (pair) => pair?.[fr ? 1 : 0] ?? "";

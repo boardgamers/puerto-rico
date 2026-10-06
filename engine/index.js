@@ -1,3 +1,5 @@
+import * as P from "./puertoma.js";
+import * as A from "./achievements.js";
 import { sha256 } from "@noble/hashes/sha2.js";
 import {
   GOODS,
@@ -24,17 +26,25 @@ const order = (s, p = s.owner) =>
 const total = (tile) => tile.w + tile.c;
 const building = (p, id) => p.buildings.find((b) => b.id === id);
 export const active = (p, id) =>
-  !!building(p, id) && total(building(p, id)) > 0;
+  !p.puertoma && !!building(p, id) && total(building(p, id)) > 0;
 const citizen = (p, id) => (building(p, id)?.c ?? 0) > 0;
 export const citySize = (p) => sum(p.buildings.map((b) => B[b.id].size));
 const citizens = (p) =>
-  p.reserve.c + sum([...p.estates, ...p.buildings].map((t) => t.c));
+  p.reserve.c +
+  (p.puertoma?.unused.c ?? 0) +
+  sum([...p.estates, ...p.buildings].map((t) => t.c));
 const people = (p) =>
-  p.reserve.w + p.reserve.c + sum([...p.estates, ...p.buildings].map(total));
+  p.reserve.w +
+  p.reserve.c +
+  (p.puertoma ? total(p.puertoma.unused) : 0) +
+  sum([...p.estates, ...p.buildings].map(total));
 const spaces = (p) =>
   p.estates.filter((t) => t.id !== "forest").length +
   sum(p.buildings.map((t) => B[t.id].workers));
-const freeSpaces = (p) => spaces(p) - (people(p) - total(p.reserve));
+const freeSpaces = (p) =>
+  p.puertoma
+    ? P.emptyEstateSpaces(p)
+    : spaces(p) - (people(p) - total(p.reserve));
 function rng(s) {
   // Hash-chain generator: state is server-only and fully deterministic.
   s.random = Array.from(sha256(new TextEncoder().encode(s.random)), (b) =>
@@ -68,6 +78,7 @@ function event(s, type, p, info = {}) {
 function vp(s, p, n) {
   if (n <= 0) return;
   s.players[p].vp += n;
+  if (s.phaseVP) s.phaseVP[p] += n;
   s.vpSupply -= n;
   if (s.vpSupply <= 0) s.endReason ??= "points";
 }
@@ -90,7 +101,9 @@ function fillRegister(s) {
     s.players.length,
     sum(
       s.players.map((p) =>
-        sum(p.buildings.map((b) => B[b.id].workers - total(b))),
+        p.puertoma
+          ? P.registerDemand(p)
+          : sum(p.buildings.map((b) => B[b.id].workers - total(b))),
       ),
     ),
   );
@@ -123,7 +136,10 @@ function setupFestival(s) {
   )
     return;
   const cards = s.expansions.includes("festival-cards")
-    ? shuffle(s, clone(FESTIVALS)).slice(0, 3)
+    ? shuffle(
+        s,
+        clone(FESTIVALS.filter((f) => !s.puertoma || f.goal !== "ship")),
+      ).slice(0, 3)
     : ["connoisseur", "cocktail", "pioneer"].map((id) =>
         clone(FESTIVALS.find((f) => f.id === id)),
       );
@@ -147,7 +163,10 @@ function setupFestival(s) {
     }
     if (f.building) {
       const choices = Object.keys(s.market).filter(
-        (id) => !B[id].good && B[id].vp === f.building && s.market[id] > 0,
+        (id) =>
+          !B[id].good &&
+          (f.building === 4 ? B[id].size === 2 : B[id].vp === f.building) &&
+          s.market[id] > 0,
       );
       const id = choices[Math.floor(rng(s) * choices.length)];
       f.targets.building = id;
@@ -168,7 +187,7 @@ export function init(n, expansions = [], options = {}, seed = "puerto-rico") {
   assert(
     Array.isArray(expansions) &&
       expansions.every((x) => EXPANSIONS.includes(x)),
-    "Unsupported expansion; Achievements requires the verified 30-card deck",
+    "Unsupported expansion",
   );
   const s = {
     version: 1,
@@ -246,17 +265,21 @@ export function init(n, expansions = [], options = {}, seed = "puerto-rico") {
   for (const b of Object.values(B))
     if (b.expansion === "base" && (!choose || b.good))
       s.market[b.id] = n === 2 ? (b.good ? 2 : 1) : b.copies;
+  if (options.puertoma) setupPuertoma(s, options.puertoma);
   fillRegister(s);
   if (choose) s.tasks = [{ kind: "draft", p: 0 }];
   else {
+    finishPuertomaSetup(s);
     setupFestival(s);
     refillEstates(s);
     s.tasks = [{ kind: "role", p: 0 }];
   }
+  setupAchievements(s);
   event(s, "round", 0);
   return s;
 }
 export function production(p) {
+  if (p.puertoma) return P.production(p);
   const out = counts();
   for (const g of GOODS) {
     const farms = sum(p.estates.filter((t) => t.id === g).map(total));
@@ -271,7 +294,8 @@ export function production(p) {
       if (out[g] && active(p, id)) out[g]++;
   return out;
 }
-export function cost(s, p, id) {
+export function cost(s, p, id, move = {}) {
+  if (s.players[p].puertoma) return P.price(s, p, id);
   const a = s.players[p],
     b = B[id];
   let base = b.cost;
@@ -297,7 +321,46 @@ export function cost(s, p, id) {
       : b.size === 1
         ? 1
         : 0;
-  return Math.max(0, base - discount);
+  return move.pay ?? Math.max(0, base - discount);
+}
+function buildingPayments(s, p, id) {
+  const a = s.players[p],
+    b = B[id];
+  const base =
+    s.options.costSwap && id === "factory"
+      ? 8
+      : s.options.costSwap && id === "school"
+        ? 7
+        : b.cost;
+  const quarries = Math.min(
+    sum(a.estates.filter((t) => t.id === "quarry").map(total)),
+    b.size === 2 ? 4 : b.vp,
+  );
+  const privilege =
+    s.owner === p && s.role === "builder"
+      ? active(a, "publishingHouse")
+        ? 2
+        : 1
+      : 0;
+  const lumber = active(a, "lumberyard")
+    ? Math.floor(a.estates.filter((t) => t.id === "forest").length / 2)
+    : 0;
+  const notary = active(a, "notary")
+    ? citizen(a, "notary")
+      ? b.size === 2
+        ? 2
+        : 0
+      : b.size === 1
+        ? 1
+        : 0
+    : 0;
+  let reductions = Array.from({ length: quarries + 1 }, (_, i) => i);
+  for (const bonus of [privilege, lumber, notary])
+    if (bonus)
+      reductions = [...new Set(reductions.flatMap((n) => [n, n + bonus]))];
+  return [...new Set(reductions.map((n) => Math.max(0, base - n)))].sort(
+    (a, b) => a - b,
+  );
 }
 function tileRef(a, key) {
   if (key === "reserve") return a.reserve;
@@ -316,6 +379,7 @@ function workerSources(a) {
   );
 }
 export function buildOptions(s, p) {
+  if (s.players[p].puertoma) return P.buildings(s, p);
   const a = s.players[p],
     out = [];
   for (const [id, n] of Object.entries(s.market)) {
@@ -335,6 +399,11 @@ export function buildOptions(s, p) {
     const short = cost(s, p, id) - a.coins;
     if (short <= 0) {
       out.push({ type: "build", id });
+      // Quarry reductions and role Advantages may be declined (rulebook pp. 9, 12).
+      // Explicit higher Coin payments let Big Spender use this legal choice.
+      for (const pay of buildingPayments(s, p, id))
+        if (pay > cost(s, p, id) && pay <= a.coins)
+          out.push({ type: "build", id, pay });
       continue;
     }
     if (short > 3 || !active(a, "hiddenMarket")) continue;
@@ -407,6 +476,9 @@ function startRole(s, id, p, captured = false) {
   if (s.captured?.id === id) s.captured = null;
   s.role = id.startsWith("adventurer") ? "adventurer" : id;
   s.owner = p;
+  s.phaseVP = s.players.map(() => 0);
+  if (s.role === "recruiter")
+    for (const a of s.players) if (a.puertoma) a.puertoma.recruited = 0;
   s.production = s.players.map(() => counts());
   s.shipped = s.players.map(() => counts());
   s.planted = s.players.map(() => []);
@@ -449,6 +521,7 @@ function finishPhase(s) {
     s.offer = [];
     refillEstates(s);
   }
+  finishPuertomaPhase(s);
   if (s.role === "recruiter") fillRegister(s);
   if (s.role === "trader" && s.trade.length === 4) {
     for (const g of s.trade) s.supply[g]++;
@@ -542,7 +615,10 @@ function checkFestival(s, p, e) {
     let nw = 0;
     for (let k = 0; k < (f.reward.workers ?? 0); k++)
       if (gainPerson(s, p)) nw++;
-    if (nw) s.tasks.unshift({ kind: "bonusAssign", p, remaining: nw });
+    if (nw) {
+      if (a.puertoma) allocatePuertoma(s, p);
+      else s.tasks.unshift({ kind: "bonusAssign", p, remaining: nw });
+    }
     event(s, "festival", p, { id: f.id, reward: { ...f.reward, workers: nw } });
   }
 }
@@ -583,8 +659,12 @@ export function shipping(s, p) {
 function phaseLegal(s, t) {
   const p = t.p,
     a = s.players[p];
+  if (a.puertoma) return [P.choice(s, t, puertomaAPI)];
   const pass = { type: "pass" };
   switch (t.kind) {
+    case "achievementChoose":
+    case "achievementDraft":
+      return a.achievementOffer.map((id) => ({ type: t.kind, id }));
     case "role":
       return s.roles
         .filter(
@@ -755,7 +835,7 @@ function phaseLegal(s, t) {
       if (total(s.register) > s.players.length) out.push({ type: "poach" });
       out.push(
         ...s.roles
-          .filter((r) => r.taken === null && r.id !== "smuggler")
+          .filter((r) => !s.puertoma && r.taken === null && r.id !== "smuggler")
           .map((r) => ({ type: "capture", id: r.id })),
       );
       return [...out, pass];
@@ -934,6 +1014,11 @@ function settle(s) {
     if (s.finished || !s.tasks.length) return;
     const t = s.tasks[0],
       a = s.players[t.p];
+    if (t.kind === "bonusAssign" && a.puertoma) {
+      allocatePuertoma(s, t.p);
+      s.tasks.shift();
+      continue;
+    }
     if (t.kind === "phaseEnd") {
       s.tasks.shift();
       finishPhase(s);
@@ -999,6 +1084,7 @@ function endPoach(s, t) {
   s.tasks[0] = { kind: "poachDiscard", p: t.p };
 }
 export function autoAssignment(s, p) {
+  if (s.players[p].puertoma) return P.allocation(s, p);
   const a = s.players[p],
     estates = a.estates.map(() => ({ w: 0, c: 0 })),
     buildings = a.buildings.map(() => ({ w: 0, c: 0 }));
@@ -1055,6 +1141,7 @@ export function autoAssignment(s, p) {
   return { estates, buildings };
 }
 export function autoStorage(s, p) {
+  if (s.players[p].puertoma) return P.storage(s.players[p]);
   const a = s.players[p],
     slots =
       (active(a, "smallWarehouse") ? 1 : 0) +
@@ -1104,7 +1191,17 @@ export function move(state, m, p) {
   const s = clone(state),
     t = s.tasks[0],
     a = s.players[p],
-    extra = { phase: t.kind };
+    extra = { phase: t.kind, beforeCoins: s.players[p].coins };
+  if (a.puertoma) {
+    assert(sameMove(P.choice(s, t, puertomaAPI), m));
+    for (let i = 0; i < (m.puertomaDraws ?? 0); i++) drawPuertoma(s);
+    applyPuertoma(s, t, m);
+    s.history.push({ p, move: clone(m) });
+    checkAchievements(s, p, { ...m });
+    settle(s);
+    checkAllAchievements(s);
+    return s;
+  }
   const custom = {
     assign: "assign",
     produce: "produce",
@@ -1146,6 +1243,10 @@ export function move(state, m, p) {
   }
   const next = () => s.tasks.shift();
   switch (m.type) {
+    case "achievementChoose":
+    case "achievementDraft":
+      selectAchievement(s, t, m);
+      break;
     case "role":
       startRole(s, m.id, p);
       break;
@@ -1155,6 +1256,7 @@ export function move(state, m, p) {
       if (marketChoices(s).length)
         s.tasks.unshift({ kind: "draft", p: (p + 1) % s.players.length });
       else {
+        finishPuertomaSetup(s);
         setupFestival(s);
         refillEstates(s);
         s.tasks = [{ kind: "role", p: s.governor }];
@@ -1296,7 +1398,7 @@ export function move(state, m, p) {
       next();
       break;
     case "build": {
-      const price = cost(s, p, m.id),
+      const price = cost(s, p, m.id, m),
         paid = Math.min(price, a.coins),
         school = active(a, "school"),
         church = active(a, "church");
@@ -1329,6 +1431,8 @@ export function move(state, m, p) {
           building: a.buildings.length - 1,
         });
       extra.coins = -paid;
+      extra.paid = paid;
+      updateReservations(s, m.id);
       checkFestival(s, p, { type: "build", id: m.id });
       break;
     }
@@ -1509,6 +1613,7 @@ export function move(state, m, p) {
         s.shipPasses++;
         if (s.shipPasses >= s.players.length) {
           next();
+          beforePuertomaStorage(s);
           s.tasks.unshift(...order(s).map((p) => ({ kind: "store", p })));
         } else t.p = (p + 1) % s.players.length;
       } else if (t.kind === "poach") endPoach(s, t);
@@ -1518,9 +1623,12 @@ export function move(state, m, p) {
       assert(false);
   }
   if (!["role", "plant"].includes(m.type))
-    event(s, m.type, p, { ...m, ...extra });
+    if (!["achievementChoose", "achievementDraft"].includes(m.type))
+      event(s, m.type, p, { ...m, ...extra });
   s.history.push({ p, move: clone(m) });
+  checkAchievements(s, p, { ...m, ...extra });
   settle(s);
+  checkAllAchievements(s);
   return s;
 }
 export function currentPlayer(s) {
@@ -1534,7 +1642,13 @@ export function ended(s) {
 }
 export function scoreBreakdown(s, p) {
   const a = s.players[p],
-    bonus = {};
+    bonus = a.puertoma ? P.score(a) : {};
+  if (s.expansions.includes("achievements"))
+    bonus.achievements = s.puertoma
+      ? a.puertoma
+        ? A.incompletePoints(s)
+        : 0
+      : A.points(a);
   if (active(a, "fireStation"))
     bonus.fireStation = sum(
       a.buildings
@@ -1587,8 +1701,27 @@ export function stripSecret(state, p) {
   s.bagCount = s.bag.length;
   delete s.bag;
   delete s.discard;
+  if (s.puertoma) {
+    delete s.puertoma.deck;
+    delete s.puertoma.discard;
+    for (const a of s.players)
+      if (a.puertoma)
+        a.puertoma.abilities = a.puertoma.abilities.map((x) =>
+          s.finished || x.active ? x : { level: x.level, active: false },
+        );
+  }
   for (let i = 0; i < s.players.length; i++)
-    if (i !== p && !s.finished) s.players[i].vp = null;
+    if (i !== p && !s.finished) {
+      s.players[i].vp = null;
+      if (s.players[i].achievements)
+        s.players[i].achievements = s.players[i].achievements.map((c) =>
+          c.completed ? { id: c.id, completed: true } : { hidden: true },
+        );
+      if (s.players[i].achievementOffer)
+        s.players[i].achievementOffer = s.players[i].achievementOffer.map(
+          () => null,
+        );
+    }
   // Logs contain only public moves; historical earned points are public even though totals are concealed.
   s.legal = Number.isInteger(p) ? legal(state, p) : [];
   s.roleWarnings = Number.isInteger(p) ? roleWarnings(state, p) : {};
@@ -1738,4 +1871,489 @@ export function chooseAI(s, p = currentPlayer(s)) {
 }
 export function moveAI(s, p = currentPlayer(s)) {
   return move(s, chooseAI(s, p), p);
+}
+
+function drawPuertoma(s) {
+  if (!s.puertoma.deck.length) {
+    s.puertoma.deck = shuffle(s, s.puertoma.discard);
+    s.puertoma.discard = [];
+  }
+  const card = s.puertoma.deck.pop();
+  s.puertoma.discard.push(card);
+  s.puertoma.lastCard = card;
+  return card;
+}
+const puertomaAPI = { draw: drawPuertoma, marketChoices, shipping };
+function setupPuertoma(s, config) {
+  assert(
+    config && typeof config === "object",
+    "Puertoma configuration requires a human count and difficulty",
+  );
+  const humans = config.humans ?? 1,
+    difficulty = config.difficulty ?? "normal";
+  assert(
+    integer(humans) &&
+      humans >= 1 &&
+      s.players.length - humans >= 1 &&
+      s.players.length - humans <= 2,
+    "Use one or two Puertomas after the human seats",
+  );
+  assert(
+    ["easy", "normal", "hard"].includes(difficulty),
+    "Unsupported Puertoma difficulty",
+  );
+  s.puertoma = {
+    humans,
+    difficulty,
+    tracker: "builder",
+    deck: shuffle(s, [1, 2, 3, 4, 5, 6, 7, 8]),
+    discard: [],
+    lastCard: null,
+    setup: false,
+  };
+  for (let p = humans; p < s.players.length; p++) {
+    s.players[p].bot = true;
+    s.players[p].puertoma = {
+      unused: { w: 0, c: 0 },
+      reserved: null,
+      abilities: [1, 2, 3, 4].map((level) => ({
+        level,
+        id: P.ABILITIES[level][Math.floor(rng(s) * 3)],
+        active: difficulty === "hard" && level === 1,
+      })),
+      recruited: 0,
+    };
+  }
+}
+function finishPuertomaSetup(s) {
+  if (!s.puertoma || s.puertoma.setup) return;
+  s.puertoma.setup = true;
+  if (s.puertoma.difficulty !== "hard") return;
+  for (let p = s.puertoma.humans; p < s.players.length; p++) {
+    const a = s.players[p],
+      n = p - s.puertoma.humans;
+    const choices = Object.keys(s.market).filter(
+      (id) => s.market[id] && !B[id].good && P.level(id) === (n === 0 ? 1 : 2),
+    );
+    assert(choices.length, "No commercial building for Hard Puertoma setup");
+    choices.sort(P.buildingOrder);
+    const id = choices[(drawPuertoma(s) - 1) % choices.length];
+    s.market[id]--;
+    a.buildings.push({ id, w: 0, c: 0, level: P.level(id) });
+    reserveExpanded(s, p);
+    if (n === 0) {
+      gainPerson(s, p);
+      allocatePuertoma(s, p);
+    } else a.coins = 1;
+    const good = n === 0 ? "corn" : "sugar";
+    if (s.supply[good]) {
+      s.supply[good]--;
+      a.goods[good]++;
+    }
+  }
+}
+function allocatePuertoma(s, p) {
+  const a = s.players[p],
+    assigned = P.allocation(s, p, () => drawPuertoma(s));
+  a.estates.forEach((t, i) => Object.assign(t, assigned.estates[i]));
+  a.puertoma.unused.w += assigned.unused.w;
+  a.puertoma.unused.c += assigned.unused.c;
+  a.reserve = { w: 0, c: 0 };
+}
+function reserveExpanded(s, p) {
+  const a = s.players[p];
+  const taken = s.players
+    .filter((x) => x.puertoma)
+    .map((x) => x.puertoma.reserved);
+  const choices = Object.keys(s.market).filter(
+    (id) =>
+      s.market[id] &&
+      B[id].size === 2 &&
+      !taken.includes(id) &&
+      !a.buildings.some((b) => b.id === id),
+  );
+  choices.sort(P.buildingOrder);
+  a.puertoma.reserved = choices.length
+    ? choices[(drawPuertoma(s) - 1) % choices.length]
+    : null;
+}
+function updateReservations(s, id) {
+  if (!s.puertoma) return;
+  for (let p = s.puertoma.humans; p < s.players.length; p++)
+    if (s.players[p].puertoma.reserved === id) {
+      s.players[p].puertoma.reserved = null;
+      reserveExpanded(s, p);
+    }
+}
+function trackPuertoma(s, role) {
+  if (P.ADJACENCY[s.puertoma.tracker]?.includes(role))
+    s.puertoma.tracker = role;
+}
+function gainPuertomaWorker(s, p) {
+  if (gainPerson(s, p)) {
+    s.players[p].puertoma.recruited++;
+    return true;
+  }
+  return false;
+}
+function beforePuertomaStorage(s) {
+  if (!s.puertoma) return;
+  for (let p = s.puertoma.humans; p < s.players.length; p++) {
+    const a = s.players[p];
+    if (P.ability(a, "goodsPoints")) {
+      const points = GOODS.filter((g) => a.goods[g]).length;
+      vp(s, p, points);
+      if (points)
+        event(s, "puertomaBonus", p, { id: "goodsPoints", vp: points });
+    }
+    if (P.ability(a, "discardPoints")) {
+      const good = GOODS.find((g) => a.goods[g]);
+      if (good) {
+        const n = Math.min(2, a.goods[good]);
+        a.goods[good] -= n;
+        s.supply[good] += n;
+        vp(s, p, n);
+        event(s, "puertomaBonus", p, {
+          id: "discardPoints",
+          vp: n,
+          goods: { [good]: -n },
+        });
+      }
+    }
+  }
+}
+function finishPuertomaPhase(s) {
+  if (!s.puertoma) return;
+  for (let p = s.puertoma.humans; p < s.players.length; p++) {
+    const a = s.players[p];
+    if (s.role === "craftsman") {
+      if (P.ability(a, "produceCrate")) {
+        const good = [...GOODS]
+          .reverse()
+          .find((g) => s.production[p][g] && s.supply[g]);
+        if (good) {
+          s.supply[good]--;
+          a.goods[good]++;
+          s.production[p][good]++;
+          event(s, "puertomaBonus", p, {
+            id: "produceCrate",
+            goods: { [good]: 1 },
+          });
+          checkFestival(s, p, { type: "produce" });
+        }
+      }
+      if (P.ability(a, "produceCoins")) {
+        const coins = GOODS.filter((g) => s.production[p][g]).length;
+        a.coins += coins;
+        if (coins) event(s, "puertomaBonus", p, { id: "produceCoins", coins });
+      }
+    }
+    if (s.role === "recruiter") {
+      if (P.ability(a, "recruitWorker")) {
+        if (gainPuertomaWorker(s, p))
+          event(s, "puertomaBonus", p, { id: "recruitWorker", workers: 1 });
+        allocatePuertoma(s, p);
+      }
+      if (P.ability(a, "recruitCoins")) {
+        const coins = a.puertoma.recruited;
+        a.coins += coins;
+        if (coins) event(s, "puertomaBonus", p, { id: "recruitCoins", coins });
+      }
+      a.puertoma.recruited = 0;
+    }
+  }
+}
+function applyPuertoma(s, t, m) {
+  const p = t.p,
+    a = s.players[p],
+    next = () => s.tasks.shift(),
+    extra = { phase: t.kind };
+  switch (m.type) {
+    case "role":
+      startRole(s, m.id, p);
+      if (s.role === "adventurer") trackPuertoma(s, "adventurer");
+      return;
+    case "draft":
+      s.market[m.id] = s.players.length === 2 ? 1 : B[m.id].copies;
+      next();
+      if (marketChoices(s).length)
+        s.tasks.unshift({ kind: "draft", p: (p + 1) % s.players.length });
+      else {
+        finishPuertomaSetup(s);
+        setupFestival(s);
+        refillEstates(s);
+        s.tasks = [{ kind: "role", p: s.governor }];
+      }
+      break;
+    case "plant": {
+      if (m.id === "quarry") s.quarries--;
+      else s.offer.splice(s.offer.indexOf(m.id), 1);
+      next();
+      const vpArea =
+        m.id !== "quarry" &&
+        a.estates.filter((e) => e.id === m.id && !e.vpArea).length >= 2;
+      a.estates.push({
+        id: m.id,
+        w: 0,
+        c: 0,
+        ...(vpArea ? { vpArea: true } : {}),
+      });
+      s.planted[p].push(a.estates.length - 1);
+      if (P.ability(a, "plantCrate") && s.supply[m.id]) {
+        s.supply[m.id]--;
+        a.goods[m.id]++;
+        event(s, "puertomaBonus", p, {
+          id: "plantCrate",
+          goods: { [m.id]: 1 },
+        });
+      }
+      event(s, "estate", p, { id: m.id });
+      checkFestival(s, p, { type: "estates" });
+      trackPuertoma(s, "planter");
+      break;
+    }
+    case "build": {
+      const buildWorker = P.ability(a, "buildWorker");
+      const bonus = Number(P.ability(a, "buildCoin"));
+      a.coins += bonus - P.price(s, p, m.id);
+      s.market[m.id]--;
+      a.buildings.push({ id: m.id, w: 0, c: 0, level: m.level });
+      const count = a.buildings.filter((b) => b.level === m.level).length;
+      const unlocked = a.puertoma.abilities.filter((x) => x.active).length;
+      const target = a.puertoma.abilities.find((x) => x.level === m.level);
+      if (
+        target &&
+        !target.active &&
+        (m.level === 4 || count === 2) &&
+        !(s.puertoma.difficulty === "easy" && unlocked >= 2)
+      ) {
+        target.active = true;
+        event(s, "puertomaAbility", p, { id: target.id, level: m.level });
+      }
+      if (
+        [1, 2, 3, 4].every(
+          (l) => a.buildings.filter((b) => b.level === l).length === 2,
+        )
+      )
+        s.endReason ??= "city";
+      next();
+      if (buildWorker) {
+        if (gainPuertomaWorker(s, p))
+          event(s, "puertomaBonus", p, { id: "buildWorker", workers: 1 });
+        allocatePuertoma(s, p);
+      }
+      updateReservations(s, m.id);
+      if (
+        !a.puertoma.reserved &&
+        a.buildings.filter((b) => B[b.id].size === 2).length < 2
+      )
+        reserveExpanded(s, p);
+      extra.coins = bonus - P.price(s, p, m.id);
+      checkFestival(s, p, { type: "build", id: m.id });
+      trackPuertoma(s, "builder");
+      break;
+    }
+    case "recruitBonus":
+      gainPuertomaWorker(s, p);
+      if (--t.remaining === 0) next();
+      trackPuertoma(s, "recruiter");
+      break;
+    case "recruit":
+      s.register[m.kind]--;
+      a.reserve[m.kind]++;
+      a.puertoma.recruited++;
+      t.p = (p + 1) % s.players.length;
+      trackPuertoma(s, "recruiter");
+      break;
+    case "assign":
+      a.estates.forEach((estate, i) => Object.assign(estate, m.estates[i]));
+      a.puertoma.unused.w += m.unused.w;
+      a.puertoma.unused.c += m.unused.c;
+      a.reserve = { w: 0, c: 0 };
+      next();
+      break;
+    case "produce":
+      for (const g of GOODS) {
+        a.goods[g] += m.goods[g];
+        s.supply[g] -= m.goods[g];
+        s.production[p][g] += m.goods[g];
+      }
+      next();
+      checkFestival(s, p, { type: "produce" });
+      if (sum(Object.values(m.goods))) trackPuertoma(s, "craftsman");
+      break;
+    case "produceBonus":
+      a.goods[m.good]++;
+      s.supply[m.good]--;
+      s.production[p][m.good]++;
+      if (--t.remaining === 0) next();
+      checkFestival(s, p, { type: "produce" });
+      break;
+    case "trade": {
+      a.goods[m.good]--;
+      s.trade.push(m.good);
+      const coins =
+        GOODS.indexOf(m.good) +
+        Number(s.owner === p) +
+        Number(P.ability(a, "tradeCoin"));
+      a.coins += coins;
+      t.acted = true;
+      extra.coins = coins;
+      checkFestival(s, p, { type: "trade", good: m.good });
+      trackPuertoma(s, "trader");
+      break;
+    }
+    case "ship": {
+      const ship = s.ships[m.ship],
+        n = Math.min(a.goods[m.good], ship.capacity - ship.amount);
+      a.goods[m.good] -= n;
+      ship.good = m.good;
+      ship.amount += n;
+      s.shipped[p][m.good] += n;
+      const advantage = p === s.owner && !s.captainBonus;
+      if (advantage) s.captainBonus = true;
+      vp(s, p, n + Number(advantage));
+      extra.vp = n + Number(advantage);
+      extra.goods = { ...counts(), [m.good]: n };
+      extra.shipCapacity = ship.capacity;
+      extra.shipLoad = ship.amount;
+      t.p = (p + 1) % s.players.length;
+      s.shipPasses = 0;
+      checkFestival(s, p, {
+        type: "ship",
+        good: m.good,
+        capacity: ship.capacity,
+        full: ship.amount === ship.capacity,
+      });
+      trackPuertoma(s, "captain");
+      break;
+    }
+    case "store":
+      for (const g of GOODS) {
+        s.supply[g] += a.goods[g] - m.goods[g];
+        a.goods[g] = m.goods[g];
+      }
+      next();
+      break;
+    case "raid": {
+      const ship = s.ships[m.ship];
+      a.goods[ship.good] += m.amount;
+      s.supply[ship.good] += ship.amount - m.amount;
+      extra.good = ship.good;
+      extra.shipCapacity = ship.capacity;
+      ship.good = null;
+      ship.amount = 0;
+      next();
+      trackPuertoma(s, "smuggler");
+      break;
+    }
+    case "plunder":
+      vp(s, p, s.trade.length);
+      extra.vp = s.trade.length;
+      s.trade.forEach((g) => s.supply[g]++);
+      s.trade = [];
+      next();
+      trackPuertoma(s, "smuggler");
+      break;
+    case "poach":
+      s.discardedPeople ??= { w: 0, c: 0 };
+      s.tasks[0] = {
+        kind: "poach",
+        p,
+        remaining: Math.min(3, total(s.register) - s.players.length),
+      };
+      trackPuertoma(s, "smuggler");
+      break;
+    case "poachWorker":
+      s.register[m.kind]--;
+      tileRef(a, m.target)[m.kind]++;
+      t.remaining--;
+      break;
+    case "discardWorker":
+      s.register[m.kind]--;
+      s.discardedPeople[m.kind]++;
+      break;
+    case "pass":
+      if (t.kind === "ship") {
+        s.shipPasses++;
+        if (s.shipPasses >= s.players.length) {
+          next();
+          beforePuertomaStorage(s);
+          s.tasks.unshift(...order(s).map((p) => ({ kind: "store", p })));
+        } else t.p = (p + 1) % s.players.length;
+      } else if (t.kind === "poach") endPoach(s, t);
+      else next();
+      break;
+    default:
+      assert(false, "Unknown Puertoma action");
+  }
+  event(s, m.type, p, { ...m, ...extra });
+}
+
+function setupAchievements(s) {
+  if (!s.expansions.includes("achievements")) return;
+  const cards = shuffle(
+    s,
+    A.ACHIEVEMENTS.map((c) => c.id),
+  );
+  for (const a of s.players) {
+    if (a.puertoma) continue;
+    a.achievements = [];
+    if (s.puertoma) a.achievementOffer = cards.splice(0, 6);
+    else if (s.options.achievementDraft)
+      a.achievementOffer = cards.splice(0, 4);
+    else
+      a.achievements = cards
+        .splice(0, 4)
+        .map((id) => ({ id, completed: false }));
+  }
+  if (s.puertoma || s.options.achievementDraft) {
+    s.setupAfterAchievements = s.tasks;
+    s.tasks = [
+      { kind: s.puertoma ? "achievementChoose" : "achievementDraft", p: 0 },
+    ];
+  }
+}
+function selectAchievement(s, t, m) {
+  const a = s.players[t.p];
+  a.achievementOffer.splice(a.achievementOffer.indexOf(m.id), 1);
+  a.achievements.push({ id: m.id, completed: false });
+  const humans = s.puertoma?.humans ?? s.players.length;
+  if (t.kind === "achievementChoose") {
+    if (a.achievements.length < 4) return;
+    delete a.achievementOffer;
+    if (t.p + 1 < humans) {
+      t.p++;
+      return;
+    }
+  } else {
+    if (t.p + 1 < humans) {
+      t.p++;
+      return;
+    }
+    const offers = s.players.map((a) => a.achievementOffer);
+    if (a.achievements.length < 4) {
+      for (let i = 0; i < humans; i++)
+        s.players[i].achievementOffer = offers[(i - 1 + humans) % humans];
+      t.p = 0;
+      return;
+    }
+    s.players.forEach((a) => delete a.achievementOffer);
+  }
+  s.tasks = s.setupAfterAchievements;
+  delete s.setupAfterAchievements;
+}
+function checkAchievements(s, p, e = {}) {
+  const a = s.players[p];
+  for (const c of a.achievements ?? []) {
+    if (!c.completed && A.fulfilled(s, p, c.id, e)) {
+      c.completed = true;
+      c.round = s.round;
+      // No VP tokens are withdrawn: card points are counted only at game end.
+      event(s, "achievement", p, { id: c.id });
+    }
+  }
+}
+function checkAllAchievements(s) {
+  s.players.forEach((_, p) => checkAchievements(s, p));
 }

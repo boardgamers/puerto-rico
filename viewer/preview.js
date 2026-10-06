@@ -1,8 +1,14 @@
 import * as engine from "../engine/index.js";
 import { RELEASE } from "../release-config.js";
 import { mountGame } from "./ui.js";
-const KEY = "puerto-rico-preview-v1";
 const params = new URLSearchParams(location.search);
+const solo = params.get("mode") === "puertoma";
+const difficulty = ["easy", "normal", "hard"].includes(params.get("difficulty"))
+  ? params.get("difficulty")
+  : "normal";
+const KEY = solo
+  ? `puerto-rico-preview-puertoma-${difficulty}-v1`
+  : "puerto-rico-preview-v1";
 let state,
   undo = [],
   generation = 0,
@@ -11,10 +17,15 @@ function newGame() {
   let s = engine.init(
     3,
     RELEASE.expansions,
-    RELEASE.options,
+    {
+      ...RELEASE.options,
+      ...(solo ? { puertoma: { humans: 1, difficulty } } : {}),
+    },
     `preview-${Date.now()}`,
   );
   s.players.forEach((p, i) => (p.name = ["Vous", "Isabel", "Rafael"][i]));
+  if (solo)
+    s.players.slice(1).forEach((p, i) => (p.name = `Puertoma ${i + 1}`));
   while (s.tasks[0]?.kind === "draft") s = engine.moveAI(s);
   return s;
 }
@@ -28,6 +39,7 @@ const ui = mountGame(document.getElementById("game"), {
   async onMove(move) {
     undo.push(structuredClone(state));
     state = engine.move(state, move, 0);
+    while (state.tasks[0]?.kind === "draft") state = engine.moveAI(state);
     display();
     setTimeout(opponents, 180);
   },

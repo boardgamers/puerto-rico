@@ -1,3 +1,4 @@
+import { achievementText, abilityTexts } from "./achievement-text.js";
 import { GOODS } from "../engine/catalog.js";
 import { icon, scoreToken } from "./icons.js";
 const esc = (value) =>
@@ -59,6 +60,15 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
         return `<li class="round-divider">${t("finished")} · ${t({ city: "journalEndCity", points: "journalEndPoints", workers: "journalEndWorkers" }[e.reason])}</li>`;
       let text = "";
       switch (e.type) {
+        case "achievement":
+          text = `${t("achievements")} · ${esc(achievementText(e.id, t).name)} ${icon("check", 20)}`;
+          break;
+        case "puertomaBonus":
+          text = `${t("ability")} · ${esc(abilityTexts[e.id][t.fr ? 1 : 0])} ${goods(e.goods)} ${e.workers ? metric("worker", e.workers, true) : ""}`;
+          break;
+        case "puertomaAbility":
+          text = `${t("ability")} ${e.level} · ${esc(abilityTexts[e.id][t.fr ? 1 : 0])}`;
+          break;
         case "income":
           text = t("journalGains");
           break;

@@ -1557,3 +1557,46 @@
   vertical-align: -2px;
   flex-shrink: 0;
 }
+.achievements,
+.puertoma-board {
+  margin-top: 1rem;
+}
+.achievements p,
+.puertoma-board p {
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+.achievements > div,
+.achievement-choices {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+}
+.achievement-card {
+  padding: 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 0.4rem;
+}
+.achievement-card strong,
+.achievement-card small,
+.achievement-choices strong,
+.achievement-choices small {
+  display: block;
+}
+.achievement-card small,
+.achievement-choices small {
+  white-space: normal;
+  line-height: 1.4;
+  margin-top: 0.4rem;
+}
+.achievement-card.completed {
+  border-color: #477347;
+}
+.achievement-choices button {
+  height: auto;
+  min-width: 0;
+  text-align: left;
+}
+.puertoma-board .metric {
+  margin-right: 0.5rem;
+}

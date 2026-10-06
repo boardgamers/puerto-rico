@@ -11,12 +11,17 @@ Apply the errata: game-end triggers finish the **round**, including VP depletion
 
 New Buildings and Citizens use the cost-constrained building selection described in this edition. Two-player games use the classic two-player rules on page 22. Optional balance variants remain separate options.
 
-## Outstanding source data
+## Achievement and Puertoma components
 
-The book describes Achievements but does not supply the complete 30-card deck. Do not invent replacement objectives or advertise this module as complete. Puertoma also needs its exact tiebreaker deck verified. Ordinary bots play the human rules and are not presented as Puertoma.
+- [All 30 Achievement cards, transcribed by owner Ben Tinney](https://boardgamegeek.com/thread/3629370/article/47036030#47036030), 17 December 2025. This supplies the physical card names, objectives and VP values missing from the rulebook. Leading Producer uses the publisher errata: seven crates in one Craftsman phase.
+- [Achievement wording discussion](https://boardgamegeek.com/thread/3743692/translation-problems-with-achievement-cards-in-chi). Independent Shipper means filling an empty cargo ship in one action; dispatch means placing the last crate, as defined on rulebook page 30. Master Architect refers to an expanded building, not an expansion building. Deal Closer requires the role chooser to place the fourth Trading House good.
+- [Authorized Puertoma print-and-play adaptation](https://boardgamegeek.com/filepage/325253/puertoricoedition2002-fanmadepuertoma), posted by RandomObfuscation, states permission from Awaken Realms and Davíd. Its eight tiebreaker card numbers/orders match the visible official examples. Terminology is mapped from Mayor/Settler/Prospector to Recruiter/Planter/Adventurer. The Special Edition rulebook pp. 33–42 controls gameplay, abilities and expansion overrides; the older terminology and action board from this adaptation are not used as gameplay rules.
+- [Puertoma Builder clarification](https://boardgamegeek.com/thread/3656491/puertoma-builder-role-questions): published highest-affordable-level/random-building behavior is implemented, rather than the earlier highest-cost design intent.
 
-### Festival building markers: unresolved rulebook conflict
+Repeated legal-move/state queries do not draw cards. Card draws are committed only when actions execute, so replays reproduce the shuffled deck. Counting tied building choices proceeds left to right in the digital market's price/name order. Festival worker ties use card numbers; ordinary worker priorities complete the estate with the fewest missing workers, then the best good. Unused workers remain permanently in the VP area. Puertoma incomplete Achievement scoring is separate from human card scoring and never removes VP tokens.
+
+### Festival building markers: rulebook conflict
 
 Pages 29–31 reserve a building as an objective marker and return it after the objective is completed. Town Patron requires an expanded building, of which only one copy exists; two-player setup also has only one copy of each commercial building. Removing that copy makes its own objective impossible. The preview uses a reference marker in those cases, keeping the unique building purchasable. With multiple copies it reserves one as written. This is an explicit implementation interpretation, **not a verified publisher ruling**, and needs confirmation before a release claiming exact rules compliance.
 
-Reference PDFs live only in ignored `.local/rules/`; they are not shipped as game assets. UI illustrations are original code-generated vectors.
+Reference PDFs and downloaded component images are research material outside the shipped package or in ignored `.local/rules/`; they are not shipped as game assets. UI illustrations are original code-generated vectors.

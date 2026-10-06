@@ -11,6 +11,7 @@ import { resolve, join } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
 import assert from "node:assert/strict";
+import { RELEASE } from "../release-config.js";
 
 export async function packageEngine() {
   const { name, version, description } = JSON.parse(
@@ -58,7 +59,7 @@ export async function packageEngine() {
     );
     for (const players of [2, 3, 4, 5]) {
       let state = engine.init(players, [], {}, `release-${players}`);
-      assert.equal(state.expansions.length, 5);
+      assert.deepEqual(state.expansions, RELEASE.expansions);
       let moves = 0;
       while (!engine.ended(state) && moves++ < 6000)
         state = engine.moveAI(state);

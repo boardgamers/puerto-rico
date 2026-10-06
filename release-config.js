@@ -6,8 +6,7 @@ export const MODULES = {
   smuggler: true,
   festival: true,
   "festival-cards": true,
-  // Reserved switch; enabling it is blocked until the complete official deck is verified.
-  achievements: false,
+  achievements: true,
 };
 export const RELEASE = {
   name: "Puerto Rico: Special Edition",
