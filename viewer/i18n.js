@@ -720,6 +720,7 @@ const rolePrivileges = {
 };
 Object.assign(labels, {
   achievements: ["Achievements", "Objectifs"],
+  achievementHelpTitle: ["About Achievements", "À propos des objectifs"],
   achievementChoose: ["Choose 4 Achievements", "Choisissez 4 objectifs"],
   achievementDraft: ["Draft an Achievement", "Choisissez un objectif à passer"],
   expanded: ["Expanded Building bonuses", "Bonus des bâtiments étendus"],

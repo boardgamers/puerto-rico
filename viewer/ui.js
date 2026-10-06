@@ -395,7 +395,7 @@ export function mountGame(
   }
   function achievements(a) {
     if (!a.achievements) return "";
-    return `<section class="achievements"><h3>${t("achievements")}</h3><p>${t(state.puertoma ? "puertomaHelp" : "achievementHelp")}</p><div>${a.achievements
+    return `<section class="achievements"><h3>${t("achievements")}<button type="button" class="icon-button" data-achievements-help title="${esc(t("achievementHelpTitle"))}" aria-label="${esc(t("achievementHelpTitle"))}">${icon("help", 14)}</button></h3><div>${a.achievements
       .map((x) => {
         const c = achievementText(x.id, t);
         return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : metric("vp", c.vp)}<small>${esc(c.text)}</small></article>`;
@@ -735,6 +735,13 @@ export function mountGame(
         return;
       }
       show(t("rules"), howToPlay(), "rules");
+      return;
+    }
+    if (el.hasAttribute("data-achievements-help")) {
+      show(
+        t("achievementHelpTitle"),
+        `<p>${t(state.puertoma ? "puertomaHelp" : "achievementHelp")}</p>`,
+      );
       return;
     }
     if (el.hasAttribute("data-roles-help")) {

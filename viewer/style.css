@@ -1600,3 +1600,24 @@
 .puertoma-board .metric {
   margin-right: 0.5rem;
 }
+
+.pr-game .achievements h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.pr-game .achievements h3 .icon-button {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  line-height: 1;
+}
+.pr-game .achievements h3 .icon-button::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+}
