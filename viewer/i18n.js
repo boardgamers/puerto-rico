@@ -92,7 +92,7 @@ const labels = {
   rolesHelp: ["What do the roles do?", "Que font les rôles ?"],
   rolesHelpIntro: [
     "For shared roles, everyone acts, starting with the chooser. Only the chooser gets the privilege and the coins on the role.",
-    "Pour les rôles communs, chacun agit en commençant par celui qui a choisi le rôle. Seul ce joueur reçoit le privilège et les pièces posées sur la tuile.",
+    "Chacun joue ce rôle à son tour, en commençant par celui qui l’a choisi. Ce joueur reçoit aussi le privilège et les pièces sur la tuile.",
   ],
   everyone: ["Everyone", "Chacun"],
   chooserOnly: ["Chooser only", "Vous seul"],
@@ -683,62 +683,56 @@ const roleActions = {
     "Prenez {estate:1} parmi les tuiles révélées.",
   ],
   recruiter: [
-    "Share the register’s {workers}, one at a time in turn order, then reassign all your {workers} and {citizens}.",
-    "Répartissez les {workers} du registre un par un dans l’ordre du tour, puis réaffectez tous vos {workers} et {citizens}.",
+    "Take the register’s {workers} one at a time in turn order. Then reassign all your {workers} / {citizens}.",
+    "Prenez les {workers} du registre à tour de rôle, un par un. Puis replacez tous vos {workers} / {citizens}.",
   ],
   builder: [
-    "You may buy one building. Occupied {quarries} reduce its price, up to the building’s limit.",
-    "Vous pouvez acheter un bâtiment. Les {quarries} occupées réduisent son prix, dans la limite du bâtiment.",
+    "Buy up to 1 building. Occupied {quarries} give a discount, up to the building’s limit.",
+    "Achetez jusqu’à 1 bâtiment. Les {quarries} occupées offrent une réduction, limitée selon le bâtiment.",
   ],
   craftsman: [
     "Produce with occupied estates and matching production buildings. {corn} needs only an occupied estate.",
-    "Produisez avec les domaines et bâtiments de production correspondants occupés. Le {corn} n’a besoin que d’un domaine occupé.",
+    "Produisez avec vos plantations et leurs bâtiments de production occupés. Le {corn} se produit sans bâtiment.",
   ],
   trader: [
-    "You may sell {crate:1} for {coins}. The trading house holds {crate:4}, all of different types.",
-    "Vous pouvez vendre {crate:1} contre des {coins}. Le marché contient au plus {crate:4}, de types différents.",
+    "Sell up to {crate:1} for {coins}. The trading house holds 4 goods, all different.",
+    "Vendez jusqu’à {crate:1} contre des {coins}. Le marché accepte 4 marchandises, toutes différentes.",
   ],
   captain: [
     "Take turns loading one type of good for {vp:1} per {crate}. Shipping is mandatory when possible. Keep your allowed storage, then discard the rest.",
-    "Chargez chacun votre tour un type de marchandise : {vp:1} par {crate}. Expédier est obligatoire si possible. Stockez ce que vous pouvez conserver et perdez le reste.",
+    "À tour de rôle, chargez un type de marchandise : {vp:1} par {crate}. Obligatoire si possible. À la fin, stockez ce qui est permis et perdez le reste.",
   ],
   adventurer: [
-    "Gain {coin:1} from the supply, plus any {coins} on this role. Other players do nothing.",
-    "Gagnez {coin:1} de la réserve, en plus des {coins} posées sur ce rôle. Les autres joueurs ne font rien.",
+    "Gain {coin:1}, plus the {coins} on this role.",
+    "Gagnez {coin:1}, plus les {coins} sur ce rôle.",
   ],
   smuggler: [
-    "Raid a ship, plunder the trading house, poach surplus {workers}, or capture a role. Other players do nothing.",
-    "Pillez un bateau ou le marché, débauchez des {workers} excédentaires ou capturez un rôle. Les autres joueurs ne font rien.",
+    "Choose one: raid a ship, plunder the trading house, poach surplus {workers}, or capture a role.",
+    "Au choix : piller un bateau, piller le marché, prendre des {workers} excédentaires ou capturer un rôle.",
   ],
 };
 const rolePrivileges = {
   planter: [
-    "You may choose a {quarry} instead of an estate.",
-    "Vous pouvez choisir une {quarry} à la place du domaine.",
+    "You may take a {quarry} instead.",
+    "Vous pouvez prendre une {quarry} à la place.",
   ],
   recruiter: [
-    "You may take {worker:1} extra from the supply before sharing the register.",
-    "Vous pouvez prendre {worker:1} supplémentaire de la réserve avant le partage du registre.",
+    "Before sharing, take up to {worker:1} extra from the supply.",
+    "Avant le partage, prenez jusqu’à {worker:1} en plus dans la réserve.",
   ],
-  builder: [
-    "Your building costs {coin:1} less.",
-    "Votre bâtiment coûte {coin:1} de moins.",
-  ],
+  builder: ["Pay {coin:1} less.", "Payez {coin:1} de moins."],
   craftsman: [
     "After everyone produces, take {crate:1} extra of a type you produced, if available.",
-    "Après la production de tous, prenez {crate:1} supplémentaire d’un type que vous avez produit, si disponible.",
+    "Après les autres, prenez {crate:1} en plus d’un type que vous avez produit, si disponible.",
   ],
-  trader: [
-    "Your sale earns {coin:+1}.",
-    "Votre vente rapporte {coin:1} supplémentaire.",
-  ],
+  trader: ["{coin:+1} for your sale.", "{coin:+1} pour votre vente."],
   captain: [
-    "Your first shipment earns {vp:+1}.",
-    "Votre premier chargement rapporte {vp:1} supplémentaire.",
+    "{vp:+1} for your first shipment.",
+    "{vp:+1} pour votre premier chargement.",
   ],
   smuggler: [
     "A captured role pays {coin:3} if another player chooses it; otherwise you play it at round end. Someone else must choose Smuggler before you can choose it again.",
-    "Un rôle capturé rapporte {coin:3} si un autre joueur le choisit ; sinon vous le jouez en fin de tour de table. Un autre joueur doit choisir le Contrebandier avant que vous puissiez le reprendre.",
+    "Rôle capturé : {coin:3} si un autre joueur le choisit. Sinon, jouez-le en fin de tour de table. Pour reprendre le Contrebandier, attendez qu’un autre joueur le choisisse.",
   ],
 };
 Object.assign(labels, {
