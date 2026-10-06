@@ -480,7 +480,19 @@ export function choice(state, t, api) {
       break;
     }
     case "ship": {
-      const moves = api.shipping(s, p).filter((m) => Number.isInteger(m.ship));
+      // Festival dispatch priorities can override the normal requirement to
+      // maximize cargo on an empty ship. Enumerate compatible shared ships
+      // first, preserving the one-Goods-type-per-ship rule.
+      const moves = GOODS.flatMap((g) => {
+        if (!a.goods[g]) return [];
+        const matching = s.ships.findIndex((sh) => sh.good === g);
+        return s.ships.flatMap((sh, ship) =>
+          sh.amount < sh.capacity &&
+          (matching >= 0 ? ship === matching : sh.good === null)
+            ? [{ type: "ship", good: g, ship }]
+            : [],
+        );
+      });
       const ceremony = moves.filter((m) =>
         s.festivals.some(
           (f) =>

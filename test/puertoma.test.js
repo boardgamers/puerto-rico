@@ -230,3 +230,25 @@ test("Capture the Role is disabled for humans in a Puertoma game", () => {
   s = E.move(s, { type: "role", id: "smuggler" }, 0);
   assert(!E.legal(s, 0).some((m) => m.type === "capture"));
 });
+test("Festival dispatch overrides normal empty-ship cargo maximization", () => {
+  let s = fresh();
+  s.players[1].goods.corn = 7;
+  s = E.move(s, { type: "role", id: "captain" }, 0);
+  s.tasks[0].p = 1;
+  s.festivals = [
+    {
+      id: "traditionalSendoff",
+      goal: "dispatchSmall",
+      targets: { goods: ["corn"], estates: [], building: null },
+      reward: { coins: 2 },
+    },
+  ];
+  const m = E.legal(s, 1)[0];
+  assert.equal(m.ship, 0);
+  assert.equal(s.ships[0].capacity, 4);
+  s = E.move(s, m, 1);
+  assert.equal(s.festivals[0].claimed, 1);
+  assert(
+    s.events.some((e) => e.type === "ship" && e.p === 1 && e.goods.corn === 4),
+  );
+});
