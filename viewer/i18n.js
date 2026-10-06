@@ -85,6 +85,7 @@ const labels = {
   reserve: ["Reserve", "Réserve"],
   vp: ["Victory points", "Points de victoire"],
   coins: ["Coins", "Pièces"],
+  availableCoins: ["Available coins", "Pièces disponibles"],
   round: ["Round", "Tour"],
   governor: ["Governor", "Gouverneur"],
   you: ["You", "Vous"],

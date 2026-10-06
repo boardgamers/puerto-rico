@@ -456,6 +456,12 @@ export function mountGame(
         ? t.effectHtml(id)
         : t.effect(id);
   }
+  function availableCoins() {
+    const player = state.players[seat];
+    return player
+      ? `<span class="available-coins" aria-label="${esc(`${t("availableCoins")} : ${player.coins}`)}"><small>${t("availableCoins")}</small>${metric("coin", player.coins)}</span>`
+      : "";
+  }
   function market() {
     const task = state.tasks[0],
       isDraft = task?.kind === "draft",
@@ -503,7 +509,7 @@ export function mountGame(
       pass = state.legal.find((m) => m.type === "pass");
     let confirm = "";
     if (can && ["build", "draft"].includes(task.kind))
-      confirm = `<button class="primary" data-market>${icon("building")} ${t("market")}</button>`;
+      confirm = `${task.kind === "build" ? availableCoins() : ""}<button class="primary" data-market>${icon("building")} ${t("market")}</button>`;
     if (can && task.kind === "assign") {
       const rest = remaining(),
         a = state.players[seat],
@@ -604,7 +610,7 @@ export function mountGame(
       );
     show(
       t(id),
-      `<div class="building-detail">${icon(spriteFor(id), 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
+      `<div class="building-budget">${availableCoins()}</div><div class="building-detail">${icon(spriteFor(id), 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
     );
   }
   function festivalCondition(f) {

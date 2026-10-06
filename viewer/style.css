@@ -1696,3 +1696,36 @@
   border-style: dashed;
   background: transparent;
 }
+
+.pr-game .available-coins {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pr-game .available-coins > small {
+  color: var(--muted);
+  font-size: 12px;
+}
+.pr-game .available-coins .metric {
+  margin: 0;
+}
+.pr-game .building-budget {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+.pr-game .building-market > header {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pr-game .action-dock .available-coins {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+@media (max-width: 600px) {
+  .pr-game .action-dock .available-coins > small {
+    display: none;
+  }
+}
