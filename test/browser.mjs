@@ -197,6 +197,18 @@ try {
     await page.mouse.wheel(0, 400);
     await page.waitForTimeout(120);
     assert.ok((await page.evaluate(() => scrollY)) > 0);
+    const summaryBox = await page.locator(".player-summary").boundingBox();
+    assert.ok(
+      Math.abs(summaryBox.y) < 1,
+      "player summary remains at viewport top",
+    );
+    assert.ok(summaryBox.height < 80, "player summary stays compact on mobile");
+    assert.equal(
+      await page
+        .locator('.player-summary [aria-label^="Pièces :"]')
+        .getAttribute("aria-label"),
+      `Pièces : ${original.players[0].coins}`,
+    );
     // Chat uses the platform's messages and a scrolling native viewport.
     await page.evaluate(() => {
       host.emit("chat:state", { enabled: true, canSend: true, mentions: [] });

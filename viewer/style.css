@@ -1697,31 +1697,60 @@
   background: transparent;
 }
 
-.pr-game .available-coins {
-  display: inline-flex;
+.pr-game .player-summary {
+  position: sticky;
+  top: 0;
+  z-index: 18;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.pr-game .available-coins > small {
-  color: var(--muted);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-bottom: 2px solid var(--gold);
+  box-shadow: 0 3px 8px var(--shadow);
   font-size: 12px;
 }
-.pr-game .available-coins .metric {
+.pr-game .summary-owner,
+.pr-game .summary-owner > strong,
+.pr-game .summary-stock,
+.pr-game .summary-goods {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.pr-game .summary-owner {
+  min-width: 0;
+}
+.pr-game .summary-owner > strong {
+  gap: 5px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.pr-game .summary-stock {
+  flex-shrink: 0;
+}
+.pr-game .player-summary .metric {
   margin: 0;
+  gap: 3px;
 }
-
-.pr-game .building-market > header {
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.pr-game .action-dock .available-coins {
-  flex-wrap: nowrap;
-  white-space: nowrap;
+.pr-game .player-summary .icon {
+  width: 18px;
+  height: 18px;
 }
 @media (max-width: 600px) {
-  .pr-game .action-dock .available-coins > small {
-    display: none;
+  .pr-game .player-summary {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 5px;
+    padding: 6px 8px;
+  }
+  .pr-game .summary-owner {
+    justify-content: space-between;
+  }
+  .pr-game .summary-goods {
+    justify-content: space-between;
   }
 }
