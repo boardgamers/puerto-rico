@@ -1009,6 +1009,28 @@ export function roleWarnings(s, p) {
   }
   return warnings;
 }
+// A single suggested move is not necessarily a single choice: assignment,
+// production and storage accept player-edited payloads. Only settle proven
+// forced actions, and leave optional bonuses and Bohío moves available.
+function forcedAction(s, t, a) {
+  if (a.puertoma) return null;
+  const choices = legal(s, t.p);
+  if (choices.length === 1) {
+    const m = choices[0];
+    if (["pass", "recruit", "discardWorker", "ship"].includes(m.type)) return m;
+    if (m.type === "assign" && people(a) === 0) return m;
+    if (m.type === "store" && !GOODS.some((g) => a.goods[g])) return m;
+  }
+  if (
+    t.kind === "produce" &&
+    choices.length === 2 &&
+    choices.some((m) => m.type === "pass" && !m.decline)
+  ) {
+    const m = choices.find((m) => m.type === "produce" && !m.decline);
+    if (m && !GOODS.some((g) => m.goods[g])) return m;
+  }
+  return null;
+}
 function settle(s) {
   for (let guard = 0; guard < 200; guard++) {
     if (s.finished || !s.tasks.length) return;
@@ -1182,6 +1204,18 @@ function sameMove(a, b) {
   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
 }
 export function move(state, m, p) {
+  let s = applyMove(state, m, p);
+  if (!s.options.autoForcedActions) return s;
+  for (let guard = 0; guard < 1000; guard++) {
+    if (s.finished || !s.tasks.length) return s;
+    const t = s.tasks[0];
+    const forced = forcedAction(s, t, s.players[t.p]);
+    if (!forced) return s;
+    s = applyMove(s, forced, t.p);
+  }
+  throw Error("Forced action loop");
+}
+function applyMove(state, m, p) {
   assert(m && typeof m === "object" && !Array.isArray(m));
   assert(
     !state.finished &&
@@ -1738,7 +1772,7 @@ export function replay(s, options = {}) {
   assert(integer(to) && to >= 1 && to <= logLength(s));
   const c = s.config;
   let r = init(c.n, c.expansions, c.options, c.seed);
-  for (const h of s.history.slice(0, to - 1)) r = move(r, h.move, h.p);
+  for (const h of s.history.slice(0, to - 1)) r = applyMove(r, h.move, h.p);
   r.players.forEach((p, i) => {
     p.name = s.players[i].name;
     p.bot = s.players[i].bot;
@@ -1755,7 +1789,7 @@ export function logSlice(
   for (let i = Math.max(0, start); i <= Math.min(end, logLength(s) - 1); i++) {
     frames.push(stripSecret(position, player));
     const h = s.history[i];
-    if (h && i < end) position = move(position, h.move, h.p);
+    if (h && i < end) position = applyMove(position, h.move, h.p);
   }
   return { frames };
 }

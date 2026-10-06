@@ -447,7 +447,7 @@ for (const n of [2, 3, 4, 5])
     ["new-buildings", "citizens", "smuggler", "festival-cards"],
   ])
     test(`${n} players / ${expansions.join("+") || "base"}: complete game, finite supplies, deterministic replay`, () => {
-      let s = e.init(n, expansions, {}, `full-${n}`);
+      let s = e.init(n, expansions, { autoForcedActions: true }, `full-${n}`);
       invariant(s);
       let moves = 0;
       while (!e.ended(s) && moves++ < 1500) {

@@ -11,5 +11,5 @@ export const MODULES = {
 export const RELEASE = {
   name: "Puerto Rico: Special Edition",
   expansions: Object.keys(MODULES).filter((id) => MODULES[id]),
-  options: {},
+  options: { autoForcedActions: true },
 };
