@@ -102,7 +102,9 @@
 }
 .pr-game .inline-symbol {
   display: inline-flex;
-  vertical-align: -0.35em;
+  align-items: center;
+  vertical-align: middle;
+  height: 1.4em;
   white-space: nowrap;
   line-height: 1;
 }
@@ -111,13 +113,11 @@
   align-items: center;
   gap: 2px;
 }
-.pr-game .inline-symbol .icon {
-  width: 22px;
-  height: 22px;
-}
+.pr-game .inline-symbol .icon,
 .pr-game .inline-symbol .score-token {
-  width: 24px;
-  height: 24px;
+  display: block;
+  width: 1.4em;
+  height: 1.4em;
 }
 .pr-game .symbol-range {
   max-width: 100%;
