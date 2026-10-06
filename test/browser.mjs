@@ -48,6 +48,36 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    const resourceCards = structuredClone(original);
+    resourceCards.players[0].goods.corn = 2;
+    resourceCards.players[1].goods.sugar = 3;
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(resourceCards, 0),
+    );
+    assert.equal(
+      await page
+        .locator('.player-strip [data-player="0"] .player-card-goods')
+        .innerText(),
+      "2",
+    );
+    assert.equal(
+      await page
+        .locator('.player-strip [data-player="1"] .player-card-goods')
+        .innerText(),
+      "3",
+    );
+    assert.equal(
+      await page
+        .locator('.player-strip [data-player="2"] .player-card-goods')
+        .count(),
+      0,
+    );
+    assert.equal(await page.locator(".player-board .inventory").count(), 0);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
     await page.evaluate(() =>
       host.emit("preferences", {
         locale: "fr",
@@ -204,7 +234,9 @@ try {
     await page.waitForTimeout(120);
     assert.ok((await page.evaluate(() => scrollY)) > 0);
     await page.evaluate(() => {
-      const inventory = document.querySelector(".player-board .inventory");
+      const inventory = document.querySelector(
+        ".player-strip [data-player='0']",
+      );
       scrollTo(0, scrollY + inventory.getBoundingClientRect().bottom + 20);
     });
     await page.waitForTimeout(60);

@@ -399,7 +399,7 @@ export function mountGame(
   }
   function playerBoard() {
     const a = state.players[view];
-    return `<section class="player-board panel" id="own-board"><header><h2>${playerMarker(view, true)}${esc(a.name)}</h2><div>${metric("coin", a.coins)}${metric("vp", a.vp ?? "?")}${metric("worker", a.reserve.w)}${a.reserve.c ? metric("citizen", a.reserve.c) : ""}</div></header><div class="inventory">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div><h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span>${pointsBadge(B[x.id].vp)}</button>${a.puertoma ? `<small>${t.fr ? "Niveau" : "Level"} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>${achievements(a)}${puertomaBoard(a)}<button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
+    return `<section class="player-board panel" id="own-board"><header><h2>${playerMarker(view, true)}${esc(a.name)}</h2></header><h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(x.id, 31)}${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${icon(spriteFor(x.id), 28)}<span>${t(x.id)}</span>${pointsBadge(B[x.id].vp)}</button>${a.puertoma ? `<small>${t.fr ? "Niveau" : "Level"} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>${achievements(a)}${puertomaBoard(a)}<button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
   }
   function achievements(a) {
     if (!a.achievements) return "";
@@ -455,6 +455,10 @@ export function mountGame(
       : html
         ? t.effectHtml(id)
         : t.effect(id);
+  }
+  function playerCard(p, i) {
+    const goods = GOODS.filter((g) => p.goods[g] > 0);
+    return `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span class="player-card-score">${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></span>${goods.length ? `<span class="player-card-goods">${goods.map((g) => `<span title="${esc(`${t(g)} : ${p.goods[g]}`)}" aria-label="${esc(`${t(g)} : ${p.goods[g]}`)}">${metric(g, p.goods[g])}</span>`).join("")}</span>` : ""}</button>`;
   }
   function playerSummary() {
     const a = state.players[seat];
@@ -546,12 +550,8 @@ export function mountGame(
     const summary = content.querySelector(".player-summary");
     const strip = content.querySelector(".player-strip");
     if (!summary || !strip) return;
-    const inventory = content.querySelector(".player-board .inventory");
-    const anchor =
-      view === seat && inventory?.getClientRects().length ? inventory : strip;
-    summary.hidden =
-      strip.getBoundingClientRect().bottom > 0 ||
-      anchor.getBoundingClientRect().bottom > 0;
+    const card = strip.querySelector(`[data-player="${seat}"]`);
+    summary.hidden = !card || card.getBoundingClientRect().bottom > 0;
   }
   function scheduleSummaryVisibility() {
     if (summaryFrame) return;
@@ -579,7 +579,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>1897 · Special Edition</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map((p, i) => `<button data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-name">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</span><span>${metric("coin", p.coins)}${metric("vp", p.vp ?? "?")}</span></button>`).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="Light / dark" aria-label="Light / dark">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}<section class="action-panel" aria-live="polite">${allowed() && !["role", "draft", "build", "plant"].includes(state.tasks[0]?.kind) ? `<h2>${title()}</h2>` : ""}${actionPanel()}</section>${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>1897 · Special Edition</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="Light / dark" aria-label="Light / dark">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}<section class="action-panel" aria-live="polite">${allowed() && !["role", "draft", "build", "plant"].includes(state.tasks[0]?.kind) ? `<h2>${title()}</h2>` : ""}${actionPanel()}</section>${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
