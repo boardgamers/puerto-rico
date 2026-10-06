@@ -5,7 +5,7 @@ const paths = {
   sugar:
     '<path fill="#f2ede0" d="m5 7 7-4 7 4v11l-7 4-7-4Z"/><path d="m5 7 7 4 7-4m-7 4v11"/>',
   tobacco:
-    '<path fill="#b78665" d="M4 19C2 9 10 3 21 3c0 12-7 18-17 16Z"/><path d="M4 19 18 6m-8 6V8m3 1h4"/>',
+    '<path fill="#9ba56a" d="m12 1 3 5 3-1-1 5 4 1-3 4 2 2-5 3-3 2-3-2-5-3 2-2-3-4 4-1-1-5 3 1Z"/><path stroke="#465b35" d="M12 4v19m0-5-5-2m5-2-4-3m4 7 5-2m-5-2 4-3m-4-1-2-2m2 2 2-2"/>',
   coffee:
     '<path fill="#806959" d="M17 3c6 4 4 12-2 17S3 21 3 15 10-2 17 3Z"/><path stroke="#f8ead4" d="M17 4c-1 7-8 6-10 15"/>',
   quarry:

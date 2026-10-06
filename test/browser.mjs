@@ -148,11 +148,36 @@ try {
     await page.locator('[data-panel="journal"]').click();
     await page.keyboard.press("Escape");
     const m = { type: "role", id: "recruiter" };
+    await page.locator(".action-dock [data-actions]").click();
     await page
-      .locator(`[data-move="${encodeURIComponent(JSON.stringify(m))}"]`)
+      .locator(
+        `.pr-modal [data-move="${encodeURIComponent(JSON.stringify(m))}"]`,
+      )
       .click();
     assert.deepEqual(await page.evaluate(() => played.at(-1)), m);
     let s = E.move(original, m, 0);
+    while (s.tasks[0].kind !== "recruit") s = E.moveAI(s);
+    await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
+    await page.evaluate(() => scrollTo(0, 0));
+    const recruitButtons = page.locator(".action-dock [data-move]");
+    assert.equal(await recruitButtons.count(), 2);
+    for (const button of await recruitButtons.all()) {
+      const bounds = await button.boundingBox();
+      assert.ok(bounds.y >= 0 && bounds.y + bounds.height <= 845);
+      assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= width);
+    }
+    await page.screenshot({ path: `.local/qa/${width}-recruitment-dock.png` });
+    await page.locator('.action-dock button[aria-label$="Citoyens"]').click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "recruit",
+      kind: "c",
+    });
+    assert.equal(
+      await page.evaluate(() => scrollY),
+      0,
+      "recruit from the dock without page scrolling",
+    );
+    s = E.move(s, { type: "recruit", kind: "c" }, 0);
     while (s.tasks[0].kind !== "assign") s = E.moveAI(s);
     s.tasks[0].p = 0;
     s.players[0].estates = [
@@ -212,7 +237,37 @@ try {
     await page.keyboard.press("Escape");
     assert.equal(await page.evaluate(() => played.length), beforeHelp);
     assert.equal(await page.locator('[data-slot="e0:0"]').isEnabled(), false);
-    await page.locator("[data-confirm-assign]").click();
+    // The dock opens the spatial editor without scrolling through objectives.
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.locator(".action-dock [data-actions]").click();
+    assert.equal(
+      await page.locator(".placement-editor .achievements").count(),
+      0,
+    );
+    assert.equal(
+      await page.locator('.pr-modal [data-slot="e1:0"].w').count(),
+      1,
+    );
+    await page.locator('.pr-modal [data-slot="e1:0"]').click();
+    assert.equal(
+      await page.locator(".pr-modal [data-confirm-assign]").isEnabled(),
+      false,
+    );
+    await page.locator('.pr-modal [data-slot="e0:0"]').click();
+    assert.equal(
+      await page.locator(".pr-modal [data-confirm-assign]").isEnabled(),
+      true,
+    );
+    await page.screenshot({ path: `.local/qa/${width}-placement-dialog.png` });
+    await page.keyboard.press("Escape");
+    assert.equal(await page.evaluate(() => scrollY), 0);
+    await page.locator(".action-dock [data-actions]").click();
+    assert.equal(
+      await page.locator('.pr-modal [data-slot="e0:0"].w').count(),
+      1,
+      "draft survives closing the editor",
+    );
+    await page.locator(".pr-modal [data-confirm-assign]").click();
     const allocation = await page.evaluate(() => played.at(-1));
     assert.equal(allocation.type, "assign");
     s = E.move(s, allocation, 0);
@@ -240,6 +295,73 @@ try {
       /Un ouvrier sur une plantation/,
     );
     await page.keyboard.press("Escape");
+    const planting = E.move(original, { type: "role", id: "planter" }, 0);
+    const plantingView = E.stripSecret(planting, 0);
+    await page.evaluate((s) => host.emit("state", s), plantingView);
+    await page.evaluate(() => scrollTo(0, 0));
+    assert.equal(
+      await page.locator(".dock-controls button").last().getAttribute("class"),
+      "move quiet dock-pass",
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    const plantMove = plantingView.legal.find((m) => m.type === "plant");
+    await page
+      .locator(
+        `.pr-modal [data-move="${encodeURIComponent(JSON.stringify(plantMove))}"]`,
+      )
+      .click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), plantMove);
+    assert.equal(await page.evaluate(() => scrollY), 0);
+    await page.locator(".action-dock [data-actions]").click();
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
+    assert.equal(
+      await page.locator("dialog[open]").count(),
+      0,
+      "a new phase closes stale action choices",
+    );
+    const storage = structuredClone(original);
+    storage.tasks = [{ kind: "store", p: 0 }];
+    storage.role = "captain";
+    storage.players[0].buildings = [];
+    storage.players[0].goods = {
+      corn: 2,
+      fruit: 1,
+      sugar: 0,
+      tobacco: 0,
+      coffee: 0,
+    };
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(storage, 0),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    await page
+      .locator('.pr-modal [data-qty="corn:1"]')
+      .click({ clickCount: 2 });
+    assert.equal(
+      await page.locator(".pr-modal [data-confirm-store]").isEnabled(),
+      false,
+    );
+    await page
+      .locator('.pr-modal [data-qty="corn:-1"]')
+      .click({ clickCount: 2 });
+    await page.locator('.pr-modal [data-qty="fruit:1"]').click();
+    assert.equal(
+      await page.locator(".pr-modal [data-confirm-store]").isEnabled(),
+      true,
+    );
+    assert.equal(await overflow(), false, `Storage editor at ${width}`);
+    await page.locator(".pr-modal [data-confirm-store]").click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1).goods), {
+      corn: 0,
+      fruit: 1,
+      sugar: 0,
+      tobacco: 0,
+      coffee: 0,
+    });
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     // Identical state notifications preserve the SVG/board nodes instead of redrawing them.
     await page.evaluate(
@@ -342,6 +464,7 @@ try {
     // Achievement selection sends a real legal move; opponents see card backs.
     let solo = hosted.init(1, [], {}, "browser-solo");
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(solo, 0));
+    await page.locator(".action-dock [data-actions]").click();
     assert.equal(await page.locator(".achievement-choices button").count(), 6);
     await page.locator(".achievement-choices button").first().click();
     const card = await page.evaluate(() => played.at(-1));
