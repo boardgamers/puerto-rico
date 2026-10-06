@@ -256,13 +256,13 @@ const labels = {
   sharedObjective: ["Shared objective", "Objectif commun"],
   festivalEstates: ["Own these plantations:", "Posséder ces plantations :"],
   festivalProduce: [
-    "Produce in a single Craftsman phase:",
-    "Produire durant une même phase Artisan :",
+    "Produce in a single {craftsman} phase:",
+    "Produire durant une même phase {craftsman} :",
   ],
   festivalBuild: ["Build this building:", "Construire ce bâtiment :"],
   festivalShip: [
-    "Ship in a single Captain phase:",
-    "Charger durant une même phase Capitaine :",
+    "Ship in a single {captain} phase:",
+    "Charger durant une même phase {captain} :",
   ],
   festivalTrade: [
     "Sell the fourth good to fill the trading house:",

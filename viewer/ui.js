@@ -316,7 +316,7 @@ export function mountGame(
           const c = achievementText(m.id, t);
           return moveButton(
             m,
-            `<strong>${esc(c.name)}</strong>${metric("vp", c.vp)}<small>${esc(c.text)}</small>`,
+            `<strong>${esc(c.name)}</strong>${metric("vp", c.vp)}<small>${c.html}</small>`,
             "check",
           );
         })
@@ -398,7 +398,7 @@ export function mountGame(
     return `<section class="achievements"><h3>${t("achievements")}<button type="button" class="icon-button" data-achievements-help title="${esc(t("achievementHelpTitle"))}" aria-label="${esc(t("achievementHelpTitle"))}">${icon("help", 14)}</button></h3><div>${a.achievements
       .map((x) => {
         const c = achievementText(x.id, t);
-        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : metric("vp", c.vp)}<small>${esc(c.text)}</small></article>`;
+        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : metric("vp", c.vp)}<small>${c.html}</small></article>`;
       })
       .join("")}</div></section>`;
   }
@@ -614,7 +614,7 @@ export function mountGame(
     const goods = targets(f.targets.goods, f.amounts);
     const estates = targets(f.targets.estates);
     const row = (label, content) =>
-      `<span class="festival-requirement"><span>${t(label)}</span>${content}</span>`;
+      `<span class="festival-requirement"><span>${t.html(label)}</span>${content}</span>`;
     if (f.goal === "estates") return row("festivalEstates", estates);
     if (f.goal === "produce") return row("festivalProduce", goods);
     if (f.goal === "farmProduce")
