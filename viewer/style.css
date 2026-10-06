@@ -1697,16 +1697,22 @@
   background: transparent;
 }
 
+.pr-game .player-summary[hidden] {
+  display: none;
+}
 .pr-game .player-summary {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 12px;
+  right: 12px;
+  max-width: 1400px;
+  margin: 0 auto;
   z-index: 18;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 8px 12px;
-  margin-bottom: 10px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-bottom: 2px solid var(--gold);

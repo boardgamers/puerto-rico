@@ -465,7 +465,7 @@ export function mountGame(
         : a.reserve;
     const stat = (id, n, label) =>
       `<span class="summary-stat" title="${esc(`${t(label)} : ${n}`)}" aria-label="${esc(`${t(label)} : ${n}`)}">${metric(id, n)}</span>`;
-    return `<aside class="player-summary" aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${stat("worker", reserve.w, "availableWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "availableCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
+    return `<aside class="player-summary" hidden aria-label="${esc(t("playerSummary"))}"><div class="summary-owner"><strong>${playerMarker(seat, true)}${esc(a.name)}</strong><span class="summary-stock">${stat("coin", a.coins, "coins")}${stat("worker", reserve.w, "availableWorkers")}${state.expansions.includes("citizens") ? stat("citizen", reserve.c, "availableCitizens") : ""}</span></div><div class="summary-goods">${GOODS.map((g) => stat(g, a.goods[g], g)).join("")}</div></aside>`;
   }
   function market() {
     const task = state.tasks[0],
@@ -541,6 +541,25 @@ export function mountGame(
         : "";
     return `<div class="action-dock"><div>${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div>${special}${confirm}${pass && can ? moveButton(pass, t(task?.kind === "trade" && task.acted ? "finish" : "pass"), "pass", "quiet") : ""}</div>`;
   }
+  let summaryFrame = 0;
+  function updateSummaryVisibility() {
+    const summary = content.querySelector(".player-summary");
+    const strip = content.querySelector(".player-strip");
+    if (!summary || !strip) return;
+    const inventory = content.querySelector(".player-board .inventory");
+    const anchor =
+      view === seat && inventory?.getClientRects().length ? inventory : strip;
+    summary.hidden =
+      strip.getBoundingClientRect().bottom > 0 ||
+      anchor.getBoundingClientRect().bottom > 0;
+  }
+  function scheduleSummaryVisibility() {
+    if (summaryFrame) return;
+    summaryFrame = requestAnimationFrame(() => {
+      summaryFrame = 0;
+      updateSummaryVisibility();
+    });
+  }
   function render(s) {
     if (s) state = s;
     if (!state) return;
@@ -567,6 +586,7 @@ export function mountGame(
         return !from.isEqualNode(to);
       },
     });
+    updateSummaryVisibility();
     if (modal.open && modalMode === "journal") {
       scrollLog = body.scrollTop;
       body.innerHTML = journal();
@@ -956,6 +976,11 @@ export function mountGame(
     ev.preventDefault();
     hide(ev.target);
   }
+  document.addEventListener("scroll", scheduleSummaryVisibility, {
+    capture: true,
+    passive: true,
+  });
+  window.addEventListener("resize", scheduleSummaryVisibility);
   shell.addEventListener("click", click);
   modal.addEventListener("cancel", onCancel);
   chatDialog.addEventListener("cancel", onCancel);
@@ -985,6 +1010,9 @@ export function mountGame(
       render();
     },
     destroy() {
+      document.removeEventListener("scroll", scheduleSummaryVisibility, true);
+      window.removeEventListener("resize", scheduleSummaryVisibility);
+      cancelAnimationFrame(summaryFrame);
       shell.removeEventListener("click", click);
       chatView?.destroy();
       shell.remove();

@@ -191,12 +191,23 @@ try {
       E.stripSecret(original, 0),
     );
     await page.evaluate(() => scrollTo(0, 0));
+    await page.waitForTimeout(60);
+    assert.equal(
+      await page.locator(".player-summary").isVisible(),
+      false,
+      "summary does not duplicate resources at the top",
+    );
     const disabled = page.locator(".offer:disabled").first();
     const box = await disabled.boundingBox();
     await page.mouse.move(box.x + 10, box.y + 10);
     await page.mouse.wheel(0, 400);
     await page.waitForTimeout(120);
     assert.ok((await page.evaluate(() => scrollY)) > 0);
+    await page.evaluate(() => {
+      const inventory = document.querySelector(".player-board .inventory");
+      scrollTo(0, scrollY + inventory.getBoundingClientRect().bottom + 20);
+    });
+    await page.waitForTimeout(60);
     const summaryBox = await page.locator(".player-summary").boundingBox();
     assert.ok(
       Math.abs(summaryBox.y) < 1,
@@ -208,6 +219,13 @@ try {
         .locator('.player-summary [aria-label^="Pièces :"]')
         .getAttribute("aria-label"),
       `Pièces : ${original.players[0].coins}`,
+    );
+    await page.evaluate(() => scrollTo(0, 0));
+    await page.waitForTimeout(60);
+    assert.equal(
+      await page.locator(".player-summary").isVisible(),
+      false,
+      "summary hides again on return to the top",
     );
     // Chat uses the platform's messages and a scrolling native viewport.
     await page.evaluate(() => {
