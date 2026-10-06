@@ -164,8 +164,14 @@ export function mountGame(
     if (key === draftKey) return;
     draftKey = key;
     draft = null;
-    if (enabled && seat === task?.p && task?.kind === "assign")
-      draft = autoAssignment(state, seat);
+    if (enabled && seat === task?.p && task?.kind === "assign") {
+      const a = state.players[seat];
+      draft = {
+        estates: a.estates.map(({ w, c }) => ({ w, c })),
+        buildings: a.buildings.map(({ w, c }) => ({ w, c })),
+      };
+      tool = a.reserve.w ? "w" : a.reserve.c ? "c" : "w";
+    }
     if (enabled && seat === task?.p && task?.kind === "store")
       draft = autoStorage(state, seat);
   }
@@ -322,7 +328,7 @@ export function mountGame(
         })
         .join("")}</div>`;
     if (task.kind === "assign")
-      return `<div class="assignment-tools" role="group" aria-label="${esc(t("workers"))}">${["w", "c", "erase"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}" aria-label="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}" title="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}">${icon(k === "w" ? "worker" : k === "c" ? "citizen" : "erase")}${k === "erase" ? "" : remaining()[k]}</button>`).join("")}<button class="icon-button" data-auto title="${esc(t("autoAssign"))}" aria-label="${esc(t("autoAssign"))}">${icon("autoAssign")}</button><span>${t("workerTool")}</span></div>`;
+      return `<div class="assignment-tools" role="group" aria-label="${esc(t("workers"))}">${["w", "c", "erase"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}" aria-label="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}" title="${esc(t(k === "erase" ? "erase" : k === "w" ? "workers" : "citizens"))}">${icon(k === "w" ? "worker" : k === "c" ? "citizen" : "erase")}${k === "erase" ? "" : remaining()[k]}</button>`).join("")}<button class="icon-button" data-auto title="${esc(t("autoAssign"))}" aria-label="${esc(t("autoAssign"))}">${icon("autoAssign")}</button><span>${remaining().w + remaining().c === 0 ? `${t("noWorkers")}. ` : ""}${t("workerTool")}</span></div>`;
     if (task.kind === "store") return storageEditor();
     if (["role", "draft", "build", "plant"].includes(task.kind)) return "";
     return `<div class="action-choices">${moves
@@ -384,8 +390,10 @@ export function mountGame(
         : x;
     return `<div class="worker-slots">${Array.from({ length: n }, (_, i) => {
       const k = i < values.c ? "c" : i < values.c + values.w ? "w" : null;
+      const unavailable =
+        editable && !k && (tool === "erase" || remaining()[tool] === 0);
       return editable
-        ? `<button class="worker-slot ${k ?? ""}" data-slot="${key}:${i}" aria-label="${esc(`${t(k === "c" ? "citizens" : k === "w" ? "workers" : "empty")} · ${t(x.id)}`)}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : "+"}</button>`
+        ? `<button class="worker-slot ${k ?? ""}" data-slot="${key}:${i}" ${unavailable ? "disabled" : ""} aria-label="${esc(`${t(k === "c" ? "citizens" : k === "w" ? "workers" : "empty")} · ${t(x.id)}`)}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : unavailable ? "·" : "+"}</button>`
         : `<span class="worker-slot ${k ?? ""}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : "·"}</span>`;
     }).join("")}</div>`;
   }
@@ -879,8 +887,10 @@ export function mountGame(
           draft[key[0] === "e" ? "estates" : "buildings"][Number(key.slice(1))],
         index = Number(ix);
       const occupied = index < x.c ? "c" : index < x.c + x.w ? "w" : null;
-      if (occupied) x[occupied]--;
-      else if (tool !== "erase" && remaining()[tool] > 0) x[tool]++;
+      if (occupied) {
+        x[occupied]--;
+        tool = occupied;
+      } else if (tool !== "erase" && remaining()[tool] > 0) x[tool]++;
       render();
       return;
     }

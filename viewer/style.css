@@ -1690,3 +1690,9 @@
 .pr-game .achievement-reward .metric {
   margin: 0;
 }
+
+.pr-game button.worker-slot:disabled {
+  opacity: 0.35;
+  border-style: dashed;
+  background: transparent;
+}

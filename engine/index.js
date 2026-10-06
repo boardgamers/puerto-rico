@@ -1018,7 +1018,21 @@ function forcedAction(s, t, a) {
   if (choices.length === 1) {
     const m = choices[0];
     if (["pass", "recruit", "discardWorker", "ship"].includes(m.type)) return m;
-    if (m.type === "assign" && people(a) === 0) return m;
+    if (m.type === "assign") {
+      if (people(a) === 0) return m;
+      // Identical plantations are interchangeable only without buildings or a
+      // worker/citizen tradeoff. Never apply a general suggested allocation.
+      const estates = a.estates.filter((e) => e.id !== "forest");
+      const w = a.reserve.w + sum(a.estates.map((e) => e.w));
+      const c = a.reserve.c + sum(a.estates.map((e) => e.c));
+      if (
+        !a.buildings.length &&
+        estates.length &&
+        estates.every((e) => e.id === estates[0].id) &&
+        !(w && c)
+      )
+        return m;
+    }
     if (m.type === "store" && !GOODS.some((g) => a.goods[g])) return m;
   }
   if (
@@ -1204,7 +1218,10 @@ function sameMove(a, b) {
   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
 }
 export function move(state, m, p) {
-  let s = applyMove(state, m, p);
+  return resolveForcedActions(applyMove(state, m, p));
+}
+export function resolveForcedActions(state) {
+  let s = state;
   if (!s.options.autoForcedActions) return s;
   for (let guard = 0; guard < 1000; guard++) {
     if (s.finished || !s.tasks.length) return s;

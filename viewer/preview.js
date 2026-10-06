@@ -37,6 +37,7 @@ state ??= newGame();
 // Keep existing local games while enabling the current interaction policy.
 state.options.autoForcedActions = true;
 state.config.options.autoForcedActions = true;
+state = engine.resolveForcedActions(state);
 const ui = mountGame(document.getElementById("game"), {
   automatedSetup: true,
   async onMove(move) {

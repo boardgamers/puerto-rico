@@ -125,9 +125,30 @@ try {
     let s = E.move(original, m, 0);
     while (s.tasks[0].kind !== "assign") s = E.moveAI(s);
     s.tasks[0].p = 0;
+    s.players[0].estates = [
+      { id: "corn", w: 0, c: 0 },
+      { id: "fruit", w: 0, c: 0 },
+    ];
+    s.players[0].buildings = [];
+    s.players[0].reserve = { w: 1, c: 0 };
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     await page.locator("[data-confirm-assign]").waitFor({ state: "visible" });
-    assert.ok(await page.locator("[data-slot]").count());
+    assert.equal(
+      await page.locator("[data-slot].w").count(),
+      0,
+      "new workers are not preassigned",
+    );
+    assert.equal(
+      await page.locator("[data-confirm-assign]").isEnabled(),
+      false,
+    );
+    await page.locator('[data-slot="e0:0"]').click();
+    assert.equal(await page.locator('[data-slot="e1:0"]').isEnabled(), false);
+    assert.equal(await page.locator('[data-slot="e1:0"]').innerText(), "·");
+    await page.locator('[data-slot="e0:0"]').click();
+    assert.equal(await page.locator('[data-slot="e1:0"]').isEnabled(), true);
+    await page.locator('[data-slot="e1:0"]').click();
+    assert.equal(await page.locator('[data-slot="e0:0"]').isEnabled(), false);
     await page.locator("[data-confirm-assign]").click();
     const allocation = await page.evaluate(() => played.at(-1));
     assert.equal(allocation.type, "assign");

@@ -12,6 +12,7 @@ without resetting their position or history.
 | Pass with no available action | Automatic, using the normal phase transition. |
 | Production with zero output | Automatic only when no optional point or Bohío choice remains. |
 | Assignment with no people | Automatic. |
+| Assignment to a single plantation or identical plantations | Automatic only with no buildings and no worker/citizen choice. |
 | Storage with no goods | Automatic. |
 | Worker placement, production quantities, storage quantities | Manual: a single suggested move still accepts custom choices. |
 | Planting, building, trading, private ships, bonus workers/goods | Manual whenever declining or choosing an alternative is legal. |

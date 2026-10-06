@@ -67,7 +67,10 @@ test("empty trade, production, assignment and storage need no confirmation", () 
 test("suggested assignment, production and storage do not hide custom choices", () => {
   for (const kind of ["assign", "produce", "store"]) {
     const s = fixture([{ kind, p: 0 }, boundary]);
-    s.players[0].estates = [{ id: "corn", w: 1, c: 0 }];
+    s.players[0].estates = [
+      { id: "corn", w: 1, c: 0 },
+      { id: "fruit", w: 0, c: 0 },
+    ];
     s.players[0].goods.corn = 2;
     const r = start(s);
     assert.equal(r.tasks[0].kind, kind);
@@ -137,4 +140,36 @@ test("Bohío alternatives prevent automatically passing a blocked trade", () => 
   const r = start(s);
   assert.equal(r.tasks[0].kind, "trade");
   assert(E.legal(r).some((m) => m.type === "bohio"));
+});
+
+test("interchangeable plantation placements are automatic, strategic alternatives remain", () => {
+  for (const variant of [
+    "single",
+    "same",
+    "different",
+    "mixedPeople",
+    "building",
+  ]) {
+    const s = fixture([{ kind: "assign", p: 0 }, boundary]);
+    s.players[0].estates = [{ id: "corn", w: 0, c: 0 }];
+    if (variant !== "single")
+      s.players[0].estates.push({
+        id: variant === "different" ? "fruit" : "corn",
+        w: 0,
+        c: 0,
+      });
+    s.players[0].reserve = { w: 1, c: variant === "mixedPeople" ? 1 : 0 };
+    if (variant === "building")
+      s.players[0].buildings = [{ id: "smallMarket", w: 0, c: 0 }];
+    const r = start(s);
+    assert.equal(
+      r.tasks[0].kind,
+      ["single", "same"].includes(variant) ? "role" : "assign",
+    );
+    if (["single", "same"].includes(variant))
+      assert.equal(
+        r.players[0].estates.reduce((n, e) => n + e.w, 0),
+        1,
+      );
+  }
 });
