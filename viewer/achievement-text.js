@@ -42,7 +42,7 @@ export function achievementText(id, t) {
     };
   const english = {
     spendAll: "Build an expanded Building by paying all your {coins}.",
-    goodsPair: `Have at least ${c.amount} ${(c.goods ?? []).map((g) => `{${g}}`).join(" and ")} combined, including at least one of each.`,
+    goodsPair: `Have at least ${c.amount} ${(c.goods ?? []).map((g) => `{${g}}`).join(" / ")} combined, including at least one of each.`,
     dispatch: `Place the last {crate} of {${c.good}} on a cargo ship to fill it.`,
     closeTrade: "Sell the fourth Good to the Trading House as the {trader}.",
     shipTypes: "Load at least 3 different Goods during one {captain} phase.",
@@ -65,7 +65,7 @@ export function achievementText(id, t) {
   };
   const objectives = {
     spendAll: "Construire un bâtiment étendu en dépensant toutes vos {coins}.",
-    goodsPair: `Posséder au moins ${c.amount} ${(c.goods ?? []).map((g) => `{${g}}`).join(" et ")} au total, dont au moins une de chaque.`,
+    goodsPair: `Posséder au moins ${c.amount} ${(c.goods ?? []).map((g) => `{${g}}`).join(" / ")} au total, dont au moins une de chaque.`,
     dispatch: `Placer la dernière {crate} de {${c.good}} sur un navire de charge et le remplir.`,
     closeTrade:
       "Vendre la quatrième marchandise au comptoir en ayant choisi le {trader}.",
