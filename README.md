@@ -2,7 +2,7 @@
 
 [Play now at boardgamers.space](https://boardgamers.space/boardgame/puerto-rico)
 
-Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.2.1`; English and French are configured in the platform metadata.
+Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.2.2`; English and French are configured in the platform metadata.
 
 ```sh
 pnpm install
@@ -27,9 +27,9 @@ Implemented modules:
 - Festival: three shared objectives and physical resource reservations.
 - Festival Activities: all 12 activity definitions, three drawn per game.
 - Achievements: the complete 30-card deck, secret dealing, optional internal draft, automatic completion and endgame scoring.
-- Puertoma: exact eight-card tiebreaker deck, shared action tracker, permanent workers, estate production, building levels and reservations, all 12 ability types, three difficulty levels and expansion interactions. Available through local solo preview or internal `options.puertoma = { humans: 1, difficulty: "normal" }` with three total seats.
+- Puertoma: exact eight-card tiebreaker deck, shared action tracker, permanent workers, estate production, building levels and reservations, all 12 ability types, three difficulty levels and expansion interactions. Available by choosing 1 player on BGS, through local solo preview, or internal `options.puertoma = { humans: 1, difficulty: "normal" }` with three total seats.
 
-The fixed multiplayer BGS configuration includes all six expansion modules. Puertoma is available locally; hosted bot seats continue to use the human rules. See [source notes](docs/sources.md) for provenance and the Festival unique-building marker interpretation.
+The fixed multiplayer BGS configuration includes all six expansion modules. Choose **1 player** on BGS to start a solo game against **two automatic Puertomas** at normal difficulty. Their turns resolve automatically on the server; the platform tracks only the human participant, while the viewer and replay show all three boards and final scores. Hosted multiplayer bot seats continue to use the human rules. See [source notes](docs/sources.md) for provenance and the Festival unique-building marker interpretation.
 
 The engine accepts the optional `costSwap`, `alternativeStart`, `tailorLimit`, `pairingRestrictions` and `achievementDraft` balance variants internally. They are disabled in the fixed configuration and not exposed in the UI.
 
@@ -56,6 +56,6 @@ The implementation remains a preview pending playtesting, and the Festival marke
 
 ## Private BGS publication
 
-`pnpm publish:private` builds the bundles, packages only the self-contained engine and its manifest, checks complete 2–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, refuses to replace a public version, and verifies the private/listed flags and CDN bytes. It grants beta access to `coyotte508` if needed. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
+`pnpm publish:private` builds the bundles, packages only the self-contained engine and its manifest, checks complete 1–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, refuses to replace a public version, and verifies the private/listed flags and CDN bytes. It grants beta access to `coyotte508` if needed. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
 
 The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Tutorials are not yet registered.

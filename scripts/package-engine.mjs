@@ -57,20 +57,24 @@ export async function packageEngine() {
     const engine = await import(
       pathToFileURL(join(unpacked, "package/dist/engine.js"))
     );
-    for (const players of [2, 3, 4, 5]) {
+    for (const players of [1, 2, 3, 4, 5]) {
       let state = engine.init(players, [], {}, `release-${players}`);
       assert.deepEqual(state.expansions, RELEASE.expansions);
       let moves = 0;
-      while (!engine.ended(state) && moves++ < 6000)
+      while (!engine.ended(state) && moves++ < 6000) {
+        if (players === 1) assert.equal(engine.currentPlayer(state), 0);
         state = engine.moveAI(state);
+      }
       assert.ok(
         engine.ended(state),
         `Packed engine completes a ${players}-player game`,
       );
+      assert.equal(engine.scores(state).length, players);
       assert.equal(engine.rankings(state).length, players);
+      if (players === 1) assert.equal(state.players.length, 3);
     }
     console.log(
-      `Packed ${name}@${version}: only bundled engine + manifest; 2–5-player games passed.`,
+      `Packed ${name}@${version}: only bundled engine + manifest; 1–5-player games passed.`,
     );
     return { tarball, name, version };
   } finally {

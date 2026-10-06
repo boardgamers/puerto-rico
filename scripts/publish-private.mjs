@@ -70,6 +70,7 @@ if (!access.some((u) => u.username === "coyotte508"))
 const published = await api("/1"),
   meta = await api("/meta");
 assert.equal(published.public, false);
+assert.deepEqual(published.players, defaults.players);
 assert.ok(!meta.unlisted);
 assert.equal(published.engine.package.version, version);
 assert.equal(published.viewer.url, uploaded.url);

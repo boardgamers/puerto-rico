@@ -4,6 +4,7 @@ import { chromium } from "playwright";
 import { createServer } from "node:http";
 import { readFile, mkdir } from "node:fs/promises";
 import * as E from "../engine/index.js";
+import * as hosted from "../bgs/engine.js";
 import { RELEASE } from "../release-config.js";
 const server = createServer(async (req, res) => {
   res.setHeader(
@@ -203,20 +204,15 @@ try {
     assert.ok(composer.y + composer.height <= 844);
     await page.keyboard.press("Escape");
     // Achievement selection sends a real legal move; opponents see card backs.
-    let solo = E.init(
-      3,
-      RELEASE.expansions,
-      { puertoma: { humans: 1 } },
-      "browser-solo",
-    );
+    let solo = hosted.init(1, [], {}, "browser-solo");
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(solo, 0));
     assert.equal(await page.locator(".achievement-choices button").count(), 6);
     await page.locator(".achievement-choices button").first().click();
     const card = await page.evaluate(() => played.at(-1));
     assert.equal(card.type, "achievementChoose");
-    solo = E.move(solo, card, 0);
+    solo = hosted.move(solo, card, 0);
     while (["achievementChoose", "draft"].includes(solo.tasks[0]?.kind))
-      solo = E.moveAI(solo);
+      solo = hosted.moveAI(solo);
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(solo, 0));
     assert.equal(await page.locator(".achievement-card").count(), 4);
     assert.equal(await overflow(), false, `Achievement layout at ${width}`);
