@@ -479,6 +479,22 @@
   border-top: 3px solid #71958b;
   border-bottom: 3px double #71958b;
 }
+.pr-game .recruitment-pool {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  margin-bottom: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 12px;
+}
+.pr-game .recruitment-pool > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-right: auto;
+}
 .pr-game .ships {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

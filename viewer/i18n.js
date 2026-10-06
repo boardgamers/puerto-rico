@@ -150,6 +150,16 @@ const labels = {
   countryside: ["Countryside", "Campagne"],
   market: ["Buildings", "Bâtiments"],
   harborTitle: ["Harbor", "Port"],
+  recruitmentPool: ["To recruit", "À recruter"],
+  registerWorkers: [
+    "Workers to share during Recruiter",
+    "Ouvriers à partager au Recruteur",
+  ],
+  registerCitizens: [
+    "Citizens to share during Recruiter",
+    "Citoyens à partager au Recruteur",
+  ],
+  vpSupply: ["VP token supply", "Réserve de jetons PV"],
   tradingHouse: ["Trading house", "Marché de vente"],
   workers: ["Workers", "Ouvriers"],
   citizens: ["Citizens", "Citoyens"],

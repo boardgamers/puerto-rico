@@ -75,10 +75,14 @@ export function mountGame(
     modalMode = "",
     roleConfirmation = null,
     scrollLog = 0;
-  const metric = (id, n) =>
-    id === "vp"
-      ? `<span class="metric" role="img" title="${esc(t("vp"))}" aria-label="${esc(t("vp"))} : ${esc(n)}">${scoreToken(n)}</span>`
-      : `<span class="metric">${icon(id, 20)}<b>${esc(n)}</b></span>`;
+  const metric = (id, n, labelKey) => {
+    const label = esc(
+      `${t(labelKey ?? { coin: "coins", worker: "workers", citizen: "citizens" }[id] ?? id)} : ${n}`,
+    );
+    return id === "vp"
+      ? `<span class="metric" role="img" title="${label}" aria-label="${label}">${scoreToken(n)}</span>`
+      : `<span class="metric" title="${label}">${icon(id, 20)}<b>${esc(n)}</b></span>`;
+  };
   const goodsRow = (goods) =>
     GOODS.filter((g) => goods[g])
       .map((g) => metric(g, goods[g]))
@@ -458,7 +462,7 @@ export function mountGame(
       })
       .join(
         "",
-      )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply))}${metric("worker", state.register.w)}${state.register.c ? metric("citizen", state.register.c) : ""}</div></header><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${icon("trader", 18)} ${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div></div><section class="plantation-supply"><header>${icon("planter", 20)}<h3>${t("plantedOffer")}</h3></header><div class="estate-offer">${state.offer
+      )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="recruitment-pool" role="group" aria-label="${esc(t("recruitmentPool"))}"><strong>${icon("recruiter", 20)}${t("recruitmentPool")}</strong>${metric("worker", state.register.w, "registerWorkers")}${state.register.c ? metric("citizen", state.register.c, "registerCitizens") : ""}</div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply), "vpSupply")}</div></header><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${icon("trader", 18)} ${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div></div><section class="plantation-supply"><header>${icon("planter", 20)}<h3>${t("plantedOffer")}</h3></header><div class="estate-offer">${state.offer
       .map((id, i) => {
         const m = state.legal.find(
           (m) => m.type === "plant" && m.id === id && !m.forest,
