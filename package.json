@@ -10,7 +10,8 @@
     "dev": "node scripts/dev.mjs",
     "test:browser": "node test/browser.mjs && node test/locales-browser.mjs",
     "publish:private": "pnpm build && node scripts/publish-private.mjs",
-    "publish:metadata": "node scripts/publish-metadata.mjs"
+    "publish:metadata": "node scripts/publish-metadata.mjs",
+    "test:tutorials": "node test/tutorial-browser.mjs"
   },
   "dependencies": {
     "@boardgamers/protocol": "0.9.0",

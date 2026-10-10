@@ -82,3 +82,27 @@ field contains only a link to `/page/puerto-rico/rules`. Both publication comman
 back up existing CMS pages before updating them. Game metadata language overlays
 remain queued in `.local/release/manual-translations.json` when the host does not
 yet expose the manual translation endpoint; no translation API is used.
+
+## Playable tutorials
+
+BGS launches the bundled tutorials through `puertorico.launchTutorial`. Four
+chapters use real legal engine moves and deterministic scripted opponents:
+
+- `basics`: role selection, accumulated coins, production, privileges and trade.
+- `shipping`: one good type per ship, mandatory loading, storage and returning cargo.
+- `citizens`: ordinary staffing versus citizen effects in Chapel and Notary.
+- `coffee`: exhausted coffee supply, Smuggler raid and Festival markers returning to supply.
+
+The viewer supplies a compact, collapsible guide in all 16 languages. Browser
+storage contains accepted actions, not trusted saved game states; retry and
+resume reconstruct the position through the engine. Tutorial progress is separate
+from preview games. The prepared positions conserve components and show only the
+learner's view.
+
+After `pnpm build`, open `/tutorial.html?chapter=basics&locale=fr` on the local
+preview server (or replace the chapter ID above). `pnpm test` covers legality,
+conservation, replay, progress and translation completeness. `pnpm test:tutorials`
+plays every chapter through the actual controls on mobile and desktop and checks
+all languages at 320 px. `pnpm publish:private` registers the chapter metadata with
+the viewer; translated BGS chapter-list labels use the same pending manual
+metadata endpoint as other game translations.

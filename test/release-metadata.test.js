@@ -1,6 +1,8 @@
 import test from "node:test";
+import { readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 import { releaseMetadata } from "../scripts/release-metadata.mjs";
+import { chapters } from "../tutorial/scenarios.js";
 import { supportedLocales } from "../viewer/i18n.js";
 
 test("release metadata keeps title separate and prepares every manual locale overlay", async () => {
@@ -21,10 +23,30 @@ test("release metadata keeps title separate and prepares every manual locale ove
     assert.ok(overlay.description);
     assert.ok(overlay.rules);
     assert.equal(overlay.credits, metadata.credits);
-    assert.deepEqual(Object.keys(overlay.optionTranslations).sort(), [
-      "options.chooseBuildings",
-      "options.showVP",
-      "settings.autoForcedActions",
-    ]);
+    assert.deepEqual(
+      Object.keys(overlay.optionTranslations).sort(),
+      [
+        "options.chooseBuildings",
+        "options.showVP",
+        "settings.autoForcedActions",
+        ...Object.keys(chapters).flatMap((id) =>
+          ["title", "description"].map(
+            (field) => `tutorial.chapters.${id}.${field}`,
+          ),
+        ),
+      ].sort(),
+    );
   }
+});
+
+test("registered tutorial chapters match playable lesson versions", async () => {
+  const source = JSON.parse(
+    await readFile(new URL("../bgs/game.json", import.meta.url), "utf8"),
+  );
+  assert.deepEqual(
+    source.tutorial.chapters.map(({ id, version }) => ({ id, version })),
+    Object.values(chapters).map(({ id, version }) => ({ id, version })),
+  );
+  for (const chapter of Object.values(chapters))
+    assert.ok(chapter.steps.length > 0);
 });

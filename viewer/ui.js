@@ -595,10 +595,12 @@ export function mountGame(
       !p.puertoma && (i === seat || reserve.w || reserve.c)
         ? `<span class="player-card-reserve">${metric("worker", reserve.w, "reserveWorkers")}${reserve.c ? metric("citizen", reserve.c, "reserveCitizens") : ""}</span>`
         : "";
+    const avatar = playerAvatar(i);
+    const identity = `<span class="player-card-portrait${avatar ? " has-avatar" : ""}">${avatar}${playerMarker(i, true)}</span>`;
     const stock = goods.length
       ? `<span class="player-card-goods" title="${esc(t("stockLabel"))}">${goods.map((g) => metric(g, p.goods[g])).join("")}</span>`
       : "";
-    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" title="${esc(p.name)}" aria-pressed="${i === view}">${playerAvatar(i)}${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}<span class="player-name-text">${esc(p.name)}</span>${playerBadge(i)}</button><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</div>`;
+    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" title="${esc(p.name)}" aria-pressed="${i === view}">${identity}<span class="player-name-text">${esc(p.name)}</span>${i === state.governor ? icon("governor", 18) : ""}${playerBadge(i)}</button></span><span class="player-card-resources"><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span>${people}${stock}</span></div>`;
   }
   function playerSummary() {
     const a = state.players[seat];
@@ -711,7 +713,19 @@ export function mountGame(
       enabled && !pending && state.legal.some((m) => m.type === "bohio")
         ? `<button class="icon-button" data-bohio title="${esc(t("bohioMove"))}">${icon("worker")}</button>`
         : "";
-    return `<div class="action-dock"><div class="dock-prompt" aria-live="polite">${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div><div class="dock-controls">${special}${choices}${confirmation()}${pass && can ? moveButton(pass, t(task?.kind === "trade" && task.acted ? "finish" : "pass"), "pass", "quiet dock-pass") : ""}</div></div>`;
+    const confirm = confirmation();
+    const passControl =
+      pass && can
+        ? moveButton(
+            pass,
+            t(task?.kind === "trade" && task.acted ? "finish" : "pass"),
+            "pass",
+            "quiet dock-pass",
+          )
+        : "";
+    const controls = special + choices + confirm + passControl;
+    const compact = (controls.match(/<button\b/g)?.length ?? 0) <= 1;
+    return `<div class="action-dock${compact ? " action-dock-compact" : ""}"><div class="dock-prompt" aria-live="polite">${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div><div class="dock-controls">${controls}</div></div>`;
   }
   function openActions() {
     if (!allowed()) return;
@@ -763,7 +777,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {

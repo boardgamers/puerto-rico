@@ -1,0 +1,170 @@
+.pr-tutorial {
+  font:
+    14px/1.4 system-ui,
+    sans-serif;
+  color: #3e392b;
+  background: #e8dcc1;
+  min-height: 100vh;
+}
+.pr-tutorial.dark {
+  color: #f4e8cc;
+  background: #242723;
+  color-scheme: dark;
+}
+.pr-tutorial-guide {
+  position: sticky;
+  top: 0;
+  z-index: 12;
+  background: #f7edda;
+  border-bottom: 2px solid #c89737;
+  padding: 8px 14px;
+  box-shadow: 0 2px 6px #0001;
+}
+.pr-tutorial.dark .pr-tutorial-guide {
+  background: #34352c;
+}
+.pr-tutorial-guide > summary {
+  max-width: 1000px;
+  margin-inline: auto;
+  cursor: pointer;
+  min-height: 32px;
+  align-content: center;
+  line-height: 1.4;
+}
+.tutorial-progress {
+  font-variant-numeric: tabular-nums;
+  color: #716754;
+  margin-inline-end: 10px;
+}
+.pr-tutorial.dark .tutorial-progress {
+  color: #c0b89f;
+}
+.tutorial-guide-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 8px;
+  max-width: 1000px;
+  margin: auto;
+}
+.tutorial-guide-body > p,
+.tutorial-saving {
+  grid-column: 1 / -1;
+}
+.tutorial-guide-body > details {
+  grid-column: 1;
+  align-self: center;
+}
+.tutorial-guide-body > details[open],
+.tutorial-guide-body > details[open] + .tutorial-controls {
+  grid-column: 1 / -1;
+}
+.tutorial-guide-body p {
+  margin: 6px 0;
+}
+.tutorial-guide-body details > summary {
+  cursor: pointer;
+  min-height: 32px;
+  align-content: center;
+}
+.tutorial-controls {
+  grid-column: 2;
+  justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.tutorial-controls button {
+  font: inherit;
+  cursor: pointer;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 6px 10px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid #b1a17c;
+  border-radius: 4px;
+  touch-action: manipulation;
+}
+.tutorial-controls button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.tutorial-controls button:focus-visible,
+.pr-tutorial summary:focus-visible {
+  outline: 3px solid #ac6045;
+  outline-offset: 2px;
+}
+.tutorial-controls .tutorial-primary {
+  margin-inline-start: auto;
+  background: #e0e5c4;
+  color: #3e392b;
+  font-weight: 600;
+}
+.pr-tutorial .tutorial-error {
+  color: #9c2f21;
+  font-weight: 600;
+}
+.pr-tutorial.dark .tutorial-error {
+  color: #ffbaae;
+}
+.pr-tutorial .tutorial-feedback {
+  color: #356743;
+}
+.pr-tutorial.dark .tutorial-feedback {
+  color: #b8d7a5;
+}
+.tutorial-saving {
+  display: block;
+  margin-top: 6px;
+}
+.pr-tutorial [hidden] {
+  display: none !important;
+}
+.pr-tutorial .tutorial-highlight {
+  outline: 2px solid #b47c17;
+  outline-offset: 3px;
+  scroll-margin-top: 220px;
+}
+.pr-tutorial.dark .tutorial-highlight {
+  outline-color: #ddb568;
+}
+.pr-tutorial .pr-game {
+  min-height: 0;
+}
+@media (max-width: 760px) {
+  .pr-tutorial-guide {
+    padding: 5px 9px;
+  }
+  .tutorial-guide-body > p,
+  .tutorial-saving {
+    grid-column: 1 / -1;
+  }
+  .tutorial-guide-body > details {
+    grid-column: 1;
+    align-self: center;
+  }
+  .tutorial-guide-body > details[open],
+  .tutorial-guide-body > details[open] + .tutorial-controls {
+    grid-column: 1 / -1;
+  }
+  .tutorial-guide-body p {
+    margin: 4px 0;
+  }
+  .tutorial-controls {
+    grid-column: 2;
+    justify-content: flex-end;
+    margin-top: 5px;
+    gap: 4px;
+  }
+  .tutorial-guide-body {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 8px;
+    font-size: 13px;
+  }
+  .tutorial-progress {
+    margin-inline-end: 6px;
+  }
+}

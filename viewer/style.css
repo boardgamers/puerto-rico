@@ -1683,6 +1683,29 @@
   .pr-game .action-dock strong {
     font-size: 12px;
   }
+  .pr-game .action-dock-compact {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+  .pr-game .action-dock-compact .dock-prompt {
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .pr-game .action-dock-compact .dock-prompt > .icon {
+    flex-shrink: 0;
+  }
+  .pr-game .action-dock-compact .dock-prompt strong {
+    overflow-wrap: anywhere;
+  }
+  .pr-game .action-dock-compact .dock-controls {
+    width: auto;
+    flex: 0 0 auto;
+    max-width: 50%;
+  }
+  .pr-game .action-dock-compact .dock-pass {
+    min-height: 42px;
+  }
   .pr-game .action-dock .move {
     font-size: 12px;
     padding: 6px 8px;
@@ -1957,40 +1980,70 @@
 }
 
 .pr-game .player-tab {
+  padding: 6px 8px;
   flex-direction: column;
+  flex-wrap: nowrap;
   align-items: stretch;
   justify-content: flex-start;
-  gap: 5px;
+  gap: 3px;
 }
 .pr-game .player-card-top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 4px 8px;
+  min-width: 0;
 }
-.pr-game .player-card-score {
+.pr-game .player-card-top .player-name {
+  width: 100%;
+  min-width: 0;
+  flex-wrap: nowrap;
+  gap: 4px;
+}
+.pr-game .player-card-top .player-name > .icon {
+  flex-shrink: 0;
+}
+.pr-game .player-card-portrait {
+  position: relative;
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
 }
+.pr-game .player-card-portrait.has-avatar .player-marker {
+  position: absolute;
+  inset-inline-end: -3px;
+  bottom: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--panel);
+}
+.pr-game .player-name-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: start;
+}
 .pr-game .player-card-resources,
 .pr-game .player-card-goods,
-.pr-game .player-card-reserve {
+.pr-game .player-card-reserve,
+.pr-game .player-card-score {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 4px 8px;
   font-size: 12px;
 }
+.pr-game .player-card-score,
 .pr-game .player-card-reserve {
   flex-wrap: nowrap;
+  flex-shrink: 0;
 }
-.pr-game .player-card-reserve + .player-card-goods {
-  border-inline-start: 1px solid var(--line);
-  padding-inline-start: 10px;
+.pr-game .player-card-resources {
+  min-width: 0;
+  width: 100%;
+  min-height: 28px;
 }
-.pr-game .player-card-resources .metric {
+.pr-game .player-card-resources .metric,
+.pr-game .player-tab .player-card-resources .metric + .metric {
   margin: 0;
 }
 .pr-game .player-card-goods .icon,
@@ -1998,15 +2051,23 @@
   width: 18px;
   height: 18px;
 }
-@media (max-width: 600px) {
+@media (max-width: 760px) {
+  .pr-game .player-strip {
+    gap: 4px;
+  }
+  .pr-game .player-strip.many-players {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .pr-game .player-tab {
+    padding: 5px 6px;
+    font-size: 12px;
+  }
   .pr-game .player-tab .player-card-resources,
   .pr-game .player-tab .player-card-goods,
-  .pr-game .player-tab .player-card-reserve {
-    gap: 4px;
+  .pr-game .player-tab .player-card-reserve,
+  .pr-game .player-tab .player-card-score {
+    gap: 3px 6px;
     font-size: 11px;
-  }
-  .pr-game .player-card-reserve + .player-card-goods {
-    padding-inline-start: 4px;
   }
   .pr-game .player-card-resources .metric {
     gap: 2px;
@@ -2015,6 +2076,10 @@
   .pr-game .player-card-reserve .icon {
     width: 16px;
     height: 16px;
+  }
+  .pr-game .player-card-top .player-avatar {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -2607,28 +2672,4 @@
 }
 .pr-game[dir="rtl"] .icon-arrow {
   transform: scaleX(-1);
-}
-.pr-game .player-card-top {
-  min-width: 0;
-  max-width: 100%;
-}
-.pr-game .player-name-text {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-@media (max-width: 760px) {
-  .pr-game .player-strip:has(.player-tab:nth-child(4)) {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .pr-game .player-name {
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 3px;
-  }
-  .pr-game .player-name-text {
-    order: 1;
-    flex: 1 0 100%;
-    text-align: start;
-  }
 }
