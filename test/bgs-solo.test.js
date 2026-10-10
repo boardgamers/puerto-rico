@@ -63,10 +63,17 @@ test("a hosted solo game always returns to the human and fully replays virtual t
 test("multiplayer creation and moves keep the existing human rules and result counts", () => {
   for (const n of [2, 3, 4, 5]) {
     const s = host.init(n, [], {}, `host-multi-${n}`);
-    assert.deepEqual(
-      s,
-      game.init(n, RELEASE.expansions, RELEASE.options, `host-multi-${n}`),
+    let expected = game.init(
+      n,
+      RELEASE.expansions,
+      RELEASE.options,
+      `host-multi-${n}`,
     );
+    while (expected.tasks[0]?.kind === "draft")
+      expected = game.moveAI(expected);
+    assert.deepEqual(s, expected);
+    assert.notEqual(s.tasks[0]?.kind, "draft");
+    assert.deepEqual(game.replay(s), s);
     assert.equal(s.puertoma, undefined);
     assert.equal(host.scores(s).length, n);
     assert.equal(host.rankings(s).length, n);
@@ -78,4 +85,19 @@ test("older multiplayer saves still use their original configuration", () => {
   s = game.moveAI(s);
   assert.deepEqual(host.moveAI(s), game.moveAI(s));
   assert.equal(host.scores(s).length, 3);
+});
+
+test("building selection is opt-in and keeps the interactive draft", () => {
+  for (const n of [2, 3, 4, 5]) {
+    const s = host.init(n, [], { chooseBuildings: true }, "manual-market");
+    assert.equal(s.tasks[0].kind, "draft");
+    const m = game.legal(s)[0];
+    const next = host.move(s, m, 0);
+    assert.equal(next.tasks[0].kind, "draft");
+    assert.equal(next.tasks[0].p, 1);
+  }
+  assert.deepEqual(
+    host.init(3, [], {}, "auto-market"),
+    host.init(3, [], { chooseBuildings: false }, "auto-market"),
+  );
 });

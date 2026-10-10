@@ -1,3 +1,5 @@
+import { mergePreferences, imageUrl } from "./platform.js";
+import { achievementProgress } from "./achievement-progress.js";
 import {
   PLAYER_SYMBOLS,
   isPlayerSymbol,
@@ -22,7 +24,7 @@ import {
 import { richText } from "./rich-text.js";
 import { town } from "./town.js";
 import css from "./style.css";
-import { achievementText, abilityTexts } from "./achievement-text.js";
+import { achievementText } from "./achievement-text.js";
 import { productionLines } from "./production.js";
 import { estateCapacity } from "../engine/puertoma.js";
 
@@ -48,10 +50,19 @@ const playerShapes = [
 ];
 export function mountGame(
   target,
-  { onMove, chat, onOpenPlayer, localControls, automatedSetup = false } = {},
+  {
+    onMove,
+    chat,
+    onOpenPlayer,
+    onOpenChat,
+    localControls,
+    automatedSetup = false,
+  } = {},
 ) {
   const shell = document.createElement("div");
   shell.className = "pr-game";
+  shell.lang = "en";
+  shell.dir = "ltr";
   shell.innerHTML = `<style>${css}</style><div class="pr-content"></div><dialog class="pr-modal"><header><h2></h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="modal-body"></div></dialog><dialog class="pr-chat"><header><h2>Chat</h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="chat-mount"></div></dialog><p class="pr-error" role="alert" hidden></p>`;
   target.append(shell);
   const content = shell.querySelector(".pr-content"),
@@ -64,6 +75,7 @@ export function mountGame(
     view = 0,
     t = translator("en"),
     preferences = {},
+    avatars = [],
     enabled = true,
     pending = false,
     draft = null,
@@ -75,6 +87,9 @@ export function mountGame(
     actionContext = "",
     roleConfirmation = null,
     scrollLog = 0;
+  const expandedSections = new Map();
+  const sectionOpen = (id) =>
+    expandedSections.get(id) ?? window.matchMedia("(min-width: 761px)").matches;
   const metric = (id, n, labelKey) => {
     const label = esc(
       `${t(labelKey ?? { coin: "coins", worker: "workers", citizen: "citizens" }[id] ?? id)} : ${n}`,
@@ -90,10 +105,14 @@ export function mountGame(
   const playerBadge = (i) => {
     const badge =
       preferences.bgs?.players?.[i]?.pro && preferences.bgs.supporterBadge;
-    return badge
+    return badge && imageUrl(badge.url)
       ? `<img class="supporter-badge" src="${esc(badge.url)}" alt="${esc(badge.label)}" title="${esc(badge.label)}">`
       : "";
   };
+  const playerAvatar = (i) =>
+    imageUrl(avatars[i])
+      ? `<img class="player-avatar" src="${esc(imageUrl(avatars[i]))}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+      : "";
   const playerMarker = (i, decorative = false) => {
     const custom = preferences.bgs?.playerColors?.[i];
     const color =
@@ -137,11 +156,11 @@ export function mountGame(
         send: t("send"),
         sending: t("sending"),
         empty: t("noMessages"),
-        edited: t.fr ? "modifié" : "edited",
-        game: t.fr ? "Jeu" : "Game",
-        suggestions: t.fr ? "Joueurs" : "Players",
+        edited: t("edited"),
+        game: t("game"),
+        suggestions: t("players"),
         unread: (n) => `${n}`,
-        date: (d) => d.toLocaleDateString(t.fr ? "fr" : "en"),
+        date: (d) => d.toLocaleDateString(t.locale),
         status: (s) => s.reason || (s.canSend ? "" : t("readOnly")),
       },
     });
@@ -253,7 +272,7 @@ export function mountGame(
       case "recruit":
         return t(m.kind === "c" ? "citizens" : "workers");
       case "produce":
-        return goodsRow(m.goods) || t("pass");
+        return `${t("produce")} ${goodsRow(m.goods)}`;
       case "produceBonus":
         return t(m.good);
       case "trade":
@@ -338,7 +357,11 @@ export function mountGame(
   }
   function actionMoves() {
     return state.legal.filter(
-      (m) => m.type !== "bohio" && (m.type !== "pass" || m.decline?.length),
+      (m) =>
+        m.type !== "bohio" &&
+        (m.type !== "pass" || m.decline?.length) &&
+        // Zero production has the same bonus choices as passing.
+        !(m.type === "produce" && !GOODS.some((g) => m.goods[g])),
     );
   }
   function actionButton(m) {
@@ -460,16 +483,16 @@ export function mountGame(
           }
         : a;
     const lines = productionLines(preview, state.supply);
-    return `<section class="production-overview"><header><div><h3>${t(view === seat ? "productionTitle" : "otherProduction")}</h3><small>${t("productionTiming")}</small></div><button type="button" class="production-help" data-production-help title="${esc(t("productionHelp"))}" aria-label="${esc(t("productionHelp"))}">${icon("help", 16)}</button></header>${lines.length ? lines.map((line) => `<div class="production-line ${line.available ? "ready" : "blocked"}" data-production-good="${line.good}"><strong class="production-good">${icon(line.good, 20)}${t(line.good)}</strong><div class="production-flow"><span class="production-step">${icon(`field-${line.good}`, 30)}<span><small>${t("plantationLabel")}</small><b>${line.farms} / ${line.farmCount}</b> <small>${t("occupiedLabel")}</small></span></span><span class="production-join">${line.good === "corn" ? "" : "+"}</span><span class="production-step ${line.good === "corn" ? "not-needed" : ""}">${line.good === "corn" ? `<small>${t("noWorkshopNeeded")}</small>` : `${icon(`workshop-${line.good}`, 30)}<span><small>${t("workSlots")}</small>${line.workshopCount ? `<b>${line.workshops} / ${line.workshopCount}</b> <small>${t("occupiedSlots")}</small>` : `<b>${t("toBuild")}</b>`}</span>`}</span>${icon("arrow", 18)}<span class="production-output" aria-label="${esc(`${t(line.good)} : ${line.available}`)}">${metric(line.good, line.available)}</span></div><small class="production-status">${line.available ? icon("check", 13) : ""}${t(line.issue)}${line.capacity > (line.good === "corn" ? line.farms : Math.min(line.farms, line.workshops)) ? ` · ${t("canal")} +1` : ""}</small></div>`).join("") : `<p>${t("noProductionYet")}</p>`}<div class="production-destination"><span>${t("stockLabel")}</span>${icon("arrow", 14)}<span>${icon("trader", 18)}${t("trader")} ${icon("arrow", 12)}${icon("coin", 18)}</span><span class="production-or">/</span><span>${icon("captain", 18)}${t("captain")} ${icon("arrow", 12)}${scoreToken(1, 18)}</span></div></section>`;
+    return `<details class="production-overview compact-section" ${sectionOpen("production") ? "open" : ""}><summary data-section="production"><div><h3>${icon("craftsman", 20)}${t(view === seat ? "productionTitle" : "otherProduction")}</h3><span class="production-quick">${lines.map((line) => metric(line.good, line.available)).join("")}</span></div><button type="button" class="production-help" data-production-help title="${esc(t("productionHelp"))}" aria-label="${esc(t("productionHelp"))}">${icon("help", 16)}</button></summary>${lines.length ? lines.map((line) => `<div class="production-line ${line.available ? "ready" : "blocked"}" data-production-good="${line.good}"><div class="production-flow"><span class="production-step">${icon(`field-${line.good}`, 30)}<span><small>${t("plantationLabel")}</small><b>${line.farms} / ${line.farmCount}</b> <small>${t("occupiedLabel")}</small></span></span><span class="production-join">${line.good === "corn" ? "" : "+"}</span><span class="production-step ${line.good === "corn" ? "not-needed" : ""}">${line.good === "corn" ? `<small>${t("noWorkshopNeeded")}</small>` : `${icon(`workshop-${line.good}`, 30)}<span><small>${t("workSlots")}</small>${line.workshopCount ? `<b>${line.workshops} / ${line.workshopCount}</b> <small>${t("occupiedSlots")}</small>` : `<b>${t("toBuild")}</b>`}</span>`}</span>${icon("arrow", 18)}<span class="production-output" aria-label="${esc(`${t(line.good)} : ${line.available}`)}">${metric(line.good, line.available)}</span></div>${!["productionReady", "staffPlantation", "staffWorkshop"].includes(line.issue) || line.capacity > (line.good === "corn" ? line.farms : Math.min(line.farms, line.workshops)) ? `<small class="production-status">${!["productionReady", "staffPlantation", "staffWorkshop"].includes(line.issue) ? t(line.issue) : ""}${line.capacity > (line.good === "corn" ? line.farms : Math.min(line.farms, line.workshops)) ? ` ${t("canal")} +1` : ""}</small>` : ""}</div>`).join("") : `<p>${t("noProductionYet")}</p>`}<div class="production-destination"><span>${t("stockLabel")}</span>${icon("arrow", 14)}<span>${icon("trader", 18)}${t("trader")} ${icon("arrow", 12)}${icon("coin", 18)}</span><span class="production-or">/</span><span>${icon("captain", 18)}${t("captain")} ${icon("arrow", 12)}${scoreToken(1, 18)}</span></div></details>`;
   }
   function productionHelp() {
     show(
       t("productionHelp"),
-      `<div class="production-guide"><div class="production-guide-flow"><span>${icon("field-fruit", 48)}<b>${t("plantationLabel")}</b>${icon("worker", 20)}</span><b>+</b><span>${icon("workshop-fruit", 48)}<b>${t("productionBuilding")}</b>${icon("worker", 20)}</span>${icon("arrow", 24)}<span>${icon("fruit", 42)}<b>1 ${t("fruit")}</b></span></div><p>${t("productionPair")}</p><p>${t("productionIntro")}</p><p>${t("goodsMeaning")}</p><p>${t("useStock")}</p><p>${t("storageMeaning")}</p></div>`,
+      `<div class="production-guide"><div class="production-guide-flow"><span>${icon("field-fruit", 48)}<b>${t("plantationLabel")}</b>${icon("worker", 20)}</span><b>+</b><span>${icon("workshop-fruit", 48)}<b>${t("productionBuilding")}</b>${icon("worker", 20)}</span>${icon("arrow", 24)}<span>${icon("fruit", 42)}<b>1 ${t("fruit")}</b></span></div><p>${t("productionPair")}</p><p>${t("useStock")}</p></div>`,
     );
   }
   function playerAreas(a) {
-    return `<h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(GOODS.includes(x.id) ? `field-${x.id}` : x.id, 36)}<span class="estate-name">${t(x.id)}</span>${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(t.effect(x.id))}">${buildingPictogram(x.id, 28)}<span>${t(x.id)}${B[x.id].good && B[x.id].good !== "tailor" ? `<small class="building-kind">${t("productionBuilding")}</small>` : ""}</span>${pointsBadge(B[x.id].vp)}</button>${a.puertoma ? `<small>${t.fr ? "Niveau" : "Level"} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}</article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>`;
+    return `<h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(GOODS.includes(x.id) ? `field-${x.id}` : x.id, 36)}<span class="estate-name">${t(x.id)}</span>${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(x.id === "monument" ? t(x.id) : t.effect(x.id))}">${buildingPictogram(x.id, 28)}<span>${t(x.id)}</span></button><div class="owned-building-bottom">${a.puertoma ? `<small>${t("level")} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}${pointsBadge(B[x.id].vp)}</div></article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>`;
   }
   function playerBoard() {
     const a = state.players[view];
@@ -480,16 +503,28 @@ export function mountGame(
     return `<section class="achievements"><h3>${t("achievements")}<button type="button" class="icon-button" data-achievements-help title="${esc(t("achievementHelpTitle"))}" aria-label="${esc(t("achievementHelpTitle"))}">${icon("help", 14)}</button></h3><div>${a.achievements
       .map((x) => {
         const c = achievementText(x.id, t);
-        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong><small>${c.html}</small>${c.vp === undefined ? "" : `<footer class="achievement-reward"><span>${t("reward")}</span>${metric("vp", c.vp)}</footer>`}</article>`;
+        return `<article class="achievement-card ${x.completed ? "completed" : ""}"><header class="achievement-heading"><strong>${x.completed ? icon("check", 18) : ""}${esc(c.name)}</strong>${c.vp === undefined ? "" : `<span class="achievement-points" title="${esc(t("reward"))}">${metric("vp", c.vp)}</span>`}</header><small>${c.html}</small><div class="achievement-progress" aria-label="${esc(t("objectiveProgress"))}">${achievementProgress(
+          state,
+          view,
+          x,
+        )
+          .map(
+            ({ kind, value, target }) =>
+              `<span class="${value === target ? "done" : ""}" title="${esc(t(kind === "check" ? "objectiveAction" : ["craftsman", "captain"].includes(kind) ? "objectivePhase" : "objectiveProgress"))}">${icon(kind, 16)}<b>${value}<small>/${target}</small></b></span>`,
+          )
+          .join("")}</div></article>`;
       })
       .join("")}</div></section>`;
   }
   function puertomaBoard(a) {
     if (!a.puertoma) return "";
-    return `<section class="puertoma-board"><h3>Puertoma · ${t(state.puertoma.tracker)}</h3><p>${t("puertomaHelp")}</p><div>${metric("worker", a.puertoma.unused.w)}${metric("citizen", a.puertoma.unused.c)}<small>${t("unusedWorkers")}</small></div>${a.puertoma.reserved ? `<p>${t("reservedBuilding")}: ${t(a.puertoma.reserved)}</p>` : ""}${a.puertoma.abilities.map((x) => `<p>${t("ability")} ${x.level} · ${x.active ? icon("check", 18) : ""}${esc(x.id ? abilityTexts[x.id][t.fr ? 1 : 0] : t("secretAbility"))}</p>`).join("")}</section>`;
+    return `<section class="puertoma-board"><h3>Puertoma · ${t(state.puertoma.tracker)}</h3><p>${t("puertomaHelp")}</p><div>${metric("worker", a.puertoma.unused.w)}${metric("citizen", a.puertoma.unused.c)}<small>${t("unusedWorkers")}</small></div>${a.puertoma.reserved ? `<p>${t("reservedBuilding")}: ${t(a.puertoma.reserved)}</p>` : ""}${a.puertoma.abilities.map((x) => `<p>${t("ability")} ${x.level} · ${x.active ? icon("check", 18) : ""}${esc(x.id ? t(`ability.${x.id}`) : t("secretAbility"))}</p>`).join("")}</section>`;
   }
   function shipGraphic(sh) {
     return `<svg class="ship-art" viewBox="0 0 200 112" aria-hidden="true"><path fill="#edf0d4" stroke="#b6a37b" d="M96 6v58H42Zm10 9v49h43Z"/><path fill="#80614b" d="m12 66 17 31q75 22 143-3l18-28Z"/><path fill="none" stroke="#d7ac75" stroke-width="3" d="m28 77 144 0m-70-74v65"/>${Array.from({ length: sh.capacity }, (_, i) => `<rect x="${22 + i * (155 / sh.capacity)}" y="72" width="${Math.min(18, 140 / sh.capacity)}" height="17" rx="2" fill="${i < sh.amount ? "#e6c06f" : "#483e38"}" stroke="#bfa587"/>`).join("")}<path d="M5 105q20-10 40 0t40 0t40 0t40 0t30 0" fill="none" stroke="#9bbebc" stroke-width="2"/></svg>`;
+  }
+  function plantationHelp(id) {
+    return `${t(id)} — ${t(id === "quarry" ? "quarryHelp" : id === "forest" ? "forestHelp" : id === "corn" ? "cornHelp" : "plantationHelp")}`;
   }
   function sharedBoard() {
     const acting = allowed(),
@@ -510,19 +545,27 @@ export function mountGame(
       })
       .join(
         "",
-      )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="recruitment-pool" role="group" aria-label="${esc(t("recruitmentPool"))}"><strong>${icon("recruiter", 20)}${t("recruitmentPool")}</strong>${metric("worker", state.register.w, "registerWorkers")}${state.register.c ? metric("citizen", state.register.c, "registerCitizens") : ""}</div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply), "vpSupply")}</div></header><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${icon("trader", 18)} ${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div></div><section class="plantation-supply"><header>${icon("planter", 20)}<h3>${t("plantedOffer")}</h3></header><div class="estate-offer">${state.offer
+      )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="recruitment-pool" role="group" aria-label="${esc(t("recruitmentPool"))}"><strong>${icon("recruiter", 20)}${t("recruitmentPool")}</strong>${metric("worker", state.register.w, "registerWorkers")}${state.register.c ? metric("citizen", state.register.c, "registerCitizens") : ""}</div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply), "vpSupply")}</div></header><div class="goods-supply" role="group" aria-label="${esc(t("goodsSupply"))}"><strong>${t("goodsSupply")}</strong>${GOODS.map((g) => `<span class="supply-good ${state.supply[g] === 0 ? "depleted" : ""}">${metric(g, state.supply[g])}</span>`).join("")}</div><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${icon("trader", 18)} ${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div></div><section class="plantation-supply"><header>${icon("planter", 20)}<h3>${t("plantedOffer")}</h3></header><div class="estate-offer">${state.offer
       .map((id, i) => {
         const m = state.legal.find(
           (m) => m.type === "plant" && m.id === id && !m.forest,
         );
-        return `<button class="offer ${id}" ${m && acting ? `data-move="${encode(m)}"` : "disabled"} title="${esc(t(id))}">${icon(GOODS.includes(id) ? `field-${id}` : id, 32)}<span>${t(id)}</span></button>`;
+        return `<button class="offer ${id}" ${m && acting ? `data-move="${encode(m)}"` : 'aria-disabled="true"'} title="${esc(plantationHelp(id))}">${icon(GOODS.includes(id) ? `field-${id}` : id, 32)}<span>${t(id)}</span></button>`;
       })
       .join("")}${(() => {
       const m = state.legal.find(
         (m) => m.type === "plant" && m.id === "quarry",
       );
-      return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : "disabled"} title="${esc(t("quarry"))}">${icon("quarry", 28)}<span>${t("quarry")}</span><small>${state.quarries}</small></button>`;
-    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests>${icon("forest")} ${t("forest")}</button>` : ""}</div></section>${state.festivals.length ? `<section class="festival-strip" aria-label="${t("festival")}">${state.festivals.map((f, i) => `<button data-festival="${i}" class="festival ${f.claimed !== undefined ? "claimed" : ""}"><span class="festival-heading">${icon("festival", 22)}<span><small>${t("sharedObjective")}</small><strong>${t(f.id)}</strong></span></span><span class="festival-condition">${festivalCondition(f)}</span><span class="festival-reward"><small>${t("reward")}</small><span>${festivalReward(f)}</span></span>${f.claimed !== undefined ? `<span class="festival-claimed">${icon("check", 16)}${t("claimed")} ${esc(state.players[f.claimed].name)}</span>` : ""}</button>`).join("")}</section>` : ""}</section>`;
+      return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : 'aria-disabled="true"'} title="${esc(plantationHelp("quarry"))}">${icon("quarry", 28)}<span>${t("quarry")}</span><small>${state.quarries}</small></button>`;
+    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests title="${esc(plantationHelp("forest"))}">${icon("forest")} ${t("forest")}</button>` : ""}</div></section>${state.festivals.length ? `<details class="festival-section compact-section" ${sectionOpen("festival") ? "open" : ""} aria-label="${t("festival")}"><summary class="festival-section-heading" data-section="festival"><h3>${icon("festival", 20)}${t("festival")} <small>${state.festivals.filter((f) => f.claimed !== undefined).length}/${state.festivals.length}</small></h3><small>${t("sharedObjectives")}</small></summary><div class="festival-strip">${state.festivals.map(festivalCard).join("")}</div></details>` : ""}</section>`;
+  }
+  function cityFootprint() {
+    return `<span class="city-footprint" role="img" title="${esc(t("twoCitySpaces"))}" aria-label="${esc(t("twoCitySpaces"))}">${icon("cityFootprint", 24)}</span>`;
+  }
+  function quarryLimit(b) {
+    const limit = b.size === 2 ? 4 : b.vp;
+    const label = `${t("quarryDiscountLimit")} : ${limit}`;
+    return `<span class="quarry-limit" title="${esc(label)}" aria-label="${esc(label)}">${icon("quarry", 16)}<small>−${limit}</small></span>`;
   }
   function buildingSlots(b) {
     return `<span class="capacity-slots" title="${esc(`${t("workerSpaces")} : ${b.workers}`)}" aria-label="${esc(`${t("workerSpaces")} : ${b.workers}`)}">${Array.from({ length: b.workers }, () => `<span>${icon("worker", 17)}</span>`).join("")}</span>`;
@@ -532,7 +575,7 @@ export function mountGame(
     if (b.good && b.good !== "tailor") {
       const message = `${t("productionCapacity")} : ${b.workers} ${t(b.good)}. ${t("matchingWorkers")}`;
       return html
-        ? `${richText(`${t("productionCapacity")} : {${b.good}:${b.workers}}.`, t.fr)} ${esc(t("matchingWorkers"))}`
+        ? `${richText(`${t("productionCapacity")} : {${b.good}:${b.workers}}.`, t.catalog)} ${esc(t("matchingWorkers"))}`
         : message;
     }
     return html ? t.effectHtml(id) : t.effect(id);
@@ -555,7 +598,7 @@ export function mountGame(
     const stock = goods.length
       ? `<span class="player-card-goods" title="${esc(t("stockLabel"))}">${goods.map((g) => metric(g, p.goods[g])).join("")}</span>`
       : "";
-    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" aria-pressed="${i === view}">${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}${esc(p.name)}${playerBadge(i)}</button><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</div>`;
+    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" title="${esc(p.name)}" aria-pressed="${i === view}">${playerAvatar(i)}${playerMarker(i, true)}${i === state.governor ? icon("governor", 18) : ""}<span class="player-name-text">${esc(p.name)}</span>${playerBadge(i)}</button><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span></span>${people || stock ? `<span class="player-card-resources">${people}${stock}</span>` : ""}</div>`;
   }
   function playerSummary() {
     const a = state.players[seat];
@@ -596,10 +639,10 @@ export function mountGame(
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
         return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${buildingPictogram(id, 30)}<strong>${t(id)}${b.good && b.good !== "tailor" ? `<small class="building-kind">${t("productionBuilding")}</small>` : ["smallWarehouse", "largeWarehouse", "storehouse"].includes(id) ? `<small class="building-kind">${t("storageBuilding")}</small>` : ""}</strong></span>
-          <span class="bcard-cost" title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>
+          <span class="bcard-cost"><span title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>${quarryLimit(b)}</span>
           <span class="bcard-effect">${buildingSymbols(id, t)}</span>
           <span class="bcard-stats">${pointsBadge(b.vp)}${buildingSlots(b)}</span>
-          <span class="bcard-stock">${b.size === 2 ? `<span class="city-footprint" title="${esc(t("twoCitySpaces"))}" aria-label="${esc(t("twoCitySpaces"))}">${t("twoCitySpaces")}</span>` : ""}<span>${stock}</span></span>
+          <span class="bcard-stock">${b.size === 2 ? cityFootprint() : ""}<span class="building-stock-count ${n === 0 ? "depleted" : ""}" role="img" title="${esc(stock)}" aria-label="${esc(stock)}">${icon("stock", 17)}<b>${n}</b></span></span>
         </button>`;
       })
       .join("")}</div></section>`;
@@ -720,7 +763,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>1897 · Special Edition</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="Light / dark" aria-label="Light / dark">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
@@ -769,7 +812,7 @@ export function mountGame(
   function roleReference(id) {
     const solo = id === "smuggler" || id.startsWith("adventurer");
     const privilege = t.rolePrivilege(id);
-    return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small><p>${t.roleActionHtml(id)}</p></div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
+    return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small><p>${t.roleActionHtml(id)}</p>${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
   }
   function confirmRole(m) {
     const warning = state.roleWarnings?.[m.id];
@@ -808,10 +851,25 @@ export function mountGame(
       );
     show(
       t(id),
-      `<div class="building-detail">${buildingPictogram(id, 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${buildingEffect(id, true)}</p>${b.size === 2 ? `<p>${t("twoCitySpaces")}</p>` : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
+      `<div class="building-detail">${buildingPictogram(id, 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}${quarryLimit(b)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${id === "monument" ? t("noSpecialEffect") : buildingEffect(id, true)}</p>${b.size === 2 ? cityFootprint() : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
     );
   }
-  function festivalCondition(f) {
+  function festivalCard(f, i) {
+    const claimed = f.claimed !== undefined;
+    const glyph =
+      {
+        produce: "craftsman",
+        farmProduce: "planter",
+        estates: "planter",
+        build: "building",
+        ship: "ship",
+        dispatchBig: "ship",
+        dispatchSmall: "ship",
+        tradeFull: "trader",
+      }[f.goal] ?? "festival";
+    return `<button data-festival="${i}" class="festival ${claimed ? "claimed" : ""}"><span class="festival-heading"><span class="festival-emblem">${icon(claimed ? "check" : glyph, 25)}</span><strong>${t(f.id)}</strong>${icon("help", 15)}</span><span class="festival-condition">${festivalCondition(f, true)}</span><span class="festival-card-bottom"><span class="festival-reward" title="${esc(t("reward"))}"><span class="festival-reward-symbol" role="img" aria-label="${esc(t("reward"))}">${icon("reward", 17)}</span><span>${festivalReward(f)}</span></span>${claimed ? `<span class="festival-claimed">${icon("check", 14)}${esc(state.players[f.claimed].name)}</span>` : festivalReserved(f, true)}</span></button>`;
+  }
+  function festivalCondition(f, compact = false) {
     const targets = (ids, amounts, fields = false) => {
       const counts = {};
       ids.forEach((id, i) => {
@@ -827,7 +885,7 @@ export function mountGame(
     const goods = targets(f.targets.goods, f.amounts);
     const estates = targets(f.targets.estates, null, true);
     const row = (label, content) =>
-      `<span class="festival-requirement"><span>${t.html(label)}</span>${content}</span>`;
+      `<span class="festival-requirement"><span>${t.html(compact ? ({ festivalProduce: "festivalProduceShort", festivalEstates: "festivalEstatesShort", festivalBuild: "festivalBuildShort", festivalBigShip: "festivalBigShipShort", festivalSmallShip: "festivalSmallShipShort", festivalTrade: "festivalTradeShort", festivalShip: "festivalShipShort" }[label] ?? label) : label)}</span>${content}</span>`;
     if (f.goal === "estates") return row("festivalEstates", estates);
     if (f.goal === "produce") return row("festivalProduce", goods);
     if (f.goal === "farmProduce")
@@ -844,6 +902,24 @@ export function mountGame(
       goods,
     );
   }
+  function festivalReserved(f, compact = false) {
+    if (f.claimed !== undefined || !f.targets.goods.length) return "";
+    const counts = {};
+    for (const good of f.targets.goods) counts[good] = (counts[good] ?? 0) + 1;
+    if (compact)
+      return `<span class="festival-reserved compact" title="${esc(t("festivalReservedHelp"))}"><span role="img" aria-label="${esc(t("reservedGoodsShort"))}">${icon("lock", 16)}</span>${Object.entries(
+        counts,
+      )
+        .map(([good, n]) => metric(good, n))
+        .join("")}</span>`;
+    return `<span class="festival-reserved" title="${esc(t("festivalReservedHelp"))}"><small>${t("festivalReserved")}</small><span>${Object.entries(
+      counts,
+    )
+      .map(([good, n]) => metric(good, n))
+      .join(
+        "",
+      )}${icon("arrow", 14)}<small>${t("festivalReturn")}</small></span></span>`;
+  }
   function festivalReward(f) {
     return `${f.reward.coins ? metric("coin", f.reward.coins) : ""}${f.reward.vp ? metric("vp", f.reward.vp) : ""}${f.reward.workers ? metric("worker", f.reward.workers) : ""}`;
   }
@@ -851,7 +927,7 @@ export function mountGame(
     const f = state.festivals[i];
     show(
       t(f.id),
-      `<div class="festival-condition">${festivalCondition(f)}</div><h3>${t("reward")}</h3><div>${festivalReward(f)}</div>${f.claimed !== undefined ? `<p>${t("claimed")} ${esc(state.players[f.claimed].name)}</p>` : ""}`,
+      `<div class="festival-condition">${festivalCondition(f)}</div><h3>${t("reward")}</h3><div>${festivalReward(f)}</div>${festivalReserved(f)}${f.claimed === undefined && f.targets.goods.length ? `<p>${t("festivalReservedHelp")}</p>` : ""}${f.claimed !== undefined ? `<p>${t("claimed")} ${esc(state.players[f.claimed].name)}</p>` : ""}`,
     );
   }
   function scores() {
@@ -946,7 +1022,7 @@ export function mountGame(
       await onMove(m);
       if (modal.open && modalMode !== "journal") hide(modal);
     } catch (err) {
-      error.textContent = err.message || t("error");
+      error.textContent = t("error");
       error.hidden = false;
     } finally {
       pending = false;
@@ -955,6 +1031,14 @@ export function mountGame(
   }
   function click(event) {
     const el = event.target.closest("button");
+    const summary = event.target.closest("summary[data-section]");
+    if (summary && !el) {
+      expandedSections.set(
+        summary.dataset.section,
+        !summary.parentElement.open,
+      );
+      return; // Native details interaction supports touch and keyboard.
+    }
     if (el?.hasAttribute("data-score")) {
       scorePlayer = Number(el.dataset.score);
       if (Number.isFinite(state.players[scorePlayer]?.vp))
@@ -978,6 +1062,10 @@ export function mountGame(
     }
     if (el.dataset.panel) {
       if (el.dataset.panel === "chat") {
+        if (preferences.platformChat === true && onOpenChat) {
+          onOpenChat();
+          return;
+        }
         lastFocus = el;
         chatDialog.showModal();
         chat?.setOpen(true);
@@ -992,6 +1080,7 @@ export function mountGame(
       return;
     }
     if (el.hasAttribute("data-production-help")) {
+      event.preventDefault();
       productionHelp();
       return;
     }
@@ -1058,7 +1147,10 @@ export function mountGame(
     if (el.dataset.move) {
       const m = JSON.parse(decodeURIComponent(el.dataset.move));
       if (m.type === "role" && confirmRole(m)) return;
-      if (["smallWharf", "produce"].includes(m.type)) {
+      if (
+        m.type === "smallWharf" ||
+        (m.type === "produce" && sum(Object.values(m.goods)) > 1)
+      ) {
         cargoDialog(m);
         return;
       }
@@ -1114,7 +1206,12 @@ export function mountGame(
       if (occupied) {
         x[occupied]--;
         tool = occupied;
-      } else if (tool !== "erase" && remaining()[tool] > 0) x[tool]++;
+      } else if (tool !== "erase" && remaining()[tool] > 0) {
+        x[tool]++;
+        const rest = remaining(),
+          other = tool === "w" ? "c" : "w";
+        if (rest[tool] === 0 && rest[other] > 0) tool = other;
+      }
       render();
       return;
     }
@@ -1179,6 +1276,10 @@ export function mountGame(
   chatDialog.addEventListener("cancel", onCancel);
   return {
     render,
+    setAvatars(value) {
+      avatars = value;
+      render();
+    },
     setPlayer(p) {
       seat = p;
       view = p ?? 0;
@@ -1190,10 +1291,15 @@ export function mountGame(
       render();
     },
     setPreferences(p) {
-      const previousLocale = t.fr;
-      preferences = { ...preferences, ...p, bgs: p.bgs };
+      const previousLocale = preferences.locale ?? preferences.language ?? "en";
+      preferences = mergePreferences(preferences, p);
       t = translator(preferences.locale ?? preferences.language ?? "en");
-      if (previousLocale !== t.fr) configureChat();
+      shell.lang = t.locale;
+      shell.dir = t.locale === "fa" ? "rtl" : "ltr";
+      if (
+        previousLocale !== (preferences.locale ?? preferences.language ?? "en")
+      )
+        configureChat();
       for (const b of shell.querySelectorAll("[data-close]"))
         b.setAttribute("aria-label", t("close"));
       shell.classList.toggle(

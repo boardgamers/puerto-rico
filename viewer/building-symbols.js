@@ -36,16 +36,13 @@ export function buildingSymbols(id, t) {
       : t.effect(id);
   let visual;
   if (b.good && b.good !== "tailor")
-    visual =
-      row(
-        staffed(`field-${b.good}`),
-        "<b>+</b>",
-        staffed(`workshop-${b.good}`),
-        arrow(),
-        icon(b.good, 26),
-      ) +
-      `<small class="effect-caption">${t("productionCapacity")} : <b>${b.workers}</b></small>` +
-      caption("bothStaffed");
+    visual = row(
+      staffed(`field-${b.good}`),
+      "<b>+</b>",
+      staffed(`workshop-${b.good}`),
+      arrow(),
+      icon(b.good, 26),
+    );
   else
     switch (id) {
       case "smallMarket":
@@ -77,6 +74,21 @@ export function buildingSymbols(id, t) {
           arrow(),
           quantity("worker", "+1"),
         );
+        break;
+      case "church":
+        visual =
+          row(
+            icon("builder", 22),
+            `<span class="effect-options">${scoreToken(2, 22)}/${scoreToken(3, 22)}</span>`,
+            arrow(),
+            quantity("vp", "+1"),
+          ) +
+          row(
+            icon("builder", 22),
+            icon("cityFootprint", 26),
+            arrow(),
+            quantity("vp", "+2"),
+          );
         break;
       case "school":
         visual = row(icon("builder"), arrow(), quantity("worker", "+1"));
@@ -154,8 +166,7 @@ export function buildingSymbols(id, t) {
           caption("sameType");
         break;
       case "monument":
-        visual = row(icon("scoring"), icon("noWorker", 28));
-        break;
+        return "";
       case "chapel":
         visual =
           row(

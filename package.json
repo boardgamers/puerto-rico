@@ -1,6 +1,6 @@
 {
   "name": "@boardgamers/puerto-rico",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "Puerto Rico 1897 Special Edition for Boardgamers Space",
@@ -8,7 +8,7 @@
     "test": "node --test test/*.test.js",
     "build": "node scripts/build.mjs",
     "dev": "node scripts/dev.mjs",
-    "test:browser": "node test/browser.mjs",
+    "test:browser": "node test/browser.mjs && node test/locales-browser.mjs",
     "publish:private": "pnpm build && node scripts/publish-private.mjs"
   },
   "dependencies": {

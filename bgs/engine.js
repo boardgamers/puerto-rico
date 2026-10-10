@@ -10,26 +10,34 @@ function checkSeat(s, p) {
     );
 }
 function opponents(s) {
-  if (!solo(s)) return s;
   // BGS has one participant. Resolve the virtual opponents on the server before
   // returning, so the platform never waits for a nonexistent participant.
   let moves = 0;
-  while (!game.ended(s) && game.currentPlayer(s) !== 0) {
+  while (
+    !game.ended(s) &&
+    ((s.tasks[0]?.kind === "draft" && !s.options.chooseBuildings) ||
+      (solo(s) && game.currentPlayer(s) !== 0))
+  ) {
     if (++moves > 1000)
       throw Error("Puertoma turns did not return to the human player.");
     s = game.moveAI(s);
   }
   return s;
 }
-export function init(players, _expansions, _options, seed) {
+export function init(players, _expansions, suppliedOptions, seed) {
+  const baseOptions = {
+    ...RELEASE.options,
+    chooseBuildings: suppliedOptions?.chooseBuildings === true,
+    showVP: suppliedOptions?.showVP === true,
+  };
   const options =
     players === 1
       ? {
-          ...RELEASE.options,
+          ...baseOptions,
           hostedSolo: true,
           puertoma: { humans: 1, difficulty: "normal" },
         }
-      : RELEASE.options;
+      : baseOptions;
   const s = game.init(
     players === 1 ? 3 : players,
     RELEASE.expansions,
@@ -51,6 +59,10 @@ export function moveAI(s, p = game.currentPlayer(s)) {
 export function dropPlayer(s, p) {
   checkSeat(s, p);
   return game.dropPlayer(s, p);
+}
+export function setPlayerSettings(s, p, settings) {
+  checkSeat(s, p);
+  return game.setPlayerSettings(s, p, settings);
 }
 export function setPlayerMetaData(s, p, data) {
   checkSeat(s, p);

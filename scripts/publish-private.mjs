@@ -2,6 +2,8 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
+import { releaseMetadata } from "./release-metadata.mjs";
+import { supportedLocales } from "../viewer/i18n.js";
 import { packageEngine } from "./package-engine.mjs";
 
 const defaults = JSON.parse(await readFile("bgs/game.json", "utf8"));
@@ -9,25 +11,30 @@ assert.equal(defaults.public, false);
 const { tarball, version } = await packageEngine();
 const token = (await readFile(`${homedir()}/.bgs`, "utf8")).trim();
 const base = "https://admin.boardgamers.space/api/admin/gameinfo/puerto-rico";
-async function api(path, method = "GET", body, binary = false) {
+async function api(
+  path,
+  method = "GET",
+  body,
+  binary = false,
+  contentType = "application/octet-stream",
+) {
   const response = await fetch(base + path, {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
       ...(body
         ? {
-            "Content-Type": binary
-              ? "application/octet-stream"
-              : "application/json",
+            "Content-Type": binary ? contentType : "application/json",
           }
         : {}),
     },
     body: body ? (binary ? body : JSON.stringify(body)) : undefined,
   });
-  if (!response.ok)
-    throw Error(
-      `${method} ${path}: ${response.status} ${await response.text()}`,
-    );
+  if (!response.ok) {
+    const error = Error(`${method} ${path}: ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
   const text = await response.text();
   return text ? JSON.parse(text) : null;
 }
@@ -63,7 +70,32 @@ await api("/1", "PUT", {
   viewer: { ...defaults.viewer, url: uploaded.url, scriptBytes: bytes.length },
 });
 // Listed in the beta catalog; the actual playable version stays private.
-await api("/meta", "PUT", { unlisted: null });
+const { metadata, translations } = await releaseMetadata();
+await api("/meta", "PUT", metadata);
+await api(
+  "/assets/pictogram?name=Puerto%20Rico",
+  "PUT",
+  await readFile("bgs/assets/pictogram.svg"),
+  true,
+  "image/svg+xml",
+);
+await api("/icon", "PUT", { mode: "pictogram" });
+let translationsPending = false;
+for (const [lang, translation] of Object.entries(translations)) {
+  try {
+    await api(`/meta/translations/${lang}`, "PUT", translation);
+  } catch (error) {
+    // Older hosts do not yet expose the manual translation endpoint. Keep the
+    // manually authored overlays ready to upload once the platform PR is live.
+    if (error.status !== 404) throw error;
+    translationsPending = true;
+    break;
+  }
+}
+await writeFile(
+  ".local/release/manual-translations.json",
+  JSON.stringify(translations, null, 2),
+);
 const access = await api("/beta-users");
 if (!access.some((u) => u.username === "coyotte508"))
   await api("/beta-users", "POST", { usernameOrEmail: "coyotte508" });
@@ -74,12 +106,27 @@ assert.deepEqual(published.players, defaults.players);
 assert.ok(!meta.unlisted);
 assert.equal(published.engine.package.version, version);
 assert.equal(published.viewer.url, uploaded.url);
-assert.deepEqual(
-  published.preferences
-    .find((p) => p.name === "language")
-    .items.map((p) => p.name),
-  ["en", "fr"],
+assert.equal(meta.displayTitle.title, metadata.displayTitle.title);
+assert.equal(meta.displayTitle.subtitle, metadata.displayTitle.subtitle);
+assert.equal(meta.iconMode, "pictogram");
+assert.ok(meta.assets?.pictogram?.url);
+const pictogram = await fetch(meta.assets.pictogram.url);
+assert.ok(pictogram.ok, `Pictogram CDN ${pictogram.status}`);
+assert.equal(
+  (await pictogram.arrayBuffer()).byteLength,
+  meta.assets.pictogram.size,
 );
+assert.deepEqual(published.preferences, []);
+if (!translationsPending) {
+  for (const [lang, translation] of Object.entries(translations)) {
+    assert.equal(
+      meta.translations?.[lang]?.description,
+      translation.description,
+    );
+    for (const [key, label] of Object.entries(translation.optionTranslations))
+      assert.equal(meta.optionTranslations?.[lang]?.[key]?.label, label);
+  }
+}
 const downloaded = await fetch(uploaded.url);
 assert.ok(downloaded.ok, `CDN ${downloaded.status}`);
 assert.equal(hash(Buffer.from(await downloaded.arrayBuffer())), hash(bytes));
@@ -93,7 +140,9 @@ console.log(
     listed: !meta.unlisted,
     status: meta.status,
     engine: published.engine.package.version,
-    languages: ["en", "fr"],
+    languages: supportedLocales,
+    translationsPending,
+    pictogram: meta.assets.pictogram.url,
     viewer: uploaded.url,
   }),
 );

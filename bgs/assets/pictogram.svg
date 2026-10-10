@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="256" height="256">
+  <title>Puerto Rico — coastal sentry tower</title>
+  <path fill="#163d50" d="M0 100Q30 83 61 92t67-3v39H0Z"/>
+  <path fill="#56aaa8" d="M0 109q16-10 32 0t32 0 32 0 32 0v9q-16-10-32 0t-32 0-32 0-32 0Z"/>
+  <path fill="#d29a54" stroke="#493f32" stroke-width="4" stroke-linejoin="round" d="M25 98 32 51h53l7 47Z"/>
+  <path fill="#efd29a" stroke="#493f32" stroke-width="4" stroke-linejoin="round" d="M34 51V27l12-9h24l12 9v24Z"/>
+  <path fill="#b9613e" stroke="#493f32" stroke-width="4" stroke-linejoin="round" d="M31 27 44 11h28l13 16Z"/>
+  <path stroke="#493f32" stroke-width="4" stroke-linecap="round" d="M58 11V2"/>
+  <path fill="#493f32" d="M53 34a5 5 0 0 1 10 0v12H53Zm-1 42a7 7 0 0 1 14 0v22H52Z"/>
+  <path fill="#af7947" d="M68 54h13l6 42H73Z"/>
+  <path fill="none" stroke="#8e6742" stroke-width="3" d="M36 62h13m20 2h12M33 80h12m-7 10h12M72 81h12"/>
+  <path fill="#719452" stroke="#365542" stroke-width="3" d="M3 99q12-16 25-10l-1 10Zm86-2q14-18 35 0Z"/>
+  <path fill="none" stroke="#77533a" stroke-width="6" stroke-linecap="round" d="M104 94q8-25 0-48"/>
+  <path fill="#4d8255" stroke="#2d5841" stroke-width="2" stroke-linejoin="round" d="M104 46q-22-16-31 4 17-7 31-4Zm0 0q-13-27 5-31-5 15-5 31Zm0 0q13-21 24-10-14 2-24 10Zm0 0q22-4 23 16-11-12-23-16Zm0 0q-17 0-15 20 5-12 15-20Z"/>
+</svg>

@@ -1,4 +1,4 @@
-import { achievementText, abilityTexts } from "./achievement-text.js";
+import { achievementText } from "./achievement-text.js";
 import { GOODS } from "../engine/catalog.js";
 import { icon, scoreToken } from "./icons.js";
 import { buildingSprite } from "./building-symbols.js";
@@ -65,10 +65,10 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
           text = `${t("achievements")} · ${esc(achievementText(e.id, t).name)} ${icon("check", 20)}`;
           break;
         case "puertomaBonus":
-          text = `${t("ability")} · ${esc(abilityTexts[e.id][t.fr ? 1 : 0])} ${goods(e.goods)} ${e.workers ? metric("worker", e.workers, true) : ""}`;
+          text = `${t("ability")} · ${esc(t(`ability.${e.id}`))} ${goods(e.goods)} ${e.workers ? metric("worker", e.workers, true) : ""}`;
           break;
         case "puertomaAbility":
-          text = `${t("ability")} ${e.level} · ${esc(abilityTexts[e.id][t.fr ? 1 : 0])}`;
+          text = `${t("ability")} ${e.level} · ${esc(t(`ability.${e.id}`))}`;
           break;
         case "income":
           text = t("journalGains");

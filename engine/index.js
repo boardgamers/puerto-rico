@@ -13,6 +13,7 @@ import {
 } from "./catalog.js";
 
 export const hashSeed = true;
+export const JOURNAL_LIMIT = 200;
 const clone = (x) => structuredClone(x);
 const sum = (xs) => xs.reduce((a, b) => a + b, 0);
 const counts = (n = 0) => Object.fromEntries(GOODS.map((g) => [g, n]));
@@ -74,6 +75,41 @@ function refillEstates(s) {
 }
 function event(s, type, p, info = {}) {
   s.events.push({ round: s.round, role: s.role, type, p, ...info });
+  while (s.events.length > JOURNAL_LIMIT) {
+    const old = s.events.shift();
+    s.eventSummary ??= {};
+    const sources = (s.eventSummary[old.p] ??= {});
+    for (const [id, points] of Object.entries(eventPoints(old)))
+      sources[id] = (sources[id] ?? 0) + points;
+  }
+}
+// Preserve lifetime scoring details while only sending a recent journal window.
+export function eventPoints(e) {
+  const sources = {};
+  const add = (id, points) => {
+    if (points) sources[id] = (sources[id] ?? 0) + points;
+  };
+  if (e.type === "festival") add(e.id, e.reward?.vp);
+  else if (["ship", "smallWharf"].includes(e.type) && e.vp) {
+    const goods = sum(Object.values(e.goods ?? {}));
+    const base = e.type === "smallWharf" ? Math.floor(goods / 2) : goods;
+    add("scoreShipping", base);
+    add("scoreShippingBonus", e.vp - base);
+  } else if (e.vp) {
+    const source =
+      {
+        build: "church",
+        produce: "chapel",
+        pass: "chapel",
+        parkReward: "parkAuthority",
+        assembly: "assemblyHall",
+        pension: "pensionOffice",
+        plunder: "plunder",
+      }[e.type] ?? (e.type === "puertomaBonus" ? e.id : "scoreOther");
+    add(source, e.vp);
+  }
+  if (e.type === "build") add("hiddenMarket", -(e.point ?? 0));
+  return sources;
 }
 function vp(s, p, n) {
   if (n <= 0) return;
@@ -1050,6 +1086,10 @@ function settle(s) {
     if (s.finished || !s.tasks.length) return;
     const t = s.tasks[0],
       a = s.players[t.p];
+    if (t.kind === "store" && !a.puertoma && !GOODS.some((g) => a.goods[g])) {
+      s.tasks.shift();
+      continue;
+    }
     if (t.kind === "bonusAssign" && a.puertoma) {
       allocatePuertoma(s, t.p);
       s.tasks.shift();
@@ -1220,12 +1260,26 @@ function sameMove(a, b) {
 export function move(state, m, p) {
   return resolveForcedActions(applyMove(state, m, p));
 }
+export function playerSettings(s, p) {
+  return {
+    autoForcedActions: s.players[p]?.settings?.autoForcedActions === true,
+  };
+}
+export function setPlayerSettings(s, p, settings) {
+  assert(integer(p) && !!s.players[p], "Invalid player");
+  const next = clone(s);
+  next.players[p].settings = {
+    autoForcedActions: settings?.autoForcedActions === true,
+  };
+  return next;
+}
 export function resolveForcedActions(state) {
-  let s = state;
-  if (!s.options.autoForcedActions) return s;
+  let s = clone(state);
+  settle(s);
   for (let guard = 0; guard < 1000; guard++) {
     if (s.finished || !s.tasks.length) return s;
     const t = s.tasks[0];
+    if (!playerSettings(s, t.p).autoForcedActions) return s;
     const forced = forcedAction(s, t, s.players[t.p]);
     if (!forced) return s;
     s = applyMove(s, forced, t.p);
@@ -1234,6 +1288,8 @@ export function resolveForcedActions(state) {
 }
 function applyMove(state, m, p) {
   assert(m && typeof m === "object" && !Array.isArray(m));
+  assert(JSON.stringify(m).length <= 8192, "Move payload is too large");
+  assert(integer(p) && !!state.players[p], "Invalid player");
   assert(
     !state.finished &&
       (state.tasks[0]?.p === p || canMoveOutOfTurn(state, m, p)),
@@ -1763,7 +1819,10 @@ export function stripSecret(state, p) {
   }
   for (let i = 0; i < s.players.length; i++)
     if (i !== p && !s.finished) {
-      s.players[i].vp = null;
+      if (s.options.showVP !== true) {
+        s.players[i].vp = null;
+        if (s.eventSummary) delete s.eventSummary[i];
+      }
       if (s.players[i].achievements)
         s.players[i].achievements = s.players[i].achievements.map((c) =>
           c.completed ? { id: c.id, completed: true } : { hidden: true },
@@ -1793,6 +1852,7 @@ export function replay(s, options = {}) {
   r.players.forEach((p, i) => {
     p.name = s.players[i].name;
     p.bot = s.players[i].bot;
+    if (s.players[i].settings) p.settings = clone(s.players[i].settings);
   });
   return r;
 }
@@ -1800,6 +1860,7 @@ export function logSlice(
   s,
   { player, start = 0, end = logLength(s) - 1 } = {},
 ) {
+  assert(integer(start) && integer(end), "Invalid replay range");
   const frames = [];
   if (start > Math.min(end, logLength(s) - 1)) return { frames };
   let position = replay(s, Math.max(1, start + 1));
@@ -1811,12 +1872,14 @@ export function logSlice(
   return { frames };
 }
 export function setPlayerMetaData(s, p, data) {
+  assert(integer(p) && !!s.players[p], "Invalid player");
   const n = clone(s);
   if (typeof data?.name === "string")
     n.players[p].name = data.name.slice(0, 80);
   return n;
 }
 export function dropPlayer(s, p) {
+  assert(integer(p) && !!s.players[p], "Invalid player");
   const n = clone(s);
   n.players[p].bot = true;
   return n;
@@ -1827,9 +1890,12 @@ export function round(s) {
 export function canLaunchAnalysisMode(s) {
   return s.finished;
 }
-export function createAnalysis(s, { to }) {
+export function createAnalysis(s, { to = logLength(s) } = {}) {
   const n = replay(s, to);
-  n.players.forEach((p) => (p.bot = false));
+  n.players.forEach((p) => {
+    p.bot = false;
+    p.settings = { autoForcedActions: false };
+  });
   return n;
 }
 

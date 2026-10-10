@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import * as E from "../engine/index.js";
 
 function fixture(tasks) {
-  const s = E.init(3, [], { autoForcedActions: true }, "forced-actions");
+  const s = E.init(3, [], {}, "forced-actions");
+  s.players.forEach((p) => (p.settings = { autoForcedActions: true }));
   s.production = s.players.map(() => ({
     corn: 0,
     fruit: 0,
@@ -60,7 +61,7 @@ test("empty trade, production, assignment and storage need no confirmation", () 
   assert.equal(r.tasks[0].kind, "role");
   assert.deepEqual(
     r.history.slice(1).map((h) => h.move.type),
-    ["pass", "produce", "assign", "store"],
+    ["pass", "produce", "assign"],
   );
 });
 
@@ -111,7 +112,8 @@ test("a forced public shipment executes but an optional Harbor point keeps the c
 });
 
 test("automatic steps replay exactly, including intermediate log frames", () => {
-  let s = E.init(3, [], { autoForcedActions: true }, "forced-replay");
+  let s = E.init(3, [], {}, "forced-replay");
+  s.players.forEach((p) => (p.settings = { autoForcedActions: true }));
   s = E.move(s, { type: "role", id: "recruiter" }, 0);
   s = E.move(s, { type: "recruitBonus" }, 0);
   assert(s.history.some((h) => h.move.type === "recruit"));
@@ -172,4 +174,66 @@ test("interchangeable plantation placements are automatic, strategic alternative
         1,
       );
   }
+});
+
+test("forced actions default off, including states with the old global option", () => {
+  const s = fixture([{ kind: "trade", p: 0 }, boundary]);
+  s.players.forEach((p) => delete p.settings);
+  s.options.autoForcedActions = true;
+  assert.deepEqual(E.playerSettings(s, 0), { autoForcedActions: false });
+  assert.equal(start(s).tasks[0].kind, "trade");
+});
+
+test("settings only persist preferences; ordinary moves resolve opted-in forced actions", () => {
+  const s = fixture([
+    { kind: "trade", p: 0 },
+    { kind: "trade", p: 0 },
+    { kind: "trade", p: 1 },
+    boundary,
+  ]);
+  s.players.forEach((p) => delete p.settings);
+  const waiting = start(s);
+  const optedIn = E.setPlayerSettings(waiting, 0, { autoForcedActions: true });
+  const expected = structuredClone(waiting);
+  expected.players[0].settings = { autoForcedActions: true };
+  assert.deepEqual(optedIn, expected);
+  assert.equal(waiting.players[0].settings, undefined);
+  const advanced = E.move(optedIn, { type: "pass" }, 0);
+  assert.equal(advanced.tasks[0].p, 1);
+  assert.equal(advanced.tasks[0].kind, "trade");
+  assert.equal(advanced.history.length, optedIn.history.length + 2);
+  assert.deepEqual(optedIn, expected);
+  assert.deepEqual(E.playerSettings(optedIn, 1), { autoForcedActions: false });
+  const off = E.setPlayerSettings(optedIn, 0, { autoForcedActions: false });
+  assert.equal(E.playerSettings(off, 0).autoForcedActions, false);
+  assert.equal(
+    E.playerSettings(
+      E.setPlayerSettings(off, 0, { autoForcedActions: "true" }),
+      0,
+    ).autoForcedActions,
+    false,
+  );
+  assert.throws(() => E.setPlayerSettings(off, -1, {}));
+});
+
+test("empty storage skips without opting in, but nonempty storage still waits", () => {
+  for (const goods of [0, 1, 2]) {
+    const s = fixture([{ kind: "store", p: 0 }, boundary]);
+    s.players.forEach((p) => delete p.settings);
+    s.players[0].goods.corn = goods;
+    const r = start(s);
+    assert.equal(r.tasks[0].kind, goods ? "store" : "role");
+    assert.equal(r.players[0].goods.corn, goods);
+    assert.equal(r.history.length, s.history.length + 1);
+  }
+});
+
+test("an already waiting empty storage step normalizes without changing the input", () => {
+  const s = fixture([{ kind: "store", p: 0 }, boundary]);
+  s.tasks.shift();
+  s.players.forEach((p) => delete p.settings);
+  const r = E.resolveForcedActions(s);
+  assert.equal(r.tasks[0].kind, "role");
+  assert.equal(s.tasks[0].kind, "store");
+  assert.deepEqual(r.history, s.history);
 });

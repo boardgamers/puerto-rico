@@ -19,7 +19,7 @@ const symbols = {
   crate: ["crate", ["good", "goods"], ["marchandise", "marchandises"]],
   worker: ["worker", ["worker", "workers"], ["ouvrier", "ouvriers"]],
   citizen: ["citizen", ["citizen", "citizens"], ["citoyen", "citoyens"]],
-  estate: ["estate", ["estate", "estates"], ["domaine", "domaines"]],
+  estate: ["estate", ["estate", "estates"], ["plantation", "plantations"]],
   expanded: [
     "expandedBuilding",
     ["expanded building", "expanded buildings"],
@@ -57,7 +57,9 @@ const plurals = {
   ships: "ship",
 };
 
-function format(message, fr, html) {
+function format(message, locale, html) {
+  const fr = locale === true || locale === "fr";
+  const catalog = typeof locale === "object" ? locale : null;
   const text = String(message);
   if (!text.includes("{")) return html ? escape(text) : text;
   let result = "",
@@ -73,10 +75,18 @@ function format(message, fr, html) {
       amount === undefined
         ? !!plurals[key]
         : Math.abs(Number(amount.replace("−", "-"))) !== 1;
-    const label = `${amount === undefined ? "" : `${amount} `}${(fr ? french : en)[plural ? 1 : 0]}`;
+    const words = catalog
+      ? [
+          catalog[`symbol.${plurals[key] ?? key}.one`],
+          catalog[`symbol.${plurals[key] ?? key}.other`],
+        ]
+      : fr
+        ? french
+        : en;
+    const label = `${amount === undefined ? "" : `${amount} `}${words[plural ? 1 : 0]}`;
     const hint =
       id === "expandedBuilding"
-        ? `${label} · ${fr ? "2 cases de ville par bâtiment" : "2 city spaces per building"}`
+        ? `${label} · ${catalog?.expandedSpaces ?? (fr ? "2 cases de ville par bâtiment" : "2 city spaces per building")}`
         : label;
     const before = text.slice(end, match.index);
     result += html ? escape(before) : before;
@@ -87,7 +97,7 @@ function format(message, fr, html) {
               .split("/")
               .map((n) => scoreToken(n, 24))
               .join('<span class="symbol-separator">/</span>')
-          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}${["crate", "expandedBuilding"].includes(id) ? `<span class="symbol-word">${escape((fr ? french : en)[plural ? 1 : 0])}</span>` : ""}`;
+          : `${amount === undefined ? "" : `<b>${escape(amount)}</b>`}${icon(id, 22)}${["crate", "expandedBuilding"].includes(id) ? `<span class="symbol-word">${escape(words[plural ? 1 : 0])}</span>` : ""}`;
       result += `<span class="inline-symbol${amount?.includes("/") ? " symbol-range" : ""}" role="img" aria-label="${escape(hint)}" title="${escape(hint)}"><span aria-hidden="true">${visual}</span></span>`;
     } else result += label;
     end = match.index + marker.length;

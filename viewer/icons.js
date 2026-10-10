@@ -1,4 +1,11 @@
 const paths = {
+  stock:
+    '<rect x="3" y="8" width="13" height="13" rx="1"/><path d="M7 5h12v12M10 2h12v12"/>',
+  cityFootprint:
+    '<rect x="1" y="7" width="9" height="9" rx="1"/><rect x="14" y="7" width="9" height="9" rx="1"/>',
+  reward:
+    '<path d="M8 3h8v5a4 4 0 0 1-8 0Zm0 1H4v3a4 4 0 0 0 5 4m7-7h4v3a4 4 0 0 1-5 4m-3 1v6m-4 3h8m-6-3h4v3"/>',
+  lock: '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>',
   corn: '<path fill="#f5ca4f" stroke="#95661d" stroke-width="1" d="M12 1C7 1 6 6 6 12c0 5 2 8 6 9 4-1 6-4 6-9 0-6-1-11-6-11Z"/><path stroke="#b88726" stroke-width="1" d="M10 3v13m4-13v13M7 6h10M6 10h12M7 14h10"/><path fill="#6d9954" stroke="#395d38" stroke-width="1" d="M12 22C5 21 2 16 2 10c5 2 9 6 10 12ZM12 22c7-1 10-6 10-12-5 2-9 6-10 12Z"/><path stroke="#bad28a" stroke-width="1" d="m5 14 7 8 7-8"/>',
   fruit:
     '<path fill="#79a965" d="M12 7C3 2 1 18 10 21c2 1 2-1 4 0 9-3 7-19-2-14Z"/><path d="M12 7V3m0 2c4 0 5-2 5-3"/>',

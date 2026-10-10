@@ -1,6 +1,6 @@
-import { scoreBreakdown } from "../engine/index.js";
+import { eventPoints, scoreBreakdown } from "../engine/index.js";
 import { BUILDINGS as B } from "../engine/catalog.js";
-import { achievementText, abilityTexts } from "./achievement-text.js";
+import { achievementText } from "./achievement-text.js";
 import { journalContent } from "./journal.js";
 import { icon, scoreToken } from "./icons.js";
 import { buildingSprite } from "./building-symbols.js";
@@ -18,32 +18,13 @@ const sum = (values) => values.reduce((a, b) => a + b, 0);
 // Use recorded rewards, rather than today's buildings, to explain past gains.
 export function tokenSources(state, player) {
   if (!Number.isFinite(state.players[player]?.vp)) return [];
-  const sources = new Map();
+  const sources = new Map(Object.entries(state.eventSummary?.[player] ?? {}));
   const add = (id, points) => {
     if (points) sources.set(id, (sources.get(id) ?? 0) + points);
   };
   for (const e of state.events ?? []) {
     if (e.p !== player) continue;
-    if (e.type === "festival") add(e.id, e.reward?.vp);
-    else if (["ship", "smallWharf"].includes(e.type) && e.vp) {
-      const goods = sum(Object.values(e.goods ?? {}));
-      const base = e.type === "smallWharf" ? Math.floor(goods / 2) : goods;
-      add("scoreShipping", base);
-      add("scoreShippingBonus", e.vp - base);
-    } else if (e.vp) {
-      const source =
-        {
-          build: "church",
-          produce: "chapel",
-          pass: "chapel",
-          parkReward: "parkAuthority",
-          assembly: "assemblyHall",
-          pension: "pensionOffice",
-          plunder: "plunder",
-        }[e.type] ?? (e.type === "puertomaBonus" ? e.id : "scoreOther");
-      add(source, e.vp);
-    }
-    if (e.type === "build") add("hiddenMarket", -(e.point ?? 0));
+    for (const [id, points] of Object.entries(eventPoints(e))) add(id, points);
   }
   const unrecorded = state.players[player].vp - sum([...sources.values()]);
   add("scoreUnrecorded", unrecorded);
@@ -58,7 +39,8 @@ export function scoreContent(state, player, t) {
     `<span class="score-value" aria-label="${n} ${esc(t("vp"))}">${scoreToken(n, 28)}</span>`;
   const row = (label, n, hint = "") =>
     `<li><div class="score-label">${label}${hint ? `<div class="score-hint">${hint}</div>` : ""}</div>${points(n)}</li>`;
-  const label = (id) => esc(abilityTexts[id]?.[t.fr ? 1 : 0] ?? t(id));
+  const label = (id) =>
+    esc(t(t.catalog[`ability.${id}`] ? `ability.${id}` : id));
   const sources = tokenSources(state, player);
   const history = [];
   let round;
@@ -89,7 +71,7 @@ export function scoreContent(state, player, t) {
             : completed
                 .map((c) => {
                   const card = achievementText(c.id, t);
-                  return `${esc(card.name)} · ${card.vp} ${t.fr ? "PV" : "VP"}`;
+                  return `${esc(card.name)} · ${card.vp} ${t("vpShort")}`;
                 })
                 .join("<br>") || t("scoreNoAchievements")
           : B[id]

@@ -2,13 +2,18 @@ import * as engine from "../engine/index.js";
 import { RELEASE } from "../release-config.js";
 import { mountGame } from "./ui.js";
 const params = new URLSearchParams(location.search);
+const showVP = params.get("showVP") === "true";
+const chooseBuildings = params.get("chooseBuildings") === "true";
 const solo = params.get("mode") === "puertoma";
 const difficulty = ["easy", "normal", "hard"].includes(params.get("difficulty"))
   ? params.get("difficulty")
   : "normal";
-const KEY = solo
-  ? `puerto-rico-preview-puertoma-${difficulty}-v1`
-  : "puerto-rico-preview-v1";
+const KEY =
+  (solo
+    ? `puerto-rico-preview-puertoma-${difficulty}-v1`
+    : "puerto-rico-preview-v1") +
+  (chooseBuildings ? "-choose-buildings" : "") +
+  (showVP ? "-show-vp" : "");
 let state,
   undo = [],
   generation = 0,
@@ -19,6 +24,8 @@ function newGame() {
     RELEASE.expansions,
     {
       ...RELEASE.options,
+      chooseBuildings,
+      showVP,
       ...(solo ? { puertoma: { humans: 1, difficulty } } : {}),
     },
     `preview-${Date.now()}`,
@@ -26,7 +33,7 @@ function newGame() {
   s.players.forEach((p, i) => (p.name = ["Vous", "Isabel", "Rafael"][i]));
   if (solo)
     s.players.slice(1).forEach((p, i) => (p.name = `Puertoma ${i + 1}`));
-  while (s.tasks[0]?.kind === "draft") s = engine.moveAI(s);
+  while (!chooseBuildings && s.tasks[0]?.kind === "draft") s = engine.moveAI(s);
   return s;
 }
 try {
@@ -34,16 +41,15 @@ try {
   if (state?.version !== 1 || !state.config) state = null;
 } catch {}
 state ??= newGame();
-// Keep existing local games while enabling the current interaction policy.
-state.options.autoForcedActions = true;
-state.config.options.autoForcedActions = true;
+// Older saves may have a global flag; only explicit player settings now opt in.
 state = engine.resolveForcedActions(state);
 const ui = mountGame(document.getElementById("game"), {
-  automatedSetup: true,
+  automatedSetup: !state.options.chooseBuildings,
   async onMove(move) {
     undo.push(structuredClone(state));
     state = engine.move(state, move, 0);
-    while (state.tasks[0]?.kind === "draft") state = engine.moveAI(state);
+    while (!state.options.chooseBuildings && state.tasks[0]?.kind === "draft")
+      state = engine.moveAI(state);
     display();
     setTimeout(opponents, 180);
   },

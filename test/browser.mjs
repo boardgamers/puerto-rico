@@ -48,6 +48,110 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    if (width <= 760) {
+      assert.equal(
+        await page.locator(".production-overview").getAttribute("open"),
+        null,
+      );
+      assert.equal(
+        await page.locator(".festival-section").getAttribute("open"),
+        null,
+      );
+      await page.locator('[data-section="production"]').click();
+    }
+    for (const output of [0, 1, 2]) {
+      const production = structuredClone(original);
+      production.tasks = [{ kind: "produce", p: 0 }];
+      production.role = "craftsman";
+      production.players[0].buildings = [];
+      production.players[0].estates = output
+        ? Array.from({ length: output }, () => ({ id: "corn", w: 1, c: 0 }))
+        : [{ id: "fruit", w: 1, c: 0 }];
+      await page.evaluate(
+        (s) => {
+          played.length = 0;
+          host.emit("state", s);
+        },
+        E.stripSecret(production, 0),
+      );
+      const dock = page.locator(".action-dock");
+      assert.equal(
+        await dock.getByRole("button", { name: "Passer", exact: true }).count(),
+        1,
+      );
+      const produce = dock.getByRole("button", { name: /Produire/ });
+      assert.equal(await produce.count(), output ? 1 : 0);
+      if (!output) {
+        await dock.getByRole("button", { name: "Passer", exact: true }).click();
+        assert.deepEqual(await page.evaluate(() => played), [{ type: "pass" }]);
+      } else {
+        await produce.click();
+        if (output === 1) {
+          assert.equal(await page.locator(".cargo-form").count(), 0);
+          assert.equal(await page.evaluate(() => played[0].goods.corn), 1);
+        } else {
+          assert.equal(await page.locator(".cargo-form").count(), 1);
+          await page.locator('.cargo-form input[name="corn"]').fill("1");
+          await page.locator('.cargo-form button[type="submit"]').click();
+          assert.equal(await page.evaluate(() => played[0].goods.corn), 1);
+        }
+      }
+      await page.evaluate(
+        (s) => host.emit("state", s),
+        E.stripSecret(original, 0),
+      );
+    }
+    await page.evaluate(() => {
+      played.length = 0;
+    });
+    for (const first of ["w", "c"]) {
+      const allocation = E.stripSecret(original, 0);
+      allocation.historyLength += first === "w" ? 100 : 101;
+      allocation.tasks = [{ kind: "assign", p: 0 }];
+      allocation.players[0].reserve = { w: 1, c: 1 };
+      allocation.players[0].estates = ["corn", "fruit", "sugar"].map((id) => ({
+        id,
+        w: 0,
+        c: 0,
+      }));
+      allocation.players[0].buildings = [];
+      await page.evaluate((s) => host.emit("state", s), allocation);
+      await page.locator(".action-dock [data-actions]").click();
+      await page.locator(`.pr-modal [data-tool="${first}"]`).click();
+      await page.locator('.pr-modal [data-slot="e0:0"]').click();
+      const other = first === "w" ? "c" : "w";
+      assert.equal(
+        await page
+          .locator(`.pr-modal [data-tool="${other}"]`)
+          .getAttribute("aria-pressed"),
+        "true",
+      );
+      assert.equal(
+        await page.locator('.pr-modal [data-slot="e1:0"]').isEnabled(),
+        true,
+      );
+      await page.locator('.pr-modal [data-slot="e1:0"]').click();
+      assert.equal(
+        await page.locator(`.pr-modal [data-slot="e1:0"].${other}`).count(),
+        1,
+      );
+      assert.equal(
+        await page.locator('.pr-modal [data-slot="e2:0"]').isEnabled(),
+        false,
+      );
+      await page.locator('.pr-modal [data-slot="e0:0"]').click();
+      assert.equal(
+        await page
+          .locator(`.pr-modal [data-tool="${first}"]`)
+          .getAttribute("aria-pressed"),
+        "true",
+      );
+      assert.equal(
+        await page.locator('.pr-modal [data-slot="e2:0"]').isEnabled(),
+        true,
+      );
+      await page.keyboard.press("Escape");
+    }
     const resourceCards = structuredClone(original);
     resourceCards.players[0].goods.corn = 2;
     resourceCards.players[0].reserve = { w: 2, c: 1 };
@@ -524,7 +628,7 @@ try {
       false,
       "summary does not duplicate resources at the top",
     );
-    const disabled = page.locator(".offer:disabled").first();
+    const disabled = page.locator('.offer[aria-disabled="true"]').first();
     const box = await disabled.boundingBox();
     await page.mouse.move(box.x + 10, box.y + 10);
     await page.mouse.wheel(0, 400);

@@ -1,10 +1,10 @@
 {
-  "label": "Puerto Rico: Special Edition",
+  "label": "Puerto Rico",
   "public": false,
   "players": [1, 2, 3, 4, 5],
-  "description": "Choose roles, develop your island, produce goods and ship them for points. This Special Edition adaptation includes New Buildings, Citizens, Smuggler, Festival, Festival Activities and Achievements, in one fixed configuration for 1–5 players. Choose 1 player to play against two automatic Puertomas.",
-  "rules": "Choose a role, then all players carry out its action in turn; the player who chose it receives a privilege. Plant estates, recruit workers, construct buildings and produce goods. Sell goods for money or ship them for points. When everyone has chosen their roles, pass the governor marker and begin the next round. Most points from shipping, buildings and bonuses wins.\n\n[Official Special Edition rules (English)](https://awakenrealms.com/images/download/puerto-rico/EN/EN_PR_Rulebook_210x285mm_bleed3mm%20%5B44%20pages%5D.pdf). In-game help is available in English and French.",
-  "credits": "Designed by **Andreas Seyfarth**. Based on **Puerto Rico 1897: Special Edition**, published by **Awaken Realms** and **Ravensburger**.\n\nOriginal vector interface illustrations for this digital adaptation. The private multiplayer playtest includes all six modules listed above. Choosing 1 player starts solo mode against two automatic Puertomas.",
+  "description": "Choose roles, develop your island, produce goods and ship them for points. Includes all six expansions and solo play against two Puertomas.",
+  "rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins.",
+  "credits": "Andreas Seyfarth · Awaken Realms · Ravensburger",
   "links": {
     "publisher": "https://awakenrealms.com/games/awaken-realms/puerto-rico"
   },
@@ -21,25 +21,28 @@
       "stylesheets": []
     }
   },
-  "options": [],
-  "expansions": [],
-  "preferences": [
+  "options": [
     {
-      "name": "language",
-      "label": "Language",
-      "type": "select",
-      "default": "en",
-      "items": [
-        {
-          "name": "en",
-          "label": "English"
-        },
-        {
-          "name": "fr",
-          "label": "Français"
-        }
-      ]
+      "name": "chooseBuildings",
+      "label": "Choose buildings",
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "showVP",
+      "label": "Show everyone’s VP",
+      "type": "checkbox",
+      "default": false
     }
   ],
-  "settings": []
+  "expansions": [],
+  "preferences": [],
+  "settings": [
+    {
+      "name": "autoForcedActions",
+      "label": "Automatically play forced moves",
+      "type": "checkbox",
+      "default": false
+    }
+  ]
 }
