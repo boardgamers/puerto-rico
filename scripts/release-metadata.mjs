@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { rulesPageUrl } from "./rules-pages.mjs";
 import { supportedLocales } from "../viewer/i18n.js";
 
 export async function releaseMetadata() {
@@ -24,8 +25,8 @@ export async function releaseMetadata() {
       if (!catalog[`metadata.${key}`])
         throw Error(`Missing ${locale} metadata.${key}`);
     translations[locale.split("-")[0]] = {
-      description: catalog["metadata.description"],
-      rules: catalog["metadata.rules"],
+      description: `${catalog["metadata.description"]} ${catalog.ruleTiming}`,
+      rules: `[${catalog.rules}](${rulesPageUrl})`,
       credits: source.credits,
       optionTranslations: {
         "options.chooseBuildings": catalog["metadata.chooseBuildings"],
@@ -42,6 +43,7 @@ export async function releaseMetadata() {
       rules: source.rules,
       credits: source.credits,
       links: source.links,
+      tags: source.tags,
       unlisted: null,
     },
     translations,

@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
+import { publishCmsRules } from "./publish-cms.mjs";
 import { releaseMetadata } from "./release-metadata.mjs";
 import { supportedLocales } from "../viewer/i18n.js";
 import { packageEngine } from "./package-engine.mjs";
@@ -71,6 +72,7 @@ await api("/1", "PUT", {
 });
 // Listed in the beta catalog; the actual playable version stays private.
 const { metadata, translations } = await releaseMetadata();
+await publishCmsRules(token);
 await api("/meta", "PUT", metadata);
 await api(
   "/assets/pictogram?name=Puerto%20Rico",

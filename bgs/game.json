@@ -1,12 +1,20 @@
 {
   "label": "🏝️ Puerto Rico",
   "public": false,
-  "players": [1, 2, 3, 4, 5],
-  "description": "Choose roles, develop your island, produce goods and ship them for points. Includes all six expansions and solo play against two Puertomas.",
-  "rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins.",
-  "credits": "Andreas Seyfarth · Awaken Realms · Ravensburger",
+  "players": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "description": "Choose roles to develop your island, produce goods, and ship them for victory points. Every role helps your rivals too, so timing matters as much as building a strong economy. This adaptation of Puerto Rico 1897: Special Edition includes all six expansions and solo play against two Puertomas.",
+  "rules": "[How to play](/page/puerto-rico/rules)",
+  "credits": "**Game designer:** Andreas Seyfarth.\n\n**Publishers:** [Awaken Realms](https://awakenrealms.com/games/awaken-realms/puerto-rico) and [alea / Ravensburger](https://www.ravensburger.com/).\n\n**Achievements and Festival Activities:** Andreas Seyfarth and Tomasz Zawadzki.\n\n**Solo design:** John Albertson, Xavi Bordes, David Digby, Nick Shaw, and Dávid Turczi.",
   "links": {
-    "publisher": "https://awakenrealms.com/games/awaken-realms/puerto-rico"
+    "publisher": "https://awakenrealms.com/games/awaken-realms/puerto-rico",
+    "source": "https://codeberg.org/boardgamers/puerto-rico",
+    "bgg": "https://boardgamegeek.com/boardgame/415843/puerto-rico-1897-special-edition"
   },
   "viewer": {
     "url": "",
@@ -15,7 +23,9 @@
     "fullScreenMobile": true,
     "replayable": true,
     "chat": true,
-    "integratedControls": ["chat"],
+    "integratedControls": [
+      "chat"
+    ],
     "dependencies": {
       "scripts": [],
       "stylesheets": []
@@ -44,5 +54,9 @@
       "type": "checkbox",
       "default": false
     }
+  ],
+  "tags": [
+    "eurogame",
+    "economic"
   ]
 }

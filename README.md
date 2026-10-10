@@ -73,3 +73,12 @@ The journal retains the latest 200 events. Older score contributions are accumul
 Chat opens from the button next to the journal. On a host/SDK exposing `openChat` and advertising `platformChat`, it opens the native BGS chat. Protocol 0.9 hosts retain the functional SDK chat dialog. Native chat requires the corresponding platform PR and a protocol package upgrade; no unsupported messages are sent to older hosts.
 
 The publisher sets **Puerto Rico** as the title and **1897 Special Edition** as the subtitle, uploads the original tightly cropped vector pictogram, and selects it as the BGS icon. It uploads hand-written metadata and setup-label translations through the manual translation endpoint. If an older host returns 404 for that endpoint, the game upload completes and the script explicitly reports `translationsPending`; the overlays remain ready in `.local/release/manual-translations.json`. Run the publisher again after the platform endpoint is deployed to apply them. It never calls automatic translation endpoints.
+
+`pnpm publish:metadata` updates the description, credits, links, tags and the
+`puerto-rico:rules` CMS page in all 16 supported languages without uploading the
+engine or viewer. Rules content is assembled from the manually authored player
+instructions in `viewer/locales`; it contains no interface walkthrough. The rules
+field contains only a link to `/page/puerto-rico/rules`. Both publication commands
+back up existing CMS pages before updating them. Game metadata language overlays
+remain queued in `.local/release/manual-translations.json` when the host does not
+yet expose the manual translation endpoint; no translation API is used.
