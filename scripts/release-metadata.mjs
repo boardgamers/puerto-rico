@@ -36,7 +36,7 @@ export async function releaseMetadata() {
   }
   return {
     metadata: {
-      label: "Puerto Rico",
+      label: source.label,
       displayTitle: { title: "Puerto Rico", subtitle: "1897 Special Edition" },
       description: source.description,
       rules: source.rules,

@@ -9,7 +9,7 @@ test("release metadata keeps title separate and prepares every manual locale ove
     title: "Puerto Rico",
     subtitle: "1897 Special Edition",
   });
-  assert.equal(metadata.label, "Puerto Rico");
+  assert.equal(metadata.label, "🏝️ Puerto Rico");
   assert.deepEqual(
     Object.keys(translations).sort(),
     supportedLocales
