@@ -889,7 +889,7 @@
   min-width: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;
   gap: 9px;
   text-align: start;
   padding: 12px;
@@ -1003,20 +1003,6 @@
 }
 .pr-game .capacity-slots .icon {
   opacity: 0.65;
-}
-.pr-game .bcard-stock {
-  grid-column: 1/-1;
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  flex-wrap: wrap;
-  padding-top: 6px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 11px;
-}
-.pr-game .bcard-stock > span:last-child {
-  margin-inline-start: auto;
 }
 .pr-game .bcard.sold-out {
   opacity: 0.6;
@@ -2585,18 +2571,36 @@
   height: 24px;
   margin-block: -4px;
 }
-.pr-game .bcard-stock {
-  align-items: center;
+.pr-game .market-grid {
+  padding: 11px 11px 0;
+  gap: 15px;
 }
-
-.pr-game .building-stock-count {
+.pr-game .bcard-points {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 7px;
+}
+.pr-game .building-stock-count {
+  position: absolute;
+  top: -3px;
+  inset-inline-end: -1px;
+  transform: translate(50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--card);
+  font-size: 11px;
+  font-weight: 700;
   line-height: 1;
 }
-.pr-game .building-stock-count.depleted {
-  opacity: 0.5;
+
+.pr-game[dir="rtl"] .building-stock-count {
+  transform: translate(-50%, -50%);
 }
 
 .pr-game .player-avatar {

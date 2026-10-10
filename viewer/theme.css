@@ -1,0 +1,265 @@
+/* Painted town, linen boards and a sea-green harbor. Layout stays in style.css. */
+.pr-game {
+  --paper: #ede9dc;
+  --panel: #faf6ea;
+  --card: #fffaf0;
+  --ink: #293e3b;
+  --muted: #626858;
+  --line: #d4cdb9;
+  --sea: #b9d7cf;
+  --port-ink: #234944;
+  --gold: #b88630;
+  --selected: #f0dfb8;
+  --terra: #b46b50;
+  --foliage: #647b4e;
+  --indigo: #456379;
+  --plum: #79647b;
+  --shadow: #31453c12;
+  --grain: #795b2c08;
+  --plot: #e2e6d0;
+  --stone: #e5dfce;
+  --wood: #e3d0a8;
+  --surface-light: #fff9;
+  --ripple: #ffffff26;
+  --surface-shade: #3a4d3e0b;
+  background-image: radial-gradient(var(--grain) 0.7px, transparent 0.7px);
+}
+.pr-game.dark {
+  --paper: #182b2b;
+  --panel: #263b37;
+  --card: #30453e;
+  --ink: #eee9d9;
+  --muted: #bbc4b4;
+  --line: #506157;
+  --sea: #244f50;
+  --port-ink: #e3eee1;
+  --gold: #dfb264;
+  --selected: #514c34;
+  --terra: #d99677;
+  --foliage: #a7bf86;
+  --indigo: #99b9c8;
+  --plum: #c2a6c3;
+  --shadow: #091c2240;
+  --grain: #e9d4a406;
+  --plot: #354733;
+  --stone: #233a35;
+  --wood: #455044;
+  --surface-light: #ffffff08;
+  --ripple: #ffffff08;
+  --surface-shade: #00000012;
+}
+.pr-game button {
+  border-radius: 6px;
+}
+.pr-game .game-header {
+  border-bottom: 1px solid var(--line);
+}
+.pr-game .wordmark > span {
+  color: var(--indigo);
+  letter-spacing: 0.08em;
+}
+.pr-game .panel {
+  border-color: transparent;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px var(--shadow);
+}
+.pr-game .panel > header h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 600;
+}
+.pr-game .player-tab {
+  background: var(--panel);
+  border-color: transparent;
+  border-radius: 7px;
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.pr-game .player-tab.selected {
+  background: var(--selected);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+.pr-game .player-tab.turn {
+  border-bottom-color: var(--gold);
+}
+.pr-game .role,
+.pr-game .role.available {
+  border-color: transparent;
+  border-top-color: var(--role-accent, var(--indigo));
+  border-radius: 6px 6px 9px 9px;
+  box-shadow: 0 2px 4px var(--shadow);
+  background:
+    linear-gradient(var(--surface-light), transparent 65%), var(--card);
+}
+.pr-game .role[data-role-id="recruiter"] {
+  --role-accent: var(--indigo);
+}
+.pr-game .role[data-role-id="craftsman"] {
+  --role-accent: var(--terra);
+}
+.pr-game .role[data-role-id="trader"] {
+  --role-accent: #aa8244;
+}
+.pr-game .role[data-role-id="captain"] {
+  --role-accent: #528e90;
+}
+.pr-game .role[data-role-id="smuggler"] {
+  --role-accent: var(--plum);
+}
+.pr-game .role.taken {
+  background: var(--surface-shade);
+  box-shadow: none;
+}
+.pr-game .role.current {
+  background: var(--selected);
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+.pr-game .role-help {
+  border: 1px solid transparent;
+  background: transparent;
+  box-shadow: none;
+}
+.pr-game .recruitment-pool {
+  background: transparent;
+  border-color: transparent;
+  border-radius: 6px;
+}
+.pr-game .port {
+  border-color: transparent;
+  background-image: repeating-linear-gradient(
+    174deg,
+    transparent 0 24px,
+    var(--ripple) 25px,
+    transparent 26px 52px
+  );
+  box-shadow:
+    inset 0 1px 0 var(--surface-light),
+    0 3px 12px var(--shadow);
+}
+.pr-game .trade-row {
+  border-top-color: var(--surface-shade);
+}
+.pr-game .trade-slot {
+  background: var(--wood);
+  border-color: transparent;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 3px var(--shadow),
+    0 1px 0 var(--surface-light);
+}
+.pr-game .player-board {
+  border-top-color: transparent;
+  background: var(--panel);
+}
+.pr-game .estates {
+  background: var(--plot);
+  border-radius: 6px;
+}
+.pr-game .estate,
+.pr-game .plantation-supply .offer {
+  border-color: transparent;
+  border-radius: 5px;
+  background:
+    linear-gradient(135deg, var(--surface-light), transparent 75%), var(--plot);
+}
+.pr-game .estate:not(.empty-estate) {
+  box-shadow: 0 1px 3px var(--shadow);
+}
+.pr-game .empty-estate {
+  background: repeating-linear-gradient(
+    155deg,
+    transparent 0 9px,
+    var(--surface-shade) 10px 11px,
+    transparent 12px 20px
+  );
+  border-style: solid;
+  border-color: var(--surface-shade);
+  box-shadow: inset 0 1px 2px var(--surface-shade);
+}
+.pr-game .city-grid {
+  background: var(--stone);
+  border-radius: 6px;
+}
+.pr-game .owned-building {
+  background: linear-gradient(var(--surface-light), transparent), var(--card);
+  border-color: transparent;
+  border-top-color: var(--terra);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+.pr-game .worker-slot {
+  box-shadow: inset 0 1px 2px var(--shadow);
+}
+.pr-game .building-market {
+  background: transparent;
+  box-shadow: none;
+}
+.pr-game .bcard {
+  border-color: transparent;
+  border-top-color: var(--terra);
+  border-radius: 6px;
+  background: var(--card);
+  box-shadow: 0 2px 6px var(--shadow);
+}
+.pr-game .bcard.production {
+  border-top-color: var(--foliage);
+}
+.pr-game .bcard.affordable {
+  border-color: var(--foliage);
+  background: var(--card);
+}
+.pr-game .production-overview {
+  background: var(--surface-shade);
+  border-color: transparent;
+}
+.pr-game .festival-section .festival,
+.pr-game .achievement-card {
+  background: var(--card);
+  border-color: transparent;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px var(--shadow);
+}
+.pr-game .festival-emblem {
+  background: var(--selected);
+  border-color: transparent;
+}
+.pr-game .festival-section .festival.claimed,
+.pr-game .achievement-card.completed {
+  background: var(--plot);
+}
+.pr-game .festival-section .festival-card-bottom {
+  border-top-color: transparent;
+}
+.pr-game .action-dock {
+  border-top: 1px solid var(--line);
+  background: var(--panel);
+  box-shadow: 0 -3px 16px var(--shadow);
+}
+.pr-game .primary {
+  background: var(--gold);
+  color: #24271f;
+  border-color: transparent;
+  box-shadow: 0 2px 3px var(--shadow);
+}
+.pr-game .primary .icon {
+  color: inherit;
+}
+.pr-game .pr-modal,
+.pr-game .pr-chat {
+  border-color: var(--line);
+  border-radius: 10px;
+  box-shadow: 0 16px 60px #071e2940;
+}
+
+.pr-game .plantation-supply {
+  border-color: transparent;
+  background: transparent;
+  border-radius: 8px;
+}
+.pr-game .production-step {
+  border-color: transparent;
+  background: transparent;
+}
+.pr-game .role.available:hover,
+.pr-game .plantation-supply .offer:not([aria-disabled="true"]):hover {
+  border-color: var(--gold);
+}

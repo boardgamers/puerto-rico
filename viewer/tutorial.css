@@ -2,26 +2,27 @@
   font:
     14px/1.4 system-ui,
     sans-serif;
-  color: #3e392b;
-  background: #e8dcc1;
+  color: #293e3b;
+  background: #ede9dc;
   min-height: 100vh;
 }
 .pr-tutorial.dark {
-  color: #f4e8cc;
-  background: #242723;
+  color: #eee9d9;
+  background: #182b2b;
   color-scheme: dark;
 }
 .pr-tutorial-guide {
   position: sticky;
   top: 0;
   z-index: 12;
-  background: #f7edda;
-  border-bottom: 2px solid #c89737;
+  background: #faf6ea;
+  border-bottom: 1px solid #d4cdb9;
   padding: 8px 14px;
   box-shadow: 0 2px 6px #0001;
 }
 .pr-tutorial.dark .pr-tutorial-guide {
-  background: #34352c;
+  background: #263b37;
+  border-bottom-color: #506157;
 }
 .pr-tutorial-guide > summary {
   max-width: 1000px;
@@ -33,11 +34,11 @@
 }
 .tutorial-progress {
   font-variant-numeric: tabular-nums;
-  color: #716754;
+  color: #626858;
   margin-inline-end: 10px;
 }
 .pr-tutorial.dark .tutorial-progress {
-  color: #c0b89f;
+  color: #bbc4b4;
 }
 .tutorial-guide-body {
   display: grid;
@@ -83,7 +84,7 @@
   padding: 6px 10px;
   background: transparent;
   color: inherit;
-  border: 1px solid #b1a17c;
+  border: 1px solid #d4cdb9;
   border-radius: 4px;
   touch-action: manipulation;
 }
@@ -98,8 +99,8 @@
 }
 .tutorial-controls .tutorial-primary {
   margin-inline-start: auto;
-  background: #e0e5c4;
-  color: #3e392b;
+  background: #f0dfb8;
+  color: #293e3b;
   font-weight: 600;
 }
 .pr-tutorial .tutorial-error {
@@ -167,4 +168,8 @@
   .tutorial-progress {
     margin-inline-end: 6px;
   }
+}
+
+.pr-tutorial.dark .tutorial-controls button {
+  border-color: #506157;
 }

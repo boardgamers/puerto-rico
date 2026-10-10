@@ -24,6 +24,7 @@ import {
 import { richText } from "./rich-text.js";
 import { town } from "./town.js";
 import css from "./style.css";
+import themeCss from "./theme.css";
 import { achievementText } from "./achievement-text.js";
 import { productionLines } from "./production.js";
 import { estateCapacity } from "../engine/puertoma.js";
@@ -63,7 +64,7 @@ export function mountGame(
   shell.className = "pr-game";
   shell.lang = "en";
   shell.dir = "ltr";
-  shell.innerHTML = `<style>${css}</style><div class="pr-content"></div><dialog class="pr-modal"><header><h2></h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="modal-body"></div></dialog><dialog class="pr-chat"><header><h2>Chat</h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="chat-mount"></div></dialog><p class="pr-error" role="alert" hidden></p>`;
+  shell.innerHTML = `<style>${css}\n${themeCss}</style><div class="pr-content"></div><dialog class="pr-modal"><header><h2></h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="modal-body"></div></dialog><dialog class="pr-chat"><header><h2>Chat</h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="chat-mount"></div></dialog><p class="pr-error" role="alert" hidden></p>`;
   target.append(shell);
   const content = shell.querySelector(".pr-content"),
     modal = shell.querySelector(".pr-modal"),
@@ -622,6 +623,7 @@ export function mountGame(
           ]
         : Object.keys(state.market);
     return `<section class="building-market panel"><header><h2>${isDraft ? t("chooseDraft") : t("market")}</h2><span>${icon("building")}</span></header><div class="market-grid">${ids
+      .filter((id) => isDraft || state.market[id] > 0)
       .sort((a, b) => B[a].cost - B[b].cost || a.localeCompare(b))
       .map((id) => {
         const b = B[id],
@@ -639,12 +641,12 @@ export function mountGame(
           n === 0
             ? t("soldOut")
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
-        return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" ${!n && !m ? 'aria-disabled="true"' : ""}>
+        return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" aria-description="${esc(stock)}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${buildingPictogram(id, 30)}<strong>${t(id)}${b.good && b.good !== "tailor" ? `<small class="building-kind">${t("productionBuilding")}</small>` : ["smallWarehouse", "largeWarehouse", "storehouse"].includes(id) ? `<small class="building-kind">${t("storageBuilding")}</small>` : ""}</strong></span>
           <span class="bcard-cost"><span title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>${quarryLimit(b)}</span>
           <span class="bcard-effect">${buildingSymbols(id, t)}</span>
-          <span class="bcard-stats">${pointsBadge(b.vp)}${buildingSlots(b)}</span>
-          <span class="bcard-stock">${b.size === 2 ? cityFootprint() : ""}<span class="building-stock-count ${n === 0 ? "depleted" : ""}" role="img" title="${esc(stock)}" aria-label="${esc(stock)}">${icon("stock", 17)}<b>${n}</b></span></span>
+          <span class="bcard-stats"><span class="bcard-points">${pointsBadge(b.vp)}${b.size === 2 ? cityFootprint() : ""}</span>${buildingSlots(b)}</span>
+          ${n > 1 ? `<span class="building-stock-count" role="img" title="${esc(stock)}" aria-label="${esc(stock)}">${n}</span>` : ""}
         </button>`;
       })
       .join("")}</div></section>`;
