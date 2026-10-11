@@ -851,10 +851,7 @@ try {
       await author.evaluate((el) => getComputedStyle(el).color),
       "rgb(171, 205, 239)",
     );
-    assert.equal(
-      await author.locator(".player-marker path").getAttribute("d"),
-      PLAYER_SYMBOLS.diamond.path,
-    );
+    assert.equal(await author.locator(".player-marker").count(), 0);
     const chat = page.locator('.pr-chat [role="log"]');
     assert.ok(await chat.evaluate((el) => el.scrollHeight > el.clientHeight));
     await chat.evaluate((el) => (el.scrollTop = 0));

@@ -170,7 +170,6 @@ export function mountGame(
         const author = document.createElement(onOpenPlayer ? "button" : "strong");
         author.className = "chat-author";
         author.style.color = playerColor(i);
-        author.innerHTML = playerMarker(i, true);
         author.append(document.createTextNode(message.author ?? state.players[i].name));
         if (onOpenPlayer) {
           author.type = "button";
