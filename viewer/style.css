@@ -26,7 +26,7 @@
   font-size: 14px;
   line-height: 1.4;
   min-height: 100vh;
-  padding: 0 16px calc(var(--dock-height, 60px) + 24px);
+  padding: 0 0 calc(var(--dock-height, 60px) + 24px);
   box-sizing: border-box;
   color-scheme: light;
 }
@@ -153,8 +153,7 @@
   color: var(--muted);
 }
 .pr-game .pr-content {
-  max-width: 1400px;
-  margin: 0 auto;
+  width: 100%;
 }
 .pr-game .game-header {
   position: relative;
