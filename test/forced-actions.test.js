@@ -237,3 +237,81 @@ test("an already waiting empty storage step normalizes without changing the inpu
   assert.equal(s.tasks[0].kind, "store");
   assert.deepEqual(r.history, s.history);
 });
+
+test("Captain keeps each first turn but skips later pass-only turns without opting in", () => {
+  let s = E.init(3, [], {}, "captain-repeat-pass");
+  s.players[0].goods.corn = 1;
+  s.players[0].goods.sugar = 1;
+  s = E.move(s, { type: "role", id: "captain" }, 0);
+  s = E.move(
+    s,
+    E.legal(s).find((m) => m.type === "ship" && m.good === "corn"),
+    0,
+  );
+  assert.equal(E.currentPlayer(s), 1);
+  assert.deepEqual(E.legal(s), [{ type: "pass" }]);
+  s = E.move(s, { type: "pass" }, 1);
+  assert.equal(E.currentPlayer(s), 2);
+  s = E.move(s, { type: "pass" }, 2);
+  assert.equal(E.currentPlayer(s), 0);
+  s = E.move(
+    s,
+    E.legal(s).find((m) => m.type === "ship" && m.good === "sugar"),
+    0,
+  );
+  assert.equal(s.tasks[0].kind, "role");
+  assert.deepEqual(
+    s.history.slice(-3).map((h) => [h.p, h.move.type]),
+    [
+      [1, "pass"],
+      [2, "pass"],
+      [0, "pass"],
+    ],
+  );
+});
+
+test("empty Captain first pass remains manual, including the role chooser", () => {
+  let s = E.init(3, [], {}, "captain-first-pass");
+  s = E.move(s, { type: "role", id: "captain" }, 0);
+  for (let p = 0; p < 3; p++) {
+    assert.equal(E.currentPlayer(s), p);
+    assert.equal(s.tasks[0].kind, "ship");
+    s = E.move(s, { type: "pass" }, p);
+  }
+  assert.equal(s.tasks[0].kind, "role");
+  assert.deepEqual(E.replay(s), s);
+});
+
+test("Trader skips its redundant finish but keeps the next player's first pass", () => {
+  let s = E.init(3, [], {}, "trader-repeat-pass");
+  s.players[0].goods.corn = 1;
+  s = E.move(s, { type: "role", id: "trader" }, 0);
+  s = E.move(
+    s,
+    E.legal(s).find((m) => m.type === "trade"),
+    0,
+  );
+  assert.equal(E.currentPlayer(s), 1);
+  assert.deepEqual(
+    s.history.slice(-2).map((h) => h.move.type),
+    ["trade", "pass"],
+  );
+  assert.deepEqual(E.legal(s), [{ type: "pass" }]);
+});
+
+test("a new role resets acknowledgement and Bohío alternatives remain manual", () => {
+  let s = E.init(3, [], {}, "role-pass-boundary");
+  s = E.move(s, { type: "role", id: "trader" }, 0);
+  s = E.move(s, { type: "pass" }, 0);
+  s = E.move(s, { type: "pass" }, 1);
+  s = E.move(s, { type: "pass" }, 2);
+  s = E.move(s, { type: "role", id: "captain" }, E.currentPlayer(s));
+  assert.equal(s.tasks[0].kind, "ship");
+  const p = E.currentPlayer(s);
+  s.players[p].buildings = [{ id: "bohio", w: 1, c: 0 }];
+  s.players[p].estates = [{ id: "corn", w: 0, c: 0 }];
+  s.history.push({ p, move: { type: "pass" } });
+  const resolved = E.resolveForcedActions(s);
+  assert.equal(resolved.history.length, s.history.length);
+  assert(E.legal(resolved).some((m) => m.type === "bohio"));
+});

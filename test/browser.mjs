@@ -14,7 +14,7 @@ const server = createServer(async (req, res) => {
   res.end(
     req.url === "/viewer.js"
       ? await readFile(new URL("../dist/viewer.js", import.meta.url))
-      : '<!doctype html><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{margin:0}</style><div id="game"></div><script src="/viewer.js"></script>',
+      : '<!doctype html><meta name="viewport" content="width=device-width, initial-scale=1"><div id="game"></div><script src="/viewer.js"></script>',
   );
 });
 await new Promise((r) => server.listen(0, "127.0.0.1", r));
@@ -63,12 +63,20 @@ try {
         "thumbnail captures only the harbour",
       );
     await page.evaluate(() => scrollTo(0, 0));
+    const outer = await page.locator(".pr-game").boundingBox();
+    assert.equal(outer.x, 0, "no document side margin");
+    assert.equal(
+      await page
+        .locator("body")
+        .evaluate((el) => getComputedStyle(el).marginTop),
+      "0px",
+    );
     if (width <= 760)
       assert.equal(
         await page
           .locator(".pr-game")
           .evaluate((el) => getComputedStyle(el).paddingLeft),
-        "0px",
+        "8px",
       );
     if (width <= 760) {
       assert.equal(

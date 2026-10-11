@@ -59,7 +59,7 @@
       },
       {
         "id": "shipping",
-        "version": 1,
+        "version": 2,
         "title": "Shipping and storage",
         "description": "Load matching ships, earn points and keep only what your storage allows."
       },

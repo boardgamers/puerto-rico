@@ -432,7 +432,10 @@ test("replay restores each playable boundary and log slices omit secrets", () =>
     states.push(s);
   }
   for (const i of [1, 5, 13, 36])
-    assert.deepEqual(e.replay(s, { to: i }), states[i - 1]);
+    assert.deepEqual(
+      e.replay(s, { to: e.logLength(states[i - 1]) }),
+      states[i - 1],
+    );
   const slice = e.logSlice(s, { player: 0, start: 5, end: 5 });
   assert.equal(slice.frames.length, 1);
   assert.equal(slice.frames[0].history, undefined);

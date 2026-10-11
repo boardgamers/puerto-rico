@@ -180,7 +180,6 @@ const definitions = {
         ship: 0,
         good: "fruit",
       })),
-      lesson("pass", "actions", () => ({ type: "pass" })),
       lesson("store", "actions", () => ({
         type: "store",
         types: [],
@@ -253,7 +252,7 @@ export const chapters = Object.fromEntries(
       id,
       {
         id,
-        version: 1,
+        version: id === "shipping" ? 2 : 1,
         titleKey: `tutorial.${id}.title`,
         descriptionKey: `tutorial.${id}.description`,
         initialState: definition.initialState,

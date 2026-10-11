@@ -116,9 +116,9 @@ function playChapter(id) {
     assert.deepEqual(before, frames.at(-1), "move leaves its input untouched");
     assert(step.complete(state));
     assert.equal(
-      state.history.filter((h) => h.p === 0).length,
+      state.history.filter((h) => h.p === 0 && h.move.type !== "pass").length,
       state.tutorial.completed,
-      "only the learner performs learner moves",
+      "learner actions are scripted; redundant passes may resolve automatically",
     );
     frames.push(clone(state));
   }
@@ -218,16 +218,17 @@ test("basics demonstrates accumulated role coins, production, privilege and unch
 });
 
 test("shipping enforces single-type ships, mandatory loading and base storage", () => {
-  const [, role, loaded, storage, ended] = playChapter("shipping");
+  const [, role, storage, ended] = playChapter("shipping");
   assert(!engine.legal(role).some((move) => move.type === "pass"));
   assert(!engine.legal(role).some((move) => move.good === "coffee"));
   assert.throws(() => engine.move(role, { type: "pass" }, 0));
   assert.throws(() =>
     engine.move(role, { type: "ship", ship: 1, good: "coffee" }, 0),
   );
-  assert.equal(loaded.ships[0].amount, 4);
-  assert.equal(loaded.players[0].vp, 3);
-  assert.deepEqual(engine.legal(loaded), [{ type: "pass" }]);
+  assert.equal(storage.ships[0].amount, 4);
+  assert.equal(storage.players[0].vp, 3);
+  assert.equal(storage.tasks[0].kind, "store");
+  assert(storage.history.some((h) => h.p === 0 && h.move.type === "pass"));
   assert.throws(() =>
     engine.move(
       storage,

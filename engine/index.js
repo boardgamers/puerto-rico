@@ -512,6 +512,7 @@ function startRole(s, id, p, captured = false) {
   if (s.captured?.id === id) s.captured = null;
   s.role = id.startsWith("adventurer") ? "adventurer" : id;
   s.owner = p;
+  s.roleHistoryStart = s.history.length;
   s.phaseVP = s.players.map(() => 0);
   if (s.role === "recruiter")
     for (const a of s.players) if (a.puertoma) a.puertoma.recruited = 0;
@@ -1273,14 +1274,34 @@ export function setPlayerSettings(s, p, settings) {
   };
   return next;
 }
+function repeatedRolePass(s, t) {
+  if (s.players[t.p]?.puertoma) return null;
+  // Role selection and out-of-turn Bohío moves do not acknowledge a role turn.
+  // The boundary also resets for captured roles; older games fall back to history.
+  const start =
+    s.roleHistoryStart ??
+    s.history.findLastIndex((h) => h.move.type === "role");
+  if (
+    start < 0 ||
+    !s.history
+      .slice(start)
+      .some((h) => h.p === t.p && !["role", "bohio"].includes(h.move.type))
+  )
+    return null;
+  const choices = legal(s, t.p);
+  return choices.length === 1 && choices[0].type === "pass" ? choices[0] : null;
+}
 export function resolveForcedActions(state) {
   let s = clone(state);
   settle(s);
   for (let guard = 0; guard < 1000; guard++) {
     if (s.finished || !s.tasks.length) return s;
     const t = s.tasks[0];
-    if (!playerSettings(s, t.p).autoForcedActions) return s;
-    const forced = forcedAction(s, t, s.players[t.p]);
+    const forced =
+      repeatedRolePass(s, t) ??
+      (playerSettings(s, t.p).autoForcedActions
+        ? forcedAction(s, t, s.players[t.p])
+        : null);
     if (!forced) return s;
     s = applyMove(s, forced, t.p);
   }
