@@ -659,7 +659,7 @@ export function mountGame(
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
         return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" aria-description="${esc(stock)}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${buildingPictogram(id, 30)}<strong>${t(id)}${b.good && b.good !== "tailor" ? `<small class="building-kind">${t("productionBuilding")}</small>` : ["smallWarehouse", "largeWarehouse", "storehouse"].includes(id) ? `<small class="building-kind">${t("storageBuilding")}</small>` : ""}</strong></span>
-          <span class="bcard-cost"><span title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span>${quarryLimit(b)}</span>
+          <span class="bcard-cost"><span title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span></span>
           <span class="bcard-effect">${buildingSymbols(id, t)}</span>
           <span class="bcard-stats"><span class="bcard-points">${pointsBadge(b.vp)}${b.size === 2 ? cityFootprint() : ""}</span>${buildingSlots(b)}</span>
           ${n > 1 ? `<span class="building-stock-count" role="img" title="${esc(stock)}" aria-label="${esc(stock)}">${n}</span>` : ""}
