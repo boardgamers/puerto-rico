@@ -510,9 +510,10 @@ export function mountGame(
       .join("")}</div>`;
   }
   function peopleSlots(key, x, n = 1) {
-    const editable =
-        allowed() && state.tasks[0].kind === "assign" && view === seat,
-      values = editable
+    const preview =
+        draft && isTurn() && state.tasks[0].kind === "assign" && view === seat,
+      editable = preview && !pending,
+      values = preview
         ? draft[key[0] === "e" ? "estates" : "buildings"][Number(key.slice(1))]
         : x;
     return `<div class="worker-slots">${Array.from({ length: n }, (_, i) => {

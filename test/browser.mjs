@@ -559,7 +559,25 @@ try {
       1,
       "draft survives closing the editor",
     );
+    const placedWorkers = await page
+      .locator(".player-board .worker-slot")
+      .evaluateAll((slots) => slots.map((slot) => slot.className));
     await page.locator(".pr-modal [data-confirm-assign]").click();
+    assert.deepEqual(
+      await page
+        .locator(".player-board .worker-slot")
+        .evaluateAll((slots) => slots.map((slot) => slot.className)),
+      placedWorkers,
+      "submitted workers stay visible while awaiting the platform",
+    );
+    await page.evaluate(() => host.emit("move:result", { ok: true }));
+    assert.deepEqual(
+      await page
+        .locator(".player-board .worker-slot")
+        .evaluateAll((slots) => slots.map((slot) => slot.className)),
+      placedWorkers,
+      "acknowledgement does not revert the placement",
+    );
     const allocation = await page.evaluate(() => played.at(-1));
     assert.equal(allocation.type, "assign");
     s = E.move(s, allocation, 0);
