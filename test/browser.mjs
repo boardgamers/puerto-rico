@@ -483,12 +483,21 @@ try {
       /Construisez le bâtiment/,
       "fruit still needs a production building",
     );
-    const beforeHelp = await page.evaluate(() => played.length);
-    await page.locator("[data-production-help]").click();
-    assert.match(await page.locator(".production-guide").innerText(), /maïs/);
-    assert.equal(await overflow(), false, `Production help at ${width}`);
-    await page.keyboard.press("Escape");
-    assert.equal(await page.evaluate(() => played.length), beforeHelp);
+    const beforeToggle = await page.evaluate(() => played.length);
+    assert.equal(await page.locator("[data-production-help]").count(), 0);
+    for (let toggle = 0; toggle < 2; toggle++) {
+      const caret = await page.locator(".production-toggle").boundingBox();
+      const heading = await page
+        .locator(".production-overview h3")
+        .boundingBox();
+      assert.equal(caret.height, 40);
+      assert.ok(
+        Math.abs(caret.y + caret.height / 2 - heading.y - heading.height / 2) <
+          1,
+      );
+      await page.locator('[data-section="production"]').click();
+    }
+    assert.equal(await page.evaluate(() => played.length), beforeToggle);
     assert.equal(await page.locator('[data-slot="e0:0"]').isEnabled(), false);
     // The dock opens the spatial editor without scrolling through objectives.
     await page.evaluate(() => scrollTo(0, 0));

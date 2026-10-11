@@ -133,14 +133,7 @@ try {
       `${locale}: action dock fits screen`,
     );
     assert.ok(dock.height < 200, `${locale}: action dock stays compact`);
-    await page.locator("[data-production-help]").click();
-    assert.ok(
-      (await page.locator(".pr-modal h2").innerText()).includes(
-        t("productionHelp"),
-      ),
-    );
-    await fits(`${locale}: production help`);
-    await page.keyboard.press("Escape");
+    assert.equal(await page.locator("[data-production-help]").count(), 0);
     await page.locator("[data-market]").first().click();
     await page.locator(".pr-modal [data-building]").first().click();
     await fits(`${locale}: building help`);
@@ -220,7 +213,7 @@ try {
   );
   await page.keyboard.press("Escape");
   await page.setViewportSize({ width: 568, height: 320 });
-  await page.locator("[data-production-help]").click();
+  await page.locator('[data-panel="rules"]').click();
   await fits("mobile landscape help");
   const close = await page.locator(".pr-modal [data-close]").boundingBox();
   assert.ok(
