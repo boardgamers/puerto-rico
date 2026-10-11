@@ -48,6 +48,28 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    await page.locator('.offer[data-plantation-info="quarry"]').click();
+    assert.match(await page.locator(".modal-body").innerText(), /carrière/i);
+    assert.equal(await page.evaluate(() => played.length), 0);
+    await page.keyboard.press("Escape");
+    assert.deepEqual(await page.locator(".round-order").allTextContents(), [
+      "1",
+      "2",
+      "3",
+    ]);
+    await page.evaluate(
+      (s) => host.emit("state", { ...s, governor: 1 }),
+      E.stripSecret(original, 0),
+    );
+    assert.deepEqual(await page.locator(".round-order").allTextContents(), [
+      "3",
+      "1",
+      "2",
+    ]);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
     const thumbnail = await page.evaluate(
       () =>
         new Promise((resolve) => {
@@ -551,6 +573,13 @@ try {
       (s) => host.emit("state", s),
       E.stripSecret(buildingChoice, 0),
     );
+    const passBounds = await page.locator(".dock-pass").boundingBox();
+    assert.ok(
+      Math.abs(
+        width - passBounds.x - passBounds.width - (width <= 760 ? 9 : 16),
+      ) < 1,
+      "dock buttons align to the viewport edge",
+    );
     await page.locator(".action-dock [data-market]").click();
     const productionCard = page.locator(
       '.pr-modal .bcard[data-building="smallFruit"]',
@@ -592,6 +621,47 @@ try {
       await page.locator(".pr-modal").isVisible(),
       false,
       "closing the market returns to the board",
+    );
+    const ownedView = E.stripSecret(buildingChoice, 0);
+    const ownedMove = ownedView.legal.find((m) => m.type === "build");
+    ownedView.players[0].buildings.push({ id: ownedMove.id, w: 0, c: 0 });
+    ownedView.legal = ownedView.legal.filter(
+      (m) => m.type !== "build" || m.id !== ownedMove.id,
+    );
+    await page.evaluate((s) => host.emit("state", s), ownedView);
+    await page.locator(".action-dock [data-market]").click();
+    const ownedCard = page.locator(
+      `.pr-modal [data-building="${ownedMove.id}"]`,
+    );
+    assert.match(await ownedCard.getAttribute("class"), /unavailable/);
+    await ownedCard.click();
+    assert.equal(await page.locator(".pr-modal [data-move]").count(), 0);
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(buildingChoice, 0),
+    );
+    await page.locator(".action-dock [data-market]").click();
+    const buyMove = E.stripSecret(buildingChoice, 0).legal.find(
+      (m) => m.type === "build",
+    );
+    const moveCount = await page.evaluate(() => played.length);
+    await page.locator(`.pr-modal [data-building="${buyMove.id}"]`).click();
+    assert.equal(
+      await page.evaluate(() => played.length),
+      moveCount,
+      "inspecting a building does not buy it",
+    );
+    await page
+      .locator(
+        `.pr-modal [data-move="${encodeURIComponent(JSON.stringify(buyMove))}"]`,
+      )
+      .click();
+    assert.deepEqual(
+      await page.evaluate(() => played.at(-1)),
+      buyMove,
+      "buy from the building details",
     );
     const planting = E.move(original, { type: "role", id: "planter" }, 0);
     const plantingView = E.stripSecret(planting, 0);
@@ -702,7 +772,7 @@ try {
       false,
       "summary does not duplicate resources at the top",
     );
-    const disabled = page.locator('.offer[aria-disabled="true"]').first();
+    const disabled = page.locator(".offer[data-plantation-info]").first();
     const box = await disabled.boundingBox();
     await page.mouse.move(box.x + 10, box.y + 10);
     await page.mouse.wheel(0, 400);

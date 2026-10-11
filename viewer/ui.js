@@ -198,7 +198,8 @@ export function mountGame(
   }
   const unsubscribeChatBadge = chat?.subscribe(updateChatBadge);
   configureChat();
-  const allowed = () => enabled && !pending && seat === state?.tasks[0]?.p;
+  const isTurn = () => enabled && seat === state?.tasks[0]?.p;
+  const allowed = () => isTurn() && !pending;
   const moveButton = (m, label, pictogram, classes = "", description = "") => {
     const hint =
       description +
@@ -594,13 +595,13 @@ export function mountGame(
         const m = state.legal.find(
           (m) => m.type === "plant" && m.id === id && !m.forest,
         );
-        return `<button class="offer ${id}" ${m && acting ? `data-move="${encode(m)}"` : 'aria-disabled="true"'} title="${esc(plantationHelp(id))}">${icon(GOODS.includes(id) ? `field-${id}` : id, 32)}<span>${t(id)}</span></button>`;
+        return `<button class="offer ${id}" ${m && acting ? `data-move="${encode(m)}"` : `data-plantation-info="${id}"`} title="${esc(plantationHelp(id))}">${icon(GOODS.includes(id) ? `field-${id}` : id, 32)}<span>${t(id)}</span></button>`;
       })
       .join("")}${(() => {
       const m = state.legal.find(
         (m) => m.type === "plant" && m.id === "quarry",
       );
-      return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : 'aria-disabled="true"'} title="${esc(plantationHelp("quarry"))}">${icon("quarry", 28)}<span>${t("quarry")}</span><small>${state.quarries}</small></button>`;
+      return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : 'data-plantation-info="quarry"'} title="${esc(plantationHelp("quarry"))}">${icon("quarry", 28)}<span>${t("quarry")}</span><small>${state.quarries}</small></button>`;
     })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests title="${esc(plantationHelp("forest"))}">${icon("forest")} ${t("forest")}</button>` : ""}</div></section>${state.festivals.length ? `<${festivalTag} class="festival-section compact-section" ${sectionOpen("festival") ? "open" : ""} aria-label="${t("festival")}"><${festivalHeadingTag} class="festival-section-heading" data-section="festival"><h3>${icon("festival", 20)}${t("festival")} <small>${state.festivals.filter((f) => f.claimed !== undefined).length}/${state.festivals.length}</small></h3><small>${t("sharedObjectives")}</small></${festivalHeadingTag}><div class="festival-strip">${state.festivals.map(festivalCard).join("")}</div></${festivalTag}>` : ""}</section>`;
   }
   function cityFootprint() {
@@ -633,6 +634,7 @@ export function mountGame(
       : p.reserve;
   }
   function playerCard(p, i) {
+    const order = (i - state.governor + state.players.length) % state.players.length + 1;
     const goods = GOODS.filter((g) => p.goods[g] > 0);
     const reserve = playerReserve(p, i);
     const people =
@@ -644,7 +646,7 @@ export function mountGame(
     const stock = goods.length
       ? `<span class="player-card-goods" title="${esc(t("stockLabel"))}">${goods.map((g) => metric(g, p.goods[g])).join("")}</span>`
       : "";
-    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" title="${esc(p.name)}" aria-pressed="${i === view}">${identity}<span class="player-name-text">${esc(p.name)}</span>${i === state.governor ? icon("governor", 18) : ""}${playerBadge(i)}</button></span><span class="player-card-resources"><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span>${people}${stock}</span></div>`;
+    return `<div data-player="${i}" class="player-tab ${i === view ? "selected" : ""} ${i === state.tasks[0]?.p ? "turn" : ""}"><span class="player-card-top"><button type="button" class="player-name" title="${esc(p.name)}" aria-pressed="${i === view}">${identity}<span class="player-name-text">${esc(p.name)}</span>${i === state.governor ? icon("governor", 18) : ""}${playerBadge(i)}</button><span class="round-order" title="${esc(t("roundOrder"))}" aria-label="${esc(t("roundOrder"))}: ${order}">${order}</span></span><span class="player-card-resources"><span class="player-card-score">${metric("coin", p.coins)}${scoreButton(i)}</span>${people}${stock}</span></div>`;
   }
   function playerSummary() {
     const a = state.players[seat];
@@ -684,7 +686,7 @@ export function mountGame(
           n === 0
             ? t("soldOut")
             : `${n} ${t(n === 1 ? "stockAvailableOne" : "stockAvailable")}`;
-        return `<button class="bcard ${b.good ? "production" : "commercial"} ${m && allowed() ? "affordable" : ""} ${!n ? "sold-out" : ""}" data-building="${id}" aria-description="${esc(stock)}" ${!n && !m ? 'aria-disabled="true"' : ""}>
+        return `<button class="bcard ${b.good ? "production" : "commercial"} ${isTurn() && ["build", "draft"].includes(task?.kind) ? (m ? "affordable" : "unavailable") : ""} ${!n ? "sold-out" : ""}" data-building="${id}" aria-description="${esc(stock)}" ${!n && !m ? 'aria-disabled="true"' : ""}>
           <span class="bcard-title">${buildingPictogram(id, 30)}<strong>${t(id)}${b.good && b.good !== "tailor" ? `<small class="building-kind">${t("productionBuilding")}</small>` : ["smallWarehouse", "largeWarehouse", "storehouse"].includes(id) ? `<small class="building-kind">${t("storageBuilding")}</small>` : ""}</strong></span>
           <span class="bcard-cost"><span title="${esc(`${t("cost")} : ${price}`)}" aria-label="${esc(`${t("cost")} : ${price}`)}">${metric("coin", price)}</span></span>
           <span class="bcard-effect">${buildingSymbols(id, t)}</span>
@@ -723,7 +725,7 @@ export function mountGame(
   function bottom() {
     if (state.finished)
       return `<div class="action-dock"><strong>${t("finished")}</strong><button class="primary" data-scores>${t("finalScore")}</button></div>`;
-    const can = allowed(),
+    const can = isTurn(),
       task = state.tasks[0],
       pass = state.legal.find((m) => m.type === "pass" && !m.decline?.length);
     let choices = "";
@@ -755,7 +757,7 @@ export function mountGame(
       } else choices = moves.map(actionButton).join("");
     }
     const special =
-      enabled && !pending && state.legal.some((m) => m.type === "bohio")
+      enabled && state.legal.some((m) => m.type === "bohio")
         ? `<button class="icon-button" data-bohio title="${esc(t("bohioMove"))}">${icon("worker")}</button>`
         : "";
     const confirm = confirmation();
@@ -804,7 +806,10 @@ export function mountGame(
     });
   }
   function render(s) {
-    if (s) state = s;
+    if (s) {
+      state = s;
+      pending = false;
+    }
     if (!state) return;
     if (
       roleConfirmation &&
@@ -820,7 +825,7 @@ export function mountGame(
     draftInit();
     shell.classList.toggle(
       "is-building",
-      allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
+      isTurn() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
     const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}${id === "chat" ? '<span class="chat-unread" aria-hidden="true" hidden></span>' : ""}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
@@ -829,6 +834,9 @@ export function mountGame(
         return !from.isEqualNode(to);
       },
     });
+    if (pending)
+      for (const button of content.querySelectorAll(".action-dock button"))
+        button.disabled = true;
     updateSummaryVisibility();
     updateChatBadge();
     const dock = content.querySelector(".action-dock");
@@ -915,7 +923,7 @@ export function mountGame(
       );
     show(
       t(id),
-      `<div class="building-detail">${buildingPictogram(id, 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}${quarryLimit(b)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${id === "monument" ? t("noSpecialEffect") : buildingEffect(id, true)}</p>${b.size === 2 ? cityFootprint() : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
+      `<div class="building-detail">${buildingPictogram(id, 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}${quarryLimit(b)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${id === "monument" ? t("noSpecialEffect") : buildingEffect(id, true)}</p>${b.size === 2 ? cityFootprint() : ""}${moves.length && allowed() ? `<div class="action-choices action-editor-footer">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "buyBuilding")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
       "building",
     );
   }
@@ -1169,6 +1177,11 @@ export function mountGame(
     }
     if (el.dataset.role) {
       show(t(el.dataset.role), roleReference(el.dataset.role));
+      return;
+    }
+    if (el.dataset.plantationInfo) {
+      const id = el.dataset.plantationInfo;
+      show(t(id), `${icon(GOODS.includes(id) ? `field-${id}` : id, 48)}<p>${esc(t(id === "quarry" ? "quarryHelp" : id === "forest" ? "forestHelp" : id === "corn" ? "cornHelp" : "plantationHelp"))}</p>`);
       return;
     }
     if (el.dataset.building) {

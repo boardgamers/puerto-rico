@@ -207,6 +207,13 @@
   border-color: var(--foliage);
   background: var(--card);
 }
+.pr-game .bcard.unavailable {
+  background: var(--panel);
+  border-color: transparent;
+  border-top-color: var(--line);
+  opacity: 0.55;
+  filter: grayscale(1);
+}
 .pr-game .production-overview {
   background: var(--surface-shade);
   border-color: transparent;

@@ -185,7 +185,7 @@ try {
     });
     await page.waitForTimeout(100);
   };
-  const disabled = page.locator('.offer[aria-disabled="true"]').first();
+  const disabled = page.locator('.offer[data-plantation-info]').first();
   await disabled.scrollIntoViewIfNeeded();
   const box = await disabled.boundingBox();
   const before = await page.evaluate(() => scrollY);

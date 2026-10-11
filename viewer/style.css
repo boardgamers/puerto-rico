@@ -1029,8 +1029,7 @@ body:has(.pr-game) {
   background: var(--panel);
   border-top: 3px double var(--gold);
   box-shadow: 0 -4px 16px var(--shadow);
-  padding: 9px max(16px, calc((100vw - 1368px) / 2))
-    max(9px, env(safe-area-inset-bottom));
+  padding: 9px 16px max(9px, env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -1050,12 +1049,10 @@ body:has(.pr-game) {
   flex-wrap: wrap;
   gap: 8px;
   min-width: 0;
+  margin-inline-start: auto;
 }
 .pr-game .dock-controls:empty {
   display: none;
-}
-.pr-game .dock-pass {
-  margin-inline-start: auto;
 }
 .pr-game .action-editor-footer {
   position: sticky;
@@ -1980,6 +1977,19 @@ body:has(.pr-game) {
   align-items: center;
   min-width: 0;
 }
+.pr-game .round-order {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 20px;
+  height: 20px;
+  margin-inline-start: 5px;
+  border-radius: 50%;
+  background: var(--surface-shade);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
 .pr-game .player-card-top .player-name {
   width: 100%;
   min-width: 0;
@@ -2539,7 +2549,7 @@ body:has(.pr-game) {
   color: var(--foliage);
 }
 
-.pr-game .offer[aria-disabled="true"] {
+.pr-game .offer[data-plantation-info] {
   opacity: 0.5;
   cursor: help;
 }

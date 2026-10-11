@@ -39,7 +39,14 @@
     }
   ],
   "expansions": [],
-  "preferences": [],
+  "preferences": [
+    {
+      "name": "colorBlind",
+      "label": "Color-blind mode",
+      "type": "checkbox",
+      "default": false
+    }
+  ],
   "settings": [
     {
       "name": "autoForcedActions",

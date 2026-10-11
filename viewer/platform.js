@@ -70,8 +70,10 @@ export function viewerLifecycle(ctx, ui, chat) {
     onTheme: (p) => ui.setPreferences(p),
     onError: (error) => settle(Error(String(error))),
     onMoveResult(result) {
-      if (result.ok) settle();
-      else {
+      // An acknowledgement can precede the authoritative state update.
+      if (result.ok) {
+        if (pending) ctx.fetchState();
+      } else {
         settle(Error(result.error || "Move rejected"));
         ctx.fetchState();
       }

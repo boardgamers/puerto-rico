@@ -74,7 +74,18 @@ test("replay clamps after undo and analysis accepts host branch states and moves
   viewer.onReplayEnd();
   viewer.onState({ historyLength: 2, branch: "analysis" });
   const move = viewer.move({ type: "pass" });
+  let settled = false;
+  move.then(() => {
+    settled = true;
+  });
   viewer.onMoveResult({ ok: true });
+  await Promise.resolve();
+  assert.equal(
+    settled,
+    false,
+    "acknowledgement must not restore stale controls",
+  );
+  viewer.onState({ historyLength: 3, branch: "analysis" });
   await move;
   viewer.onAvatars(["https://example.org/p.png"]);
   assert.deepEqual(calls.at(-1), ["setAvatars", ["https://example.org/p.png"]]);

@@ -118,7 +118,7 @@ assert.equal(
   (await pictogram.arrayBuffer()).byteLength,
   meta.assets.pictogram.size,
 );
-assert.deepEqual(published.preferences, []);
+assert.deepEqual(published.preferences, defaults.preferences);
 assert.deepEqual(published.tutorial, defaults.tutorial);
 if (!translationsPending) {
   for (const [lang, translation] of Object.entries(translations)) {
