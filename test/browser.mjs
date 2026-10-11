@@ -166,6 +166,7 @@ try {
     for (const first of ["w", "c"]) {
       const allocation = E.stripSecret(original, 0);
       allocation.historyLength += first === "w" ? 100 : 101;
+      allocation.roleHistoryStart = allocation.historyLength;
       allocation.tasks = [{ kind: "assign", p: 0 }];
       allocation.players[0].reserve = { w: 1, c: 1 };
       allocation.players[0].estates = ["corn", "fruit", "sugar"].map((id) => ({
@@ -428,7 +429,9 @@ try {
       "last role is not marked current during the next role choice",
     );
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
-    const recruitButtons = page.locator(".action-dock [data-move]");
+    const recruitButtons = page.locator(
+      ".action-dock [data-move]:not(.dock-undo)",
+    );
     assert.equal(await recruitButtons.count(), 2);
     for (const button of await recruitButtons.all()) {
       const bounds = await button.boundingBox();
@@ -949,6 +952,60 @@ try {
         .innerText()
         .then((x) => x.includes("Objectif secret")),
       true,
+    );
+    await page.locator("[data-production-compare]").click();
+    assert.equal(await page.locator(".production-comparison tbody").count(), 3);
+    assert.equal(await overflow(), false, `Production comparison at ${width}`);
+    await page.screenshot({
+      path: `.local/qa/${width}-production-comparison.png`,
+    });
+    await page.keyboard.press("Escape");
+    let parallel = E.init(3, [], {}, "browser-parallel");
+    parallel = E.move(parallel, { type: "role", id: "recruiter" }, 0);
+    parallel = E.move(parallel, { type: "recruitBonus" }, 0);
+    parallel.players[2].estates.push({ id: "sugar", w: 0, c: 0 });
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 2 });
+        host.emit("state", s);
+      },
+      E.stripSecret(parallel, 2),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    await page.locator('.pr-modal [data-slot="e1:0"]').click();
+    parallel = E.move(
+      parallel,
+      { type: "assign", ...E.autoAssignment(parallel, 0) },
+      0,
+    );
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(parallel, 2),
+    );
+    assert.equal(
+      await page.locator('.pr-modal [data-slot="e1:0"].w').count(),
+      1,
+      "another placement preserves our draft and editor",
+    );
+    await page.keyboard.press("Escape");
+    await page
+      .locator(
+        '.action-dock [data-move="%7B%22type%22%3A%22orderedPlacement%22%7D"]',
+      )
+      .click();
+    assert.equal(
+      await page.evaluate(() => played.at(-1).type),
+      "orderedPlacement",
+    );
+    parallel = E.move(parallel, { type: "orderedPlacement" }, 2);
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(parallel, 2),
+    );
+    assert.equal(
+      await page.locator(".action-dock [data-actions]").count(),
+      0,
+      "ordered request waits for earlier player",
     );
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(

@@ -21,6 +21,8 @@ export async function releaseMetadata() {
       "chooseBuildings",
       "showVP",
       "autoForcedActions",
+      "autoProduce",
+      "autoStore",
     ])
       if (!catalog[`metadata.${key}`])
         throw Error(`Missing ${locale} metadata.${key}`);
@@ -48,6 +50,8 @@ export async function releaseMetadata() {
         "options.chooseBuildings": catalog["metadata.chooseBuildings"],
         "options.showVP": catalog["metadata.showVP"],
         "settings.autoForcedActions": catalog["metadata.autoForcedActions"],
+        "settings.autoProduce": catalog["metadata.autoProduce"],
+        "settings.autoStore": catalog["metadata.autoStore"],
       },
     };
   }

@@ -29,6 +29,8 @@ test("release metadata keeps title separate and prepares every manual locale ove
         "options.chooseBuildings",
         "options.showVP",
         "settings.autoForcedActions",
+        "settings.autoProduce",
+        "settings.autoStore",
         ...Object.keys(chapters).flatMap((id) =>
           ["title", "description"].map(
             (field) => `tutorial.chapters.${id}.${field}`,

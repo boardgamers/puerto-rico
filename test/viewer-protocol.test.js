@@ -99,3 +99,26 @@ test("live move logs refresh the authoritative state", () => {
   assert.deepEqual(calls.at(-1), ["fetchState", undefined]);
   viewer.destroy();
 });
+
+test("another player placement does not acknowledge our pending submission", async () => {
+  const { viewer } = fixture();
+  viewer.onPlayer({ index: 1 });
+  viewer.onState({
+    historyLength: 4,
+    tasks: [
+      { kind: "assign", p: 1 },
+      { kind: "assign", p: 2 },
+    ],
+  });
+  let done = false;
+  const pending = viewer.move({ type: "assign" }).then(() => {
+    done = true;
+  });
+  viewer.onState({ historyLength: 5, tasks: [{ kind: "assign", p: 1 }] });
+  await Promise.resolve();
+  assert.equal(done, false);
+  viewer.onState({ historyLength: 6, tasks: [{ kind: "role", p: 2 }] });
+  await pending;
+  assert.equal(done, true);
+  viewer.destroy();
+});

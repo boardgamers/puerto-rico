@@ -146,6 +146,9 @@
   "playerSummary": "Jouw middelen",
   "availableWorkers": "Beschikbare arbeiders",
   "availableCitizens": "Beschikbare burgers",
+  "productionComparison": "Productie en voorraad per speler",
+  "productionComparisonHelp": "Capaciteit zonder rolvoordeel; de gezamenlijke voorraad kan de werkelijke productie beperken.",
+  "orderedPlacement": "Wacht op eerdere spelers",
   "roundOrder": "Volgorde deze ronde",
   "round": "Ronde",
   "governor": "Gouverneur",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Speciale editie",
   "metadata.chooseBuildings": "Gebouwen kiezen",
   "metadata.showVP": "Toon ieders OP",
+  "metadata.autoProduce": "Altijd maximaal produceren",
+  "metadata.autoStore": "Automatisch opslaan als alles past",
   "metadata.autoForcedActions": "Gedwongen zetten automatisch spelen",
   "metadata.description": "Kies rollen, ontwikkel je eiland, produceer goederen en verscheep ze voor punten. Met alle zes uitbreidingen en solospel tegen twee Puertoma’s.",
   "metadata.rules": "Kies een rol: iedereen voert de actie uit en jij krijgt een privilege. Plant, rekruteer, bouw, produceer, handel en verscheep. De meeste punten uit verscheping, gebouwen en bonussen winnen."

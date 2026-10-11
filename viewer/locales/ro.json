@@ -146,6 +146,9 @@
   "playerSummary": "Resursele tale",
   "availableWorkers": "Muncitori disponibili",
   "availableCitizens": "Cetățeni disponibili",
+  "productionComparison": "Producția și stocurile jucătorilor",
+  "productionComparisonHelp": "Capacitate fără privilegiul rolului; rezerva comună poate limita producția efectivă.",
+  "orderedPlacement": "Așteaptă jucătorii anteriori",
   "roundOrder": "Ordinea în rundă",
   "round": "Rundă",
   "governor": "Guvernator",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 — Ediție specială",
   "metadata.chooseBuildings": "Alege clădirile",
   "metadata.showVP": "Arată PV pentru toți",
+  "metadata.autoProduce": "Produce întotdeauna maximum",
+  "metadata.autoStore": "Depozitează automat când încape totul",
   "metadata.autoForcedActions": "Execută automat mutările forțate",
   "metadata.description": "Alege roluri, dezvoltă insula, produce bunuri și expediază-le pentru puncte. Include toate cele șase extensii și joc solo contra a două Puertoma.",
   "metadata.rules": "Alege un rol: toți îi efectuează acțiunea, iar tu primești un privilegiu. Plantează, recrutează, construiește, produce, vinde și expediază. Câștigă cele mai multe puncte din expedieri, clădiri și bonusuri."

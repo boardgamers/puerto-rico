@@ -146,6 +146,9 @@
   "playerSummary": "내 자원",
   "availableWorkers": "사용 가능한 일꾼",
   "availableCitizens": "사용 가능한 시민",
+  "productionComparison": "플레이어별 생산 및 재고",
+  "productionComparisonHelp": "역할 특권을 제외한 생산 능력입니다. 공용 공급량에 따라 실제 생산량이 제한될 수 있습니다.",
+  "orderedPlacement": "앞 순서 플레이어 기다리기",
   "roundOrder": "라운드 순서",
   "round": "라운드",
   "governor": "총독",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 특별판",
   "metadata.chooseBuildings": "건물 선택",
   "metadata.showVP": "모두의 승점 공개",
+  "metadata.autoProduce": "항상 최대 수량 생산",
+  "metadata.autoStore": "모두 보관할 수 있으면 자동 보관",
   "metadata.autoForcedActions": "강제 행동 자동 실행",
   "metadata.description": "역할을 골라 섬을 발전시키고 상품을 생산하고 배송해 점수를 얻으세요. 여섯 확장과 푸에르토마 두 명을 상대하는 1인 플레이가 포함됩니다.",
   "metadata.rules": "역할을 고르면 모두 그 행동을 하고 선택자는 특권을 받습니다. 경작, 모집, 건설, 생산, 교역, 배송을 하세요. 배송, 건물, 보너스로 가장 많은 점수를 얻으면 승리합니다."

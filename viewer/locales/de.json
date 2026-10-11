@@ -146,6 +146,9 @@
   "playerSummary": "Deine Ressourcen",
   "availableWorkers": "Verfügbare Arbeiter",
   "availableCitizens": "Verfügbare Bürger",
+  "productionComparison": "Produktion und Vorräte aller Spieler",
+  "productionComparisonHelp": "Kapazität ohne Rollenprivileg; der gemeinsame Vorrat kann die tatsächliche Produktion begrenzen.",
+  "orderedPlacement": "Auf vorherige Spieler warten",
   "roundOrder": "Reihenfolge in dieser Runde",
   "round": "Runde",
   "governor": "Gouverneur",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Sonderausgabe",
   "metadata.chooseBuildings": "Gebäude auswählen",
   "metadata.showVP": "SP aller Spieler anzeigen",
+  "metadata.autoProduce": "Immer die Höchstmenge produzieren",
+  "metadata.autoStore": "Automatisch lagern, wenn alles Platz hat",
   "metadata.autoForcedActions": "Erzwungene Züge automatisch ausführen",
   "metadata.description": "Wähle Rollen, entwickle deine Insel, produziere Waren und verschiffe sie für Punkte. Mit allen sechs Erweiterungen und Solospiel gegen zwei Puertomas.",
   "metadata.rules": "Wähle eine Rolle: Alle führen ihre Aktion aus, du erhältst ein Privileg. Pflanze, wirb an, baue, produziere, handle und verschiffe. Die meisten Punkte aus Verschiffung, Gebäuden und Boni gewinnen."

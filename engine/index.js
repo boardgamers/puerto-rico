@@ -498,6 +498,7 @@ function tasksFor(s, role, p) {
   return [...tasks, { kind: "phaseEnd" }];
 }
 function startRole(s, id, p, captured = false) {
+  s.placementOrdered = false;
   const role = s.roles.find((r) => r.id === id);
   assert(role && role.taken === null);
   if (!captured) {
@@ -926,9 +927,39 @@ function optionalPoints(s, p, m) {
     out.push("chapel");
   return out;
 }
+function placementTasks(s) {
+  if (s.tasks[0]?.kind !== "assign" || s.puertoma) return [];
+  const end = s.tasks.findIndex((t) => t.kind !== "assign");
+  return s.tasks.slice(0, end < 0 ? undefined : end);
+}
+function assignmentForced(a) {
+  if (!people(a)) return true;
+  const estates = a.estates.filter((e) => e.id !== "forest");
+  const w = a.reserve.w + sum(a.estates.map((e) => e.w));
+  const c = a.reserve.c + sum(a.estates.map((e) => e.c));
+  return (
+    !a.buildings.length &&
+    estates.length > 0 &&
+    estates.every((e) => e.id === estates[0].id) &&
+    !(w && c)
+  );
+}
+function playerTask(s, p) {
+  return (
+    (!s.placementOrdered && placementTasks(s).find((t) => t.p === p)) ||
+    s.tasks[0]
+  );
+}
+export function currentPlayers(s) {
+  if (s.finished) return [];
+  const placements = !s.placementOrdered && placementTasks(s);
+  return placements?.length
+    ? placements.map((t) => t.p)
+    : [s.tasks[0]?.p].filter(Number.isInteger);
+}
 export function legal(s, p = currentPlayer(s)) {
   if (s.finished || !s.tasks.length || !s.players[p]) return [];
-  const t = s.tasks[0],
+  const t = playerTask(s, p),
     a = s.players[p],
     moves =
       t.p === p
@@ -943,6 +974,12 @@ export function legal(s, p = currentPlayer(s)) {
             return variants;
           })
         : [];
+  if (
+    !s.placementOrdered &&
+    placementTasks(s).findIndex((t) => t.p === p) > 0 &&
+    !assignmentForced(a)
+  )
+    moves.push({ type: "orderedPlacement" });
   if ((t.kind !== "assign" || t.p !== p) && active(a, "bohio")) {
     const from = building(a, "bohio");
     for (const kind of ["w", "c"])
@@ -1258,20 +1295,61 @@ function sameMove(a, b) {
       : x;
   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
 }
+export function canUndo(s, p) {
+  if (s.tutorial) return false;
+  const last = s.history.at(-1);
+  if (
+    !last ||
+    last.p !== p ||
+    s.finished ||
+    currentPlayers(s).length !== 1 ||
+    currentPlayer(s) !== p
+  )
+    return false;
+  const before = replay(s, logLength(s) - 1);
+  return (
+    !s.players.some((a, i) =>
+      (a.achievements ?? []).some(
+        (c) =>
+          c.completed &&
+          !(before.players[i].achievements ?? []).some(
+            (old) => old.id === c.id && old.completed,
+          ),
+      ),
+    ) &&
+    !(s.festivals ?? []).some(
+      (f) =>
+        f.claimed !== undefined &&
+        !(before.festivals ?? []).some(
+          (old) => old.id === f.id && old.claimed !== undefined,
+        ),
+    ) &&
+    currentPlayers(before).length === 1 &&
+    currentPlayer(before) === p &&
+    JSON.stringify(before.random) === JSON.stringify(s.random)
+  );
+}
 export function move(state, m, p) {
+  if (m?.type === "undo") {
+    assert(canUndo(state, p), "This move can no longer be undone");
+    return replay(state, logLength(state) - 1);
+  }
   return resolveForcedActions(applyMove(state, m, p));
 }
 export function playerSettings(s, p) {
   return {
     autoForcedActions: s.players[p]?.settings?.autoForcedActions === true,
+    autoProduce: s.players[p]?.settings?.autoProduce === true,
+    autoStore: s.players[p]?.settings?.autoStore === true,
   };
 }
 export function setPlayerSettings(s, p, settings) {
   assert(integer(p) && !!s.players[p], "Invalid player");
   const next = clone(s);
-  next.players[p].settings = {
-    autoForcedActions: settings?.autoForcedActions === true,
-  };
+  next.players[p].settings = { ...next.players[p].settings };
+  for (const key of ["autoForcedActions", "autoProduce", "autoStore"])
+    if (settings && Object.hasOwn(settings, key))
+      next.players[p].settings[key] = settings[key] === true;
   return next;
 }
 function repeatedRolePass(s, t) {
@@ -1297,7 +1375,32 @@ export function resolveForcedActions(state) {
   for (let guard = 0; guard < 1000; guard++) {
     if (s.finished || !s.tasks.length) return s;
     const t = s.tasks[0];
+    const recruits = t.kind === "recruit" ? phaseLegal(s, t) : [];
+    const settings = playerSettings(s, t.p);
+    const automatic =
+      !s.players[t.p].puertoma &&
+      (t.kind === "produce" && settings.autoProduce
+        ? legal(s, t.p).find(
+            (m) =>
+              m.type === "produce" &&
+              !m.decline &&
+              optionalPoints(s, t.p, m).length === 0,
+          )
+        : t.kind === "store" && settings.autoStore
+          ? (() => {
+              const keep = autoStorage(s, t.p);
+              return GOODS.every(
+                (g) => keep.goods[g] === s.players[t.p].goods[g],
+              )
+                ? { type: "store", ...keep }
+                : null;
+            })()
+          : null);
     const forced =
+      (automatic || null) ??
+      (recruits.length === 1 && recruits[0].type === "recruit"
+        ? recruits[0]
+        : null) ??
       repeatedRolePass(s, t) ??
       (playerSettings(s, t.p).autoForcedActions
         ? forcedAction(s, t, s.players[t.p])
@@ -1313,11 +1416,11 @@ function applyMove(state, m, p) {
   assert(integer(p) && !!state.players[p], "Invalid player");
   assert(
     !state.finished &&
-      (state.tasks[0]?.p === p || canMoveOutOfTurn(state, m, p)),
+      (currentPlayers(state).includes(p) || canMoveOutOfTurn(state, m, p)),
     "It is not your turn",
   );
   const s = clone(state),
-    t = s.tasks[0],
+    t = playerTask(s, p),
     a = s.players[p],
     extra = { phase: t.kind, beforeCoins: s.players[p].coins };
   if (a.puertoma) {
@@ -1369,8 +1472,11 @@ function applyMove(state, m, p) {
       extra.coins = (extra.coins ?? 0) + coins;
     }
   }
-  const next = () => s.tasks.shift();
+  const next = () => s.tasks.splice(s.tasks.indexOf(t), 1);
   switch (m.type) {
+    case "orderedPlacement":
+      s.placementOrdered = true;
+      break;
     case "achievementChoose":
     case "achievementDraft":
       selectAchievement(s, t, m);
@@ -1826,6 +1932,8 @@ export function stripSecret(state, p) {
   delete s.random;
   delete s.config;
   delete s.history;
+  delete s.pendingMessages;
+  delete s.liveUndo;
   s.bagCount = s.bag.length;
   delete s.bag;
   delete s.discard;
@@ -1854,6 +1962,17 @@ export function stripSecret(state, p) {
         );
     }
   // Logs contain only public moves; historical earned points are public even though totals are concealed.
+  s.canUndo = Number.isInteger(p) && canUndo(state, p);
+  s.currentPlayers = currentPlayers(state);
+  const ownTask = Number.isInteger(p) ? playerTask(state, p) : null;
+  if (
+    ownTask?.kind === "assign" &&
+    ownTask.p === p &&
+    ownTask !== state.tasks[0]
+  ) {
+    const index = s.tasks.findIndex((t) => t.kind === "assign" && t.p === p);
+    s.tasks.unshift(...s.tasks.splice(index, 1));
+  }
   s.legal = Number.isInteger(p) ? legal(state, p) : [];
   s.roleWarnings = Number.isInteger(p) ? roleWarnings(state, p) : {};
   s.historyLength = logLength(state);
@@ -1925,6 +2044,7 @@ export function chooseAI(s, p = currentPlayer(s)) {
     a = s.players[p];
   if (!list.length) return null;
   const rate = (m) => {
+    if (m.type === "orderedPlacement") return -200;
     if (m.type === "pass") return -100;
     if (m.type === "bohio") return -90;
     if (m.type === "role") {

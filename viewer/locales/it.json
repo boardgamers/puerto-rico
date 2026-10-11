@@ -146,6 +146,9 @@
   "playerSummary": "Le tue risorse",
   "availableWorkers": "Lavoratori disponibili",
   "availableCitizens": "Cittadini disponibili",
+  "productionComparison": "Produzione e scorte dei giocatori",
+  "productionComparisonHelp": "Capacità senza il privilegio del ruolo; la riserva comune può limitare la produzione effettiva.",
+  "orderedPlacement": "Attendi i giocatori precedenti",
   "roundOrder": "Ordine del round",
   "round": "Round",
   "governor": "Governatore",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Edizione speciale",
   "metadata.chooseBuildings": "Scegli gli edifici",
   "metadata.showVP": "Mostra i PV di tutti",
+  "metadata.autoProduce": "Produci sempre il massimo",
+  "metadata.autoStore": "Conserva automaticamente quando c’è spazio per tutto",
   "metadata.autoForcedActions": "Esegui automaticamente le mosse obbligate",
   "metadata.description": "Scegli ruoli, sviluppa l’isola, produci merci e spediscile per ottenere punti. Include tutte le sei espansioni e il solitario contro due Puertoma.",
   "metadata.rules": "Scegli un ruolo: tutti eseguono la sua azione e tu ricevi un privilegio. Pianta, recluta, costruisci, produci, commercia e spedisci. Vince chi ottiene più punti da spedizioni, edifici e bonus."

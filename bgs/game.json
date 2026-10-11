@@ -53,6 +53,18 @@
       "label": "Automatically play forced moves",
       "type": "checkbox",
       "default": false
+    },
+    {
+      "name": "autoProduce",
+      "label": "Always produce the maximum",
+      "type": "checkbox",
+      "default": false
+    },
+    {
+      "name": "autoStore",
+      "label": "Automatically store when everything fits",
+      "type": "checkbox",
+      "default": false
     }
   ],
   "tags": ["eurogame", "economic"],

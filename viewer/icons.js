@@ -77,6 +77,10 @@ const paths = {
   eye: '<path d="M1 12S5 4 12 4s11 8 11 8-4 8-11 8S1 12 1 12Z"/><circle cx="12" cy="12" r="4"/>',
   festival:
     '<path fill="#d8ba65" d="m12 2 3 6 7 1-5 5 1 8-6-4-6 4 1-8-5-5 7-1Z"/>',
+  achievement:
+    '<rect x="4" y="2" width="16" height="20" rx="2"/><path d="m8 12 3 3 6-7"/>',
+  comparison:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16M15 10v10"/>',
   reset: '<path d="M3 10a9 9 0 1 1 2 9M3 3v7h7"/>',
   retrigger:
     '<path d="M4 8h11a6 6 0 0 1 0 12h-3M4 8l5-5M4 8l5 5"/><path d="M5 16v6m-3-3h6"/>',

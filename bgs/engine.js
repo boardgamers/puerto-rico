@@ -1,5 +1,6 @@
 export * from "../engine/index.js";
 import * as game from "../engine/index.js";
+import en from "../viewer/locales/en.json" with { type: "json" };
 import { RELEASE } from "../release-config.js";
 
 const solo = (s) => s.options.hostedSolo === true;
@@ -50,11 +51,16 @@ export function init(players, _expansions, suppliedOptions, seed) {
 }
 export function move(s, m, p) {
   checkSeat(s, p);
-  return opponents(game.move(s, m, p));
+  const next = announceCompletions(s, opponents(game.move(s, m, p)));
+  delete next.liveUndo;
+  if (m?.type === "undo") next.liveUndo = true;
+  return next;
 }
 export function moveAI(s, p = game.currentPlayer(s)) {
   checkSeat(s, p);
-  return opponents(game.moveAI(s, p));
+  const next = announceCompletions(s, opponents(game.moveAI(s, p)));
+  delete next.liveUndo;
+  return next;
 }
 export function dropPlayer(s, p) {
   checkSeat(s, p);
@@ -83,4 +89,54 @@ export function createAnalysis(s, options) {
   const copy = game.createAnalysis(s, options);
   if (solo(copy)) copy.players.slice(1).forEach((p) => (p.bot = true));
   return opponents(copy);
+}
+
+export function currentPlayers(s) {
+  return solo(s)
+    ? game.currentPlayers(s).filter((p) => p === 0)
+    : game.currentPlayers(s);
+}
+
+// The platform calls currentPlayer (singular), which accepts multiple seats.
+export function currentPlayer(s) {
+  const players = currentPlayers(s);
+  return players.length === 1 ? players[0] : players;
+}
+function announceCompletions(before, after) {
+  const notices = [...(before.pendingMessages ?? [])];
+  after.players.forEach((player, p) => {
+    for (const card of player.achievements ?? [])
+      if (
+        card.completed &&
+        !(before.players[p].achievements ?? []).some(
+          (c) => c.id === card.id && c.completed,
+        )
+      )
+        notices.push(
+          `${player.name} completed: ${en[`achievementName.${card.id}`] ?? card.id}.`,
+        );
+  });
+  for (const festival of after.festivals ?? [])
+    if (
+      festival.claimed !== undefined &&
+      !(before.festivals ?? []).some(
+        (f) => f.id === festival.id && f.claimed !== undefined,
+      )
+    )
+      notices.push(
+        `${after.players[festival.claimed].name} completed Festival: ${en[festival.id] ?? festival.id}.`,
+      );
+  return notices.length
+    ? { ...after, pendingMessages: notices.slice(-64) }
+    : after;
+}
+export function messages(s) {
+  const data = { ...s };
+  delete data.pendingMessages;
+  return { messages: s.pendingMessages ?? [], data };
+}
+
+// Undo updates the saved position without awarding another clock increment.
+export function isLiveUpdate(s) {
+  return s.liveUndo === true;
 }

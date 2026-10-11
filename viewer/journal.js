@@ -61,6 +61,9 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
         return `<li class="round-divider">${t("finished")} · ${t({ city: "journalEndCity", points: "journalEndPoints", workers: "journalEndWorkers" }[e.reason])}</li>`;
       let text = "";
       switch (e.type) {
+        case "orderedPlacement":
+          text = t("orderedPlacement");
+          break;
         case "achievement":
           text = `${t("achievements")} · ${esc(achievementText(e.id, t).name)} ${icon("check", 20)}`;
           break;

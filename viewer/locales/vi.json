@@ -146,6 +146,9 @@
   "playerSummary": "Tài nguyên của bạn",
   "availableWorkers": "Nhân công sẵn có",
   "availableCitizens": "Công dân sẵn có",
+  "productionComparison": "Sản xuất và hàng hóa của người chơi",
+  "productionComparisonHelp": "Công suất chưa tính đặc quyền vai trò; nguồn cung chung có thể hạn chế sản lượng thực tế.",
+  "orderedPlacement": "Chờ người chơi đi trước",
   "roundOrder": "Thứ tự trong vòng",
   "round": "Vòng",
   "governor": "Thống đốc",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Phiên bản đặc biệt",
   "metadata.chooseBuildings": "Chọn tòa nhà",
   "metadata.showVP": "Hiện điểm của mọi người",
+  "metadata.autoProduce": "Luôn sản xuất tối đa",
+  "metadata.autoStore": "Tự động lưu kho khi đủ chỗ cho tất cả",
   "metadata.autoForcedActions": "Tự động thực hiện nước đi bắt buộc",
   "metadata.description": "Chọn vai trò, phát triển đảo, sản xuất và giao hàng lấy điểm. Gồm cả sáu bản mở rộng và chơi đơn với hai Puertoma.",
   "metadata.rules": "Chọn vai trò: mọi người thực hiện hành động, bạn nhận đặc quyền. Trồng trọt, tuyển người, xây dựng, sản xuất, buôn bán và giao hàng. Ai có nhiều điểm nhất từ giao hàng, tòa nhà và thưởng sẽ thắng."

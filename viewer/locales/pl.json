@@ -146,6 +146,9 @@
   "playerSummary": "Twoje zasoby",
   "availableWorkers": "Dostępni robotnicy",
   "availableCitizens": "Dostępni obywatele",
+  "productionComparison": "Produkcja i zapasy graczy",
+  "productionComparisonHelp": "Wydajność bez przywileju roli; wspólna pula może ograniczyć rzeczywistą produkcję.",
+  "orderedPlacement": "Poczekaj na wcześniejszych graczy",
   "roundOrder": "Kolejność w rundzie",
   "round": "Runda",
   "governor": "Gubernator",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 — Edycja specjalna",
   "metadata.chooseBuildings": "Wybieraj budynki",
   "metadata.showVP": "Pokazuj PZ wszystkich graczy",
+  "metadata.autoProduce": "Zawsze produkuj maksimum",
+  "metadata.autoStore": "Przechowuj automatycznie, gdy wszystko się mieści",
   "metadata.autoForcedActions": "Automatycznie wykonuj wymuszone ruchy",
   "metadata.description": "Wybieraj role, rozwijaj wyspę, produkuj towary i wysyłaj je za punkty. Wszystkie sześć rozszerzeń i gra solo przeciwko dwóm Puertomom.",
   "metadata.rules": "Wybierz rolę: wszyscy wykonują jej akcję, a ty otrzymujesz przywilej. Sadź, werbuj, buduj, produkuj, handluj i wysyłaj. Wygrywa najwięcej punktów za wysyłkę, budynki i premie."

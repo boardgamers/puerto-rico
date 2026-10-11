@@ -146,6 +146,9 @@
   "playerSummary": "Your resources",
   "availableWorkers": "Available workers",
   "availableCitizens": "Available citizens",
+  "productionComparison": "Players’ production and stock",
+  "productionComparisonHelp": "Production capacity before the role bonus; shared supply may limit actual production.",
+  "orderedPlacement": "Wait for earlier players",
   "roundOrder": "Round order",
   "round": "Round",
   "governor": "Governor",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Special Edition",
   "metadata.chooseBuildings": "Choose buildings",
   "metadata.showVP": "Show everyone’s VP",
+  "metadata.autoProduce": "Always produce the maximum",
+  "metadata.autoStore": "Automatically store when everything fits",
   "metadata.autoForcedActions": "Automatically play forced moves",
   "metadata.description": "Choose roles, develop your island, produce goods and ship them for points. Includes all six expansions and solo play against two Puertomas.",
   "metadata.rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins."

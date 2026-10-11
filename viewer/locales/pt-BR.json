@@ -146,6 +146,9 @@
   "playerSummary": "Seus recursos",
   "availableWorkers": "Trabalhadores disponíveis",
   "availableCitizens": "Cidadãos disponíveis",
+  "productionComparison": "Produção e estoque dos jogadores",
+  "productionComparisonHelp": "Capacidade sem o privilégio do papel; a reserva comum pode limitar a produção efetiva.",
+  "orderedPlacement": "Aguardar jogadores anteriores",
   "roundOrder": "Ordem da rodada",
   "round": "Rodada",
   "governor": "Governador",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Edição Especial",
   "metadata.chooseBuildings": "Escolher edifícios",
   "metadata.showVP": "Mostrar os PV de todos",
+  "metadata.autoProduce": "Sempre produzir o máximo",
+  "metadata.autoStore": "Armazenar automaticamente quando tudo couber",
   "metadata.autoForcedActions": "Jogar automaticamente as jogadas obrigatórias",
   "metadata.description": "Escolha papéis, desenvolva sua ilha, produza mercadorias e embarque-as por pontos. Inclui as seis expansões e jogo solo contra dois Puertomas.",
   "metadata.rules": "Escolha um papel: todos realizam a ação e você recebe um privilégio. Plante, recrute, construa, produza, negocie e embarque. Vence quem tiver mais pontos de embarques, edifícios e bônus."

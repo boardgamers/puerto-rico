@@ -146,6 +146,9 @@
   "playerSummary": "Dine ressourcer",
   "availableWorkers": "Tilgængelige arbejdere",
   "availableCitizens": "Tilgængelige borgere",
+  "productionComparison": "Spillernes produktion og lager",
+  "productionComparisonHelp": "Kapacitet uden rollefordelen; fællesbeholdningen kan begrænse den faktiske produktion.",
+  "orderedPlacement": "Vent på tidligere spillere",
   "roundOrder": "Rækkefølge i runden",
   "round": "Runde",
   "governor": "Guvernør",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 Specialudgave",
   "metadata.chooseBuildings": "Vælg bygninger",
   "metadata.showVP": "Vis alles SP",
+  "metadata.autoProduce": "Producér altid det maksimale",
+  "metadata.autoStore": "Opbevar automatisk, når alt kan være der",
   "metadata.autoForcedActions": "Spil tvungne træk automatisk",
   "metadata.description": "Vælg roller, udvikl din ø, producer varer, og afskib dem for point. Omfatter alle seks udvidelser og solospil mod to Puertomaer.",
   "metadata.rules": "Vælg en rolle: alle udfører handlingen, og du får et privilegium. Plant, rekrutter, byg, producer, handl og afskib. Flest point fra afskibning, bygninger og bonusser vinder."

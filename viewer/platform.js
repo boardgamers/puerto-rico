@@ -15,6 +15,7 @@ export function viewerLifecycle(ctx, ui, chat) {
   let live,
     replaying = false,
     position = 1,
+    playerIndex,
     pending,
     timer;
   const settle = (error) => {
@@ -42,7 +43,7 @@ export function viewerLifecycle(ctx, ui, chat) {
       if (replaying || pending)
         return Promise.reject(Error("Move unavailable"));
       return new Promise((resolve, reject) => {
-        pending = { resolve, reject };
+        pending = { resolve, reject, move: m, player: playerIndex };
         timer = setTimeout(() => {
           settle(Error("No confirmation received. Please try again."));
           ctx.fetchState();
@@ -53,18 +54,26 @@ export function viewerLifecycle(ctx, ui, chat) {
     chat,
     onState(s) {
       live = s;
+      const awaitingPlacement =
+        pending &&
+        ((pending.move.type === "assign" &&
+          s.tasks.some((t) => t.kind === "assign" && t.p === pending.player)) ||
+          (pending.move.type === "orderedPlacement" && !s.placementOrdered));
       if (!replaying) {
         position = Math.max(1, s.historyLength);
-        ui.render(s);
+        ui.render(s, !!awaitingPlacement);
       } else {
         // An undo or branch replacement may shorten the host history.
         if (position > s.historyLength) seek(s.historyLength);
         info();
       }
-      settle();
+      if (!awaitingPlacement) settle();
     },
     onThumbnail: () => ui.thumbnail(),
-    onPlayer: (p) => ui.setPlayer(p.index),
+    onPlayer: (p) => {
+      playerIndex = p.index;
+      ui.setPlayer(p.index);
+    },
     onAvatars: (avatars) => ui.setAvatars(avatars),
     onPreferences: (p) => ui.setPreferences(p),
     onTheme: (p) => ui.setPreferences(p),

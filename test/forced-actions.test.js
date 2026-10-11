@@ -180,7 +180,11 @@ test("forced actions default off, including states with the old global option", 
   const s = fixture([{ kind: "trade", p: 0 }, boundary]);
   s.players.forEach((p) => delete p.settings);
   s.options.autoForcedActions = true;
-  assert.deepEqual(E.playerSettings(s, 0), { autoForcedActions: false });
+  assert.deepEqual(E.playerSettings(s, 0), {
+    autoForcedActions: false,
+    autoProduce: false,
+    autoStore: false,
+  });
   assert.equal(start(s).tasks[0].kind, "trade");
 });
 
@@ -203,8 +207,16 @@ test("settings only persist preferences; ordinary moves resolve opted-in forced 
   assert.equal(advanced.tasks[0].kind, "trade");
   assert.equal(advanced.history.length, optedIn.history.length + 2);
   assert.deepEqual(optedIn, expected);
-  assert.deepEqual(E.playerSettings(optedIn, 1), { autoForcedActions: false });
-  const off = E.setPlayerSettings(optedIn, 0, { autoForcedActions: false });
+  assert.deepEqual(E.playerSettings(optedIn, 1), {
+    autoForcedActions: false,
+    autoProduce: false,
+    autoStore: false,
+  });
+  const off = E.setPlayerSettings(optedIn, 0, {
+    autoForcedActions: false,
+    autoProduce: false,
+    autoStore: false,
+  });
   assert.equal(E.playerSettings(off, 0).autoForcedActions, false);
   assert.equal(
     E.playerSettings(

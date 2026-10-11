@@ -2711,7 +2711,7 @@ body:has(.pr-game) {
 
 .pr-game .production-overview > summary {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 40px;
+  grid-template-columns: minmax(0, 1fr) 40px 40px;
   gap: 0 8px;
   align-items: center;
 }
@@ -2732,7 +2732,7 @@ body:has(.pr-game) {
   grid-row: 1;
 }
 .pr-game .production-toggle {
-  grid-column: 2;
+  grid-column: 3;
   grid-row: 1;
   width: 40px;
   height: 40px;
@@ -2748,4 +2748,37 @@ body:has(.pr-game) {
 }
 .pr-game .production-overview > summary:hover .production-toggle {
   border-color: var(--gold);
+}
+
+.pr-game .production-compare {
+  grid-column: 2;
+  grid-row: 1;
+  width: 40px;
+  height: 40px;
+}
+.pr-game .production-comparison {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.pr-game .production-comparison th:first-child {
+  width: 36%;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+.pr-game .production-comparison th,
+.pr-game .production-comparison td {
+  padding: 6px 3px;
+  text-align: center;
+}
+.pr-game .production-comparison .comparison-player {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.pr-game .player-card-objectives {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }

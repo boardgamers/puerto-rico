@@ -37,7 +37,7 @@ test("a hosted solo game always returns to the human and fully replays virtual t
     const input = s,
       before = structuredClone(s),
       m = game.chooseAI(s, 0);
-    s = host.move(s, m, 0);
+    s = host.messages(host.move(s, m, 0)).data;
     assert.deepEqual(input, before);
     if (actions === 10) assert.deepEqual(before, host.replay(before));
     assert.equal(host.scores(s).length, 1);

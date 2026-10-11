@@ -146,6 +146,9 @@
   "playerSummary": "你的資源",
   "availableWorkers": "可用工人",
   "availableCitizens": "可用市民",
+  "productionComparison": "玩家產能與庫存",
+  "productionComparisonHelp": "不含角色特權的產能；實際產量可能受共用供應限制。",
+  "orderedPlacement": "等待前順位玩家",
   "roundOrder": "本輪順序",
   "round": "輪次",
   "governor": "總督",
@@ -584,6 +587,8 @@
   "metadata.subtitle": "1897 特別版",
   "metadata.chooseBuildings": "自行選擇建築",
   "metadata.showVP": "公開所有玩家的分數",
+  "metadata.autoProduce": "一律生產最大數量",
+  "metadata.autoStore": "可全部儲存時自動儲存",
   "metadata.autoForcedActions": "自動執行唯一可行的行動",
   "metadata.description": "選擇角色、發展島嶼、生產貨物並運出賺分。包含全部六個擴充，以及對抗兩個 Puertoma 的單人模式。",
   "metadata.rules": "選擇角色：所有玩家執行其行動，而你獲得特權。開墾、招募、建造、生產、交易及運輸。運輸、建築與獎勵總分最高者獲勝。"
