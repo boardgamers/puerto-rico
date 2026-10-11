@@ -127,12 +127,14 @@ export function mountGame(
     imageUrl(avatars[i])
       ? `<img class="player-avatar" src="${esc(imageUrl(avatars[i]))}" alt="" loading="lazy" referrerpolicy="no-referrer">`
       : "";
-  const playerMarker = (i, decorative = false) => {
+  const playerColor = (i) => {
     const custom = preferences.bgs?.playerColors?.[i];
-    const color =
-      custom && /^#[a-f0-9]{6}$/i.test(custom)
+    return custom && /^#[a-f0-9]{6}$/i.test(custom)
         ? custom
         : playerColors[i % playerColors.length];
+  };
+  const playerMarker = (i, decorative = false) => {
+    const color = playerColor(i);
     const colorBlind = preferences.colorBlind === true;
     const preferred = preferences.bgs?.playerSymbols?.[i];
     const shape = colorBlind
@@ -162,6 +164,20 @@ export function mountGame(
     chatView = mountChat(shell.querySelector(".chat-mount"), {
       chat,
       openPlayer: onOpenPlayer,
+      renderAuthor(message) {
+        const i = message.playerIndex;
+        if (!Number.isInteger(i) || !state?.players[i]) return;
+        const author = document.createElement(onOpenPlayer ? "button" : "strong");
+        author.className = "chat-author";
+        author.style.color = playerColor(i);
+        author.innerHTML = playerMarker(i, true);
+        author.append(document.createTextNode(message.author ?? state.players[i].name));
+        if (onOpenPlayer) {
+          author.type = "button";
+          author.addEventListener("click", () => onOpenPlayer(i));
+        }
+        return author;
+      },
       styles: true,
       labels: {
         title: t("chat"),
@@ -811,6 +827,7 @@ export function mountGame(
       pending = false;
     }
     if (!state) return;
+    if (s) chatView?.refresh();
     if (
       roleConfirmation &&
       (!enabled ||
@@ -1400,6 +1417,7 @@ export function mountGame(
         FORCE_DARK_THEME || (preferences.dark ?? preferences.theme === "dark"),
       );
       render();
+      chatView?.refresh();
     },
     destroy() {
       document.removeEventListener("scroll", scheduleSummaryVisibility, true);

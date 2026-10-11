@@ -2750,3 +2750,11 @@ body:has(.pr-game) {
 .pr-game .production-overview > summary:hover .production-toggle {
   border-color: var(--gold);
 }
+
+.pr-game .chat-author .player-marker {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-inline-end: 4px;
+}

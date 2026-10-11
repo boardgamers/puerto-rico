@@ -836,6 +836,25 @@ try {
     assert.equal(await page.locator(".chat-unread").innerText(), "70");
     await page.locator('[data-panel="chat"]').click();
     await page.waitForTimeout(100);
+    await page.evaluate(() =>
+      host.emit("preferences", {
+        colorBlind: true,
+        bgs: {
+          players: [],
+          playerColors: ["#112233", "#abcdef"],
+          playerSymbols: ["star", "diamond"],
+        },
+      }),
+    );
+    const author = page.locator(".pr-chat .chat-author").first();
+    assert.equal(
+      await author.evaluate((el) => getComputedStyle(el).color),
+      "rgb(171, 205, 239)",
+    );
+    assert.equal(
+      await author.locator(".player-marker path").getAttribute("d"),
+      PLAYER_SYMBOLS.diamond.path,
+    );
     const chat = page.locator('.pr-chat [role="log"]');
     assert.ok(await chat.evaluate((el) => el.scrollHeight > el.clientHeight));
     await chat.evaluate((el) => (el.scrollTop = 0));
