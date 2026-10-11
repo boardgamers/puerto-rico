@@ -1,3 +1,4 @@
+import { FORCE_DARK_THEME } from "./theme.js";
 import { createTutorial } from "@boardgamers/protocol/tutorial";
 import { stripSecret } from "../engine/index.js";
 import { tutorialOptions } from "../tutorial/scenarios.js";
@@ -97,7 +98,7 @@ export async function mountTutorial(
   const ui = mountGame(game, { onMove: (move) => controller.play(move) });
   const theme = matchMedia("(prefers-color-scheme: dark)");
   function updateTheme() {
-    root.classList.toggle("dark", theme.matches);
+    root.classList.toggle("dark", FORCE_DARK_THEME || theme.matches);
     ui.setPreferences({ locale: t.locale, dark: theme.matches });
   }
   updateTheme();

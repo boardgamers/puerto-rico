@@ -1,3 +1,4 @@
+import { FORCE_DARK_THEME } from "./theme.js";
 import { mergePreferences, imageUrl } from "./platform.js";
 import { achievementProgress } from "./achievement-progress.js";
 import {
@@ -61,7 +62,7 @@ export function mountGame(
   } = {},
 ) {
   const shell = document.createElement("div");
-  shell.className = "pr-game";
+  shell.className = `pr-game${FORCE_DARK_THEME ? " dark" : ""}`;
   shell.lang = "en";
   shell.dir = "ltr";
   shell.innerHTML = `<style>${css}\n${themeCss}</style><div class="pr-content"></div><dialog class="pr-modal"><header><h2></h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="modal-body"></div></dialog><dialog class="pr-chat"><header><h2>Chat</h2><button type="button" class="icon-button" data-close aria-label="Close">${icon("close")}</button></header><div class="chat-mount"></div></dialog><p class="pr-error" role="alert" hidden></p>`;
@@ -779,7 +780,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button><button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button></div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
@@ -1320,7 +1321,7 @@ export function mountGame(
         b.setAttribute("aria-label", t("close"));
       shell.classList.toggle(
         "dark",
-        preferences.dark ?? preferences.theme === "dark",
+        FORCE_DARK_THEME || (preferences.dark ?? preferences.theme === "dark"),
       );
       render();
     },
