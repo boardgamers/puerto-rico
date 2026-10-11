@@ -145,6 +145,11 @@ try {
     await page.locator(".pr-modal [data-building]").first().click();
     await fits(`${locale}: building help`);
     await page.keyboard.press("Escape");
+    assert.equal(
+      await page.locator(".pr-modal .market-grid").isVisible(),
+      true,
+    );
+    await page.keyboard.press("Escape");
     await page.screenshot({ path: `.local/qa/locale-${locale}.png` });
   }
 
