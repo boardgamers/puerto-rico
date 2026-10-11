@@ -31,7 +31,7 @@
   "productionBuilding": "Productie",
   "storageBuilding": "Opslag",
   "productionCapacity": "Basiscapaciteit per Ambachtsmanfase",
-  "matchingWorkers": "Eén arbeider op een bijbehorende plantage en één hier per geproduceerd goed.",
+  "matchingWorkers": "Voor de productie van één goed zijn twee arbeiders nodig: één op een bijbehorende plantage en één in dit gebouw.",
   "productionIntro": "Plantages en productiegebouwen blijven op je bord. De Ambachtsmanfase voegt de geproduceerde goederen toe aan je voorraad.",
   "productionPair": "1 bezette plantage + 1 bezette productieplaats → 1 goed. Maïs vereist alleen een bezette plantage.",
   "goodsMeaning": "Een goed is één eenheid maïs, fruit, suiker, tabak of koffie. De regels noemen deze eenheden kratten; er is geen aparte kratgrondstof.",

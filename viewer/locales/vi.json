@@ -31,7 +31,7 @@
   "productionBuilding": "Sản xuất",
   "storageBuilding": "Lưu trữ",
   "productionCapacity": "Công suất cơ bản mỗi pha Thợ thủ công",
-  "matchingWorkers": "Mỗi hàng cần một nhân công ở đồn điền tương ứng và một người ở đây.",
+  "matchingWorkers": "Để sản xuất một hàng hóa cần hai nhân công: một ở đồn điền tương ứng và một trong công trình này.",
   "productionIntro": "Đồn điền và xưởng sản xuất nằm trên bảng của bạn. Pha Thợ thủ công thêm hàng sản xuất vào kho của bạn.",
   "productionPair": "1 đồn điền có người + 1 ô sản xuất có người → 1 hàng. Ngô chỉ cần đồn điền có người.",
   "goodsMeaning": "Một hàng là một đơn vị ngô, trái cây, đường, thuốc lá hoặc cà phê. Luật gọi là kiện; không có tài nguyên kiện riêng.",

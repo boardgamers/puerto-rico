@@ -31,7 +31,7 @@
   "productionBuilding": "Produção",
   "storageBuilding": "Armazenamento",
   "productionCapacity": "Capacidade básica por Artesão",
-  "matchingWorkers": "Um trabalhador na plantação correspondente e outro aqui por mercadoria produzida.",
+  "matchingWorkers": "Produzir uma mercadoria exige dois trabalhadores: um em uma plantação correspondente e outro neste edifício.",
   "productionIntro": "Plantações e edifícios de produção ficam no seu tabuleiro. A fase Artesão acrescenta as mercadorias produzidas ao seu estoque.",
   "productionPair": "1 plantação ocupada + 1 espaço de produção ocupado → 1 mercadoria. Milho exige apenas uma plantação ocupada.",
   "goodsMeaning": "Uma mercadoria é uma unidade de milho, fruta, açúcar, tabaco ou café. O manual chama essas unidades de caixas; não há um recurso caixa separado.",

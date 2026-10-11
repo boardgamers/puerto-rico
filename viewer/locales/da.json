@@ -31,7 +31,7 @@
   "productionBuilding": "Produktion",
   "storageBuilding": "Opbevaring",
   "productionCapacity": "Grundkapacitet pr. Håndværkerfase",
-  "matchingWorkers": "Én arbejder på en tilsvarende plantage og én her pr. produceret vare.",
+  "matchingWorkers": "Produktion af én vare kræver to arbejdere: én på en tilsvarende plantage og én i denne bygning.",
   "productionIntro": "Plantager og produktionsbygninger bliver på dit bræt. Håndværkerfasen føjer de producerede varer til din beholdning.",
   "productionPair": "1 bemandet plantage + 1 bemandet produktionsplads → 1 vare. Majs kræver kun en bemandet plantage.",
   "goodsMeaning": "En vare er én enhed majs, frugt, sukker, tobak eller kaffe. Reglerne kalder disse enheder kasser; der findes ingen særskilt kasseressource.",

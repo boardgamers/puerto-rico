@@ -538,7 +538,7 @@ try {
     await productionCard.click();
     assert.match(
       await page.locator(".modal-body").innerText(),
-      /Un ouvrier sur une plantation/,
+      /Produire une marchandise nécessite deux ouvriers/,
     );
     await page.keyboard.press("Escape");
     assert.equal(

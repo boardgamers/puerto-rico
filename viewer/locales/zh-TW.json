@@ -31,7 +31,7 @@
   "productionBuilding": "生產",
   "storageBuilding": "儲存",
   "productionCapacity": "每次工匠階段的基本產能",
-  "matchingWorkers": "每份貨物需要對應種植園和此處各有一名工人。",
+  "matchingWorkers": "每生產一份貨物需要兩名工人：一名在對應的種植園，另一名在這棟建築內。",
   "productionIntro": "種植園與生產建築會留在你的圖板上。工匠階段會將產出的貨物加入庫存。",
   "productionPair": "1 個有工人的種植園 + 1 個有工人的生產格 → 1 份貨物。玉米只需要有工人的種植園。",
   "goodsMeaning": "一份貨物指一單位玉米、水果、糖、菸草或咖啡。規則稱之為貨箱；沒有另外的貨箱資源。",

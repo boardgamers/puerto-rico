@@ -31,7 +31,7 @@
   "productionBuilding": "Production",
   "storageBuilding": "Stockage",
   "productionCapacity": "Capacité de base par Artisan",
-  "matchingWorkers": "Un ouvrier sur une plantation correspondante et un ici par marchandise produite.",
+  "matchingWorkers": "Produire une marchandise nécessite deux ouvriers : un sur une plantation correspondante et un dans ce bâtiment.",
   "productionIntro": "Les plantations et les bâtiments restent sur votre plateau. La phase Artisan ajoute les marchandises produites à votre stock.",
   "productionPair": "1 plantation occupée + 1 place occupée dans le bâtiment → 1 marchandise. Le maïs n’a besoin que d’une plantation occupée.",
   "goodsMeaning": "Une marchandise est une unité de maïs, fruits, sucre, tabac ou café. Les règles les appellent « caisses » : il n’y a pas de ressource caisse supplémentaire.",

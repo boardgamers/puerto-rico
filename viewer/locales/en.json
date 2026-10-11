@@ -31,7 +31,7 @@
   "productionBuilding": "Production",
   "storageBuilding": "Storage",
   "productionCapacity": "Base capacity per Craftsman",
-  "matchingWorkers": "One worker on a matching plantation and one here per good produced.",
+  "matchingWorkers": "Producing one good requires two workers: one on a matching plantation and one in this building.",
   "productionIntro": "Plantations and production buildings stay on your board. The Craftsman phase adds the goods produced to your stock.",
   "productionPair": "1 occupied plantation + 1 occupied production slot → 1 good. Corn needs only an occupied plantation.",
   "goodsMeaning": "A good is one unit of corn, fruit, sugar, tobacco or coffee. The rulebook calls these units crates; there is no separate crate resource.",

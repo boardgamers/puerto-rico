@@ -90,9 +90,20 @@ export function mountGame(
     actionContext = "",
     roleConfirmation = null,
     scrollLog = 0;
+  const desktopLayout = window.matchMedia("(min-width: 761px)");
   const expandedSections = new Map();
+  const productionPreference = "puerto-rico:production-expanded:desktop";
+  let desktopProductionOpen = true;
+  try {
+    desktopProductionOpen =
+      localStorage.getItem(productionPreference) !== "false";
+  } catch {
+    /* Storage may be unavailable in embedded viewers. */
+  }
   const sectionOpen = (id) =>
-    expandedSections.get(id) ?? window.matchMedia("(min-width: 761px)").matches;
+    id === "production" && desktopLayout.matches
+      ? desktopProductionOpen
+      : (expandedSections.get(id) ?? desktopLayout.matches);
   const metric = (id, n, labelKey) => {
     const label = esc(
       `${t(labelKey ?? { coin: "coins", worker: "workers", citizen: "citizens" }[id] ?? id)} : ${n}`,
@@ -544,6 +555,8 @@ export function mountGame(
     return `${t(id)} — ${t(id === "quarry" ? "quarryHelp" : id === "forest" ? "forestHelp" : id === "corn" ? "cornHelp" : "plantationHelp")}`;
   }
   function sharedBoard() {
+    const festivalTag = desktopLayout.matches ? "section" : "details";
+    const festivalHeadingTag = desktopLayout.matches ? "header" : "summary";
     const acting = allowed(),
       task = state.tasks[0];
     const currentRole =
@@ -574,7 +587,7 @@ export function mountGame(
         (m) => m.type === "plant" && m.id === "quarry",
       );
       return `<button class="offer quarry" ${m && acting ? `data-move="${encode(m)}"` : 'aria-disabled="true"'} title="${esc(plantationHelp("quarry"))}">${icon("quarry", 28)}<span>${t("quarry")}</span><small>${state.quarries}</small></button>`;
-    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests title="${esc(plantationHelp("forest"))}">${icon("forest")} ${t("forest")}</button>` : ""}</div></section>${state.festivals.length ? `<details class="festival-section compact-section" ${sectionOpen("festival") ? "open" : ""} aria-label="${t("festival")}"><summary class="festival-section-heading" data-section="festival"><h3>${icon("festival", 20)}${t("festival")} <small>${state.festivals.filter((f) => f.claimed !== undefined).length}/${state.festivals.length}</small></h3><small>${t("sharedObjectives")}</small></summary><div class="festival-strip">${state.festivals.map(festivalCard).join("")}</div></details>` : ""}</section>`;
+    })()}${acting && task.kind === "plant" && state.legal.some((m) => m.forest) ? `<button data-forests title="${esc(plantationHelp("forest"))}">${icon("forest")} ${t("forest")}</button>` : ""}</div></section>${state.festivals.length ? `<${festivalTag} class="festival-section compact-section" ${sectionOpen("festival") ? "open" : ""} aria-label="${t("festival")}"><${festivalHeadingTag} class="festival-section-heading" data-section="festival"><h3>${icon("festival", 20)}${t("festival")} <small>${state.festivals.filter((f) => f.claimed !== undefined).length}/${state.festivals.length}</small></h3><small>${t("sharedObjectives")}</small></${festivalHeadingTag}><div class="festival-strip">${state.festivals.map(festivalCard).join("")}</div></${festivalTag}>` : ""}</section>`;
   }
   function cityFootprint() {
     return `<span class="city-footprint" role="img" title="${esc(t("twoCitySpaces"))}" aria-label="${esc(t("twoCitySpaces"))}">${icon("cityFootprint", 24)}</span>`;
@@ -1070,10 +1083,17 @@ export function mountGame(
     const el = event.target.closest("button");
     const summary = event.target.closest("summary[data-section]");
     if (summary && !el) {
-      expandedSections.set(
-        summary.dataset.section,
-        !summary.parentElement.open,
-      );
+      const open = !summary.parentElement.open;
+      if (summary.dataset.section === "production" && desktopLayout.matches) {
+        desktopProductionOpen = open;
+        try {
+          localStorage.setItem(productionPreference, String(open));
+        } catch {
+          /* Keep the choice for this session when storage is blocked. */
+        }
+      } else {
+        expandedSections.set(summary.dataset.section, open);
+      }
       return; // Native details interaction supports touch and keyboard.
     }
     if (el?.hasAttribute("data-score")) {
@@ -1307,6 +1327,8 @@ export function mountGame(
     capture: true,
     passive: true,
   });
+  const updateLayout = () => render();
+  desktopLayout.addEventListener("change", updateLayout);
   window.addEventListener("resize", scheduleSummaryVisibility);
   shell.addEventListener("click", click);
   modal.addEventListener("cancel", onCancel);
@@ -1353,6 +1375,7 @@ export function mountGame(
     destroy() {
       document.removeEventListener("scroll", scheduleSummaryVisibility, true);
       window.removeEventListener("resize", scheduleSummaryVisibility);
+      desktopLayout.removeEventListener("change", updateLayout);
       cancelAnimationFrame(summaryFrame);
       dockObserver.disconnect();
       shell.removeEventListener("click", click);

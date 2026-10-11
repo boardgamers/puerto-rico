@@ -31,7 +31,7 @@
   "productionBuilding": "Produzione",
   "storageBuilding": "Deposito",
   "productionCapacity": "Capacità base per fase Artigiano",
-  "matchingWorkers": "Un lavoratore su una piantagione corrispondente e uno qui per ogni merce prodotta.",
+  "matchingWorkers": "Per produrre una merce servono due lavoratori: uno su una piantagione corrispondente e uno in questo edificio.",
   "productionIntro": "Piantagioni ed edifici produttivi restano sulla tua plancia. La fase Artigiano aggiunge le merci prodotte alle tue scorte.",
   "productionPair": "1 piantagione occupata + 1 posto produttivo occupato → 1 merce. Il mais richiede solo una piantagione occupata.",
   "goodsMeaning": "Una merce è un’unità di mais, frutta, zucchero, tabacco o caffè. Il regolamento chiama queste unità casse; non esiste una risorsa cassa separata.",

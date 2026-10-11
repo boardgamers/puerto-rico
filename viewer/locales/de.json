@@ -31,7 +31,7 @@
   "productionBuilding": "Produktion",
   "storageBuilding": "Lagerung",
   "productionCapacity": "Grundkapazität pro Handwerkerphase",
-  "matchingWorkers": "Je ein Arbeiter auf einer passenden Plantage und hier pro produzierter Ware.",
+  "matchingWorkers": "Für die Produktion einer Ware brauchst du zwei Arbeiter: einen auf einer passenden Plantage und einen in diesem Gebäude.",
   "productionIntro": "Plantagen und Produktionsgebäude bleiben auf deinem Tableau. Die Handwerkerphase fügt die produzierten Waren deinem Vorrat hinzu.",
   "productionPair": "1 besetzte Plantage + 1 besetzter Produktionsplatz → 1 Ware. Mais benötigt nur eine besetzte Plantage.",
   "goodsMeaning": "Eine Ware ist eine Einheit Mais, Obst, Zucker, Tabak oder Kaffee. Die Regeln nennen diese Einheiten Kisten; es gibt keine eigene Kistenressource.",

@@ -31,7 +31,7 @@
   "productionBuilding": "Producție",
   "storageBuilding": "Depozitare",
   "productionCapacity": "Capacitate de bază la Meșteșugar",
-  "matchingWorkers": "Un muncitor pe plantația corespunzătoare și unul aici pentru fiecare bun produs.",
+  "matchingWorkers": "Producerea unui bun necesită doi muncitori: unul pe o plantație corespunzătoare și unul în această clădire.",
   "productionIntro": "Plantațiile și clădirile de producție rămân pe tabla ta. Faza Meșteșugarului adaugă bunurile produse în stocul tău.",
   "productionPair": "1 plantație ocupată + 1 loc de producție ocupat → 1 bun. Porumbul necesită doar o plantație ocupată.",
   "goodsMeaning": "Un bun este o unitate de porumb, fructe, zahăr, tutun sau cafea. Regulamentul numește aceste unități lăzi; lada nu este o resursă separată.",

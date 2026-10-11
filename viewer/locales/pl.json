@@ -31,7 +31,7 @@
   "productionBuilding": "Produkcja",
   "storageBuilding": "Przechowywanie",
   "productionCapacity": "Podstawowa wydajność na fazę Rzemieślnika",
-  "matchingWorkers": "Na każdy towar potrzeba robotnika tutaj i na odpowiedniej plantacji.",
+  "matchingWorkers": "Wyprodukowanie jednego towaru wymaga dwóch robotników: jednego na odpowiedniej plantacji i jednego w tym budynku.",
   "productionIntro": "Plantacje i budynki produkcyjne pozostają na planszy. Faza Rzemieślnika dodaje wyprodukowane towary do twoich zapasów.",
   "productionPair": "1 obsadzona plantacja + 1 obsadzone miejsce produkcyjne → 1 towar. Kukurydza wymaga tylko obsadzonej plantacji.",
   "goodsMeaning": "Towar to jednostka kukurydzy, owoców, cukru, tytoniu lub kawy. Instrukcja nazywa te jednostki skrzyniami; nie ma osobnego zasobu skrzyń.",

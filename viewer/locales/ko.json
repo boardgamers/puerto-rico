@@ -31,7 +31,7 @@
   "productionBuilding": "생산",
   "storageBuilding": "보관",
   "productionCapacity": "장인 단계당 기본 생산량",
-  "matchingWorkers": "상품 1개마다 해당 농장과 이곳에 각각 일꾼 1명이 필요합니다.",
+  "matchingWorkers": "상품 1개를 생산하려면 일꾼 2명이 필요합니다. 해당 농장에 1명, 이 건물에 1명이 있어야 합니다.",
   "productionIntro": "농장과 생산 건물은 내 보드에 남습니다. 장인 단계에 생산된 상품이 내 보유량에 추가됩니다.",
   "productionPair": "일꾼이 있는 농장 1개 + 일꾼이 있는 생산 칸 1개 → 상품 1개. 옥수수는 일꾼이 있는 농장만 필요합니다.",
   "goodsMeaning": "상품은 옥수수, 과일, 설탕, 담배, 커피 중 하나 1개입니다. 규칙서의 상자는 이 단위를 뜻하며 별도 자원이 아닙니다.",
