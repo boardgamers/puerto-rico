@@ -16,6 +16,7 @@
     "fullScreen": true,
     "fullScreenMobile": true,
     "replayable": true,
+    "thumbnail": true,
     "chat": true,
     "integratedControls": ["chat"],
     "dependencies": {

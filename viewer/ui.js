@@ -85,6 +85,7 @@ export function mountGame(
     tool = "w",
     lastFocus,
     modalMode = "",
+    marketReturn = null,
     scorePlayer = null,
     actionContext = "",
     roleConfirmation = null,
@@ -184,7 +185,8 @@ export function mountGame(
     return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" aria-label="${esc(hint)}"` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${m.decline?.length ? `<small>${t("withoutBonus")} · ${m.decline.map((id) => t(id)).join(", ")}</small>` : ""}</span></button>`;
   };
   function show(title, html, mode = "") {
-    lastFocus = document.activeElement;
+    if (!modal.open) lastFocus = document.activeElement;
+    if (mode !== "building") marketReturn = null;
     modalMode = mode;
     modal.querySelector("h2").textContent = title;
     body.innerHTML = html;
@@ -194,6 +196,7 @@ export function mountGame(
   }
   function hide(d) {
     d.close();
+    if (d === modal) marketReturn = null;
     if (d === modal) roleConfirmation = null;
     if (d === modal && modalMode === "actions") {
       body.replaceChildren();
@@ -202,6 +205,18 @@ export function mountGame(
     }
     if (d === chatDialog) chat?.setOpen(false);
     lastFocus?.focus?.();
+  }
+  function dismiss(d) {
+    if (d === modal && modalMode === "building" && marketReturn) {
+      const previous = marketReturn;
+      show(t("market"), market(), "market");
+      body
+        .querySelector(`[data-building="${previous.id}"]`)
+        ?.focus({ preventScroll: true });
+      body.scrollTop = previous.scroll;
+      return;
+    }
+    hide(d);
   }
   function draftInit() {
     const task = state.tasks[0],
@@ -862,6 +877,10 @@ export function mountGame(
     return journalContent(state, t, { automatedSetup });
   }
   function buildingInfo(id) {
+    marketReturn =
+      modal.open && modalMode === "market"
+        ? { id, scroll: body.scrollTop }
+        : null;
     const b = B[id],
       moves = state.legal.filter(
         (m) => ["build", "draft"].includes(m.type) && m.id === id,
@@ -869,6 +888,7 @@ export function mountGame(
     show(
       t(id),
       `<div class="building-detail">${buildingPictogram(id, 56)}<div class="building-detail-stats"><span><small>${t("cost")}</small>${metric("coin", b.cost)}${quarryLimit(b)}</span><span><small>${t("printedPoints")}</small>${metric("vp", b.vp)}</span><span><small>${t("workerSpaces")}</small>${buildingSlots(b)}</span></div></div><p>${id === "monument" ? t("noSpecialEffect") : buildingEffect(id, true)}</p>${b.size === 2 ? cityFootprint() : ""}${moves.length && allowed() ? `<div class="action-choices">${moves.map((m) => moveButton(m, `${t(m.type === "draft" ? "selected" : "builder")} ${metric("coin", m.type === "draft" ? b.cost : cost(state, seat, id, m))}${m.worker ? ` − ${icon(m.worker.kind === "c" ? "citizen" : "worker")} ${targetLabel(m.worker.key)}` : ""}${m.good ? ` − ${icon(m.good)}` : ""}${m.point ? ` − ${metric("vp", 1)}` : ""}`, "check", "primary")).join("")}</div>` : ""}`,
+      "building",
     );
   }
   function festivalCard(f, i) {
@@ -1074,7 +1094,7 @@ export function mountGame(
     }
     if (!el || el.disabled) return;
     if (el.hasAttribute("data-close")) {
-      hide(el.closest("dialog"));
+      dismiss(el.closest("dialog"));
       return;
     }
     if (el.dataset.panel) {
@@ -1281,7 +1301,7 @@ export function mountGame(
   }
   function onCancel(ev) {
     ev.preventDefault();
-    hide(ev.target);
+    dismiss(ev.target);
   }
   document.addEventListener("scroll", scheduleSummaryVisibility, {
     capture: true,
@@ -1293,6 +1313,11 @@ export function mountGame(
   chatDialog.addEventListener("cancel", onCancel);
   return {
     render,
+    thumbnail() {
+      const port = shell.querySelector(".port");
+      port?.scrollIntoView({ block: "center", behavior: "instant" });
+      return port;
+    },
     setAvatars(value) {
       avatars = value;
       render();

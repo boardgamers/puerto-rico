@@ -63,6 +63,7 @@ export function viewerLifecycle(ctx, ui, chat) {
       }
       settle();
     },
+    onThumbnail: () => ui.thumbnail(),
     onPlayer: (p) => ui.setPlayer(p.index),
     onAvatars: (avatars) => ui.setAvatars(avatars),
     onPreferences: (p) => ui.setPreferences(p),

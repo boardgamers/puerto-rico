@@ -48,6 +48,28 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    const thumbnail = await page.evaluate(
+      () =>
+        new Promise((resolve) => {
+          host.on("thumbnail:ready", resolve);
+          host.emit("thumbnail:render", { width: 600, height: 400 });
+        }),
+    );
+    assert.equal(thumbnail.supported, true);
+    const portBounds = await page.locator(".port").boundingBox();
+    for (const key of ["x", "y", "width", "height"])
+      assert.ok(
+        Math.abs(thumbnail.bounds[key] - portBounds[key]) < 1,
+        "thumbnail captures only the harbour",
+      );
+    await page.evaluate(() => scrollTo(0, 0));
+    if (width <= 760)
+      assert.equal(
+        await page
+          .locator(".pr-game")
+          .evaluate((el) => getComputedStyle(el).paddingLeft),
+        "0px",
+      );
     if (width <= 760) {
       assert.equal(
         await page.locator(".production-overview").getAttribute("open"),
@@ -519,6 +541,34 @@ try {
       /Un ouvrier sur une plantation/,
     );
     await page.keyboard.press("Escape");
+    assert.equal(
+      await productionCard.isVisible(),
+      true,
+      "closing details returns to the market",
+    );
+    const lastBuilding = page.locator(".pr-modal .bcard").last();
+    await lastBuilding.scrollIntoViewIfNeeded();
+    const marketScroll = await page
+      .locator(".modal-body")
+      .evaluate((el) => el.scrollTop);
+    const lastBuildingId = await lastBuilding.getAttribute("data-building");
+    await lastBuilding.click();
+    await page.locator(".pr-modal > header [data-close]").click();
+    assert.equal(
+      await page.locator(".modal-body").evaluate((el) => el.scrollTop),
+      marketScroll,
+      "market scroll survives detail close",
+    );
+    assert.equal(
+      await page.evaluate(() => document.activeElement.dataset.building),
+      lastBuildingId,
+    );
+    await page.keyboard.press("Escape");
+    assert.equal(
+      await page.locator(".pr-modal").isVisible(),
+      false,
+      "closing the market returns to the board",
+    );
     const planting = E.move(original, { type: "role", id: "planter" }, 0);
     const plantingView = E.stripSecret(planting, 0);
     await page.evaluate((s) => host.emit("state", s), plantingView);

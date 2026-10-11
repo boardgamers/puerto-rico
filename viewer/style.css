@@ -1494,7 +1494,7 @@
 }
 @media (max-width: 760px) {
   .pr-game {
-    padding: 0 8px calc(var(--dock-height, 60px) + 24px);
+    padding: 0 0 calc(var(--dock-height, 60px) + 24px);
     font-size: 13px;
   }
   .pr-game .game-header {
