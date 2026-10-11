@@ -185,6 +185,18 @@ export function mountGame(
     chatView.element.append(chatBody);
     chatDialog.querySelector("h2").textContent = t("chat");
   }
+  function updateChatBadge() {
+    const button = content.querySelector('[data-panel="chat"]');
+    if (!button) return;
+    const count = chat?.unread ?? 0;
+    const badge = button.querySelector(".chat-unread");
+    badge.hidden = count === 0;
+    badge.textContent = count > 99 ? "99+" : String(count);
+    const label = count ? `${t("chat")} (${count})` : t("chat");
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  }
+  const unsubscribeChatBadge = chat?.subscribe(updateChatBadge);
   configureChat();
   const allowed = () => enabled && !pending && seat === state?.tasks[0]?.p;
   const moveButton = (m, label, pictogram, classes = "", description = "") => {
@@ -393,6 +405,8 @@ export function mountGame(
     );
   }
   function actionButton(m) {
+    if (m.type === "produce")
+      return `${moveButton(m, moveLabel(m), "craftsman", "primary")}<button class="quiet" data-custom-production="${encode(m)}" ${allowed() ? "" : "disabled"}>${t("selectQty")}</button>`;
     if (m.type === "role") {
       const role = state.roles.find((r) => r.id === m.id);
       const warning = state.roleWarnings?.[m.id];
@@ -808,7 +822,7 @@ export function mountGame(
       "is-building",
       allowed() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}${id === "chat" ? '<span class="chat-unread" aria-hidden="true" hidden></span>' : ""}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
@@ -816,6 +830,7 @@ export function mountGame(
       },
     });
     updateSummaryVisibility();
+    updateChatBadge();
     const dock = content.querySelector(".action-dock");
     if (dock !== observedDock) {
       dockObserver.disconnect();
@@ -1201,13 +1216,14 @@ export function mountGame(
       send(confirmation.move);
       return;
     }
+    if (el.dataset.customProduction) {
+      cargoDialog(JSON.parse(decodeURIComponent(el.dataset.customProduction)));
+      return;
+    }
     if (el.dataset.move) {
       const m = JSON.parse(decodeURIComponent(el.dataset.move));
       if (m.type === "role" && confirmRole(m)) return;
-      if (
-        m.type === "smallWharf" ||
-        (m.type === "produce" && sum(Object.values(m.goods)) > 1)
-      ) {
+      if (m.type === "smallWharf") {
         cargoDialog(m);
         return;
       }
@@ -1379,6 +1395,7 @@ export function mountGame(
       cancelAnimationFrame(summaryFrame);
       dockObserver.disconnect();
       shell.removeEventListener("click", click);
+      unsubscribeChatBadge?.();
       chatView?.destroy();
       shell.remove();
     },

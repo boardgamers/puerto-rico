@@ -2677,3 +2677,23 @@
 .pr-game[dir="rtl"] .icon-arrow {
   transform: scaleX(-1);
 }
+
+.pr-game [data-panel="chat"] {
+  position: relative;
+}
+.pr-game .chat-unread:not([hidden]) {
+  position: absolute;
+  top: -2px;
+  inset-inline-end: -3px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: var(--gold);
+  color: #24271f;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: center;
+  pointer-events: none;
+}

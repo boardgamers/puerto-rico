@@ -108,10 +108,17 @@ try {
         assert.deepEqual(await page.evaluate(() => played), [{ type: "pass" }]);
       } else {
         await produce.click();
-        if (output === 1) {
-          assert.equal(await page.locator(".cargo-form").count(), 0);
-          assert.equal(await page.evaluate(() => played[0].goods.corn), 1);
-        } else {
+        assert.equal(await page.locator(".cargo-form").count(), 0);
+        assert.equal(await page.evaluate(() => played[0].goods.corn), output);
+        if (output === 2) {
+          await page.evaluate(
+            (s) => {
+              played.length = 0;
+              host.emit("state", s);
+            },
+            E.stripSecret(production, 0),
+          );
+          await dock.locator("[data-custom-production]").click();
           assert.equal(await page.locator(".cargo-form").count(), 1);
           await page.locator('.cargo-form input[name="corn"]').fill("1");
           await page.locator('.cargo-form button[type="submit"]').click();
@@ -712,11 +719,19 @@ try {
     );
     // Chat uses the platform's messages and a scrolling native viewport.
     await page.evaluate(() => {
-      host.emit("chat:state", { enabled: true, canSend: true, mentions: [] });
+      window.chatReads = [];
+      host.on("chat:read", (m) => chatReads.push(m));
+      host.emit("chat:state", {
+        enabled: true,
+        canSend: true,
+        mentions: [],
+        readState: { userId: "self", lastReadAt: 0 },
+      });
       host.emit(
         "chat:messages",
         Array.from({ length: 70 }, (_, i) => ({
-          _id: `message-${i}`,
+          _id: `${(1700000000 + i).toString(16)}0000000000000000`,
+          authorId: "other",
           type: "text",
           author: "Isabel",
           playerIndex: 1,
@@ -725,6 +740,13 @@ try {
         })),
       );
     });
+    await page.waitForTimeout(600);
+    assert.deepEqual(
+      await page.evaluate(() => chatReads),
+      [],
+      "closed chat does not mark messages read",
+    );
+    assert.equal(await page.locator(".chat-unread").innerText(), "70");
     await page.locator('[data-panel="chat"]').click();
     await page.waitForTimeout(100);
     const chat = page.locator('.pr-chat [role="log"]');
@@ -736,6 +758,34 @@ try {
     assert.ok((await chat.evaluate((el) => el.scrollTop)) > 0);
     const composer = await page.locator(".chat-composer").boundingBox();
     assert.ok(composer.y + composer.height <= 844);
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(600);
+    await page.evaluate(() => {
+      chatReads.length = 0;
+      host.emit("chat:messages", [
+        {
+          _id: "700000000000000000000001",
+          type: "text",
+          author: "Isabel",
+          authorId: "other",
+          playerIndex: 1,
+          text: "New message while closed",
+        },
+      ]);
+    });
+    await page.waitForTimeout(600);
+    assert.deepEqual(
+      await page.evaluate(() => chatReads),
+      [],
+      "new messages stay unread while closed",
+    );
+    assert.equal(await page.locator(".chat-unread").innerText(), "1");
+    await page.locator('[data-panel="chat"]').click();
+    await page.waitForTimeout(900);
+    assert.equal(await page.locator(".chat-unread").isVisible(), false);
+    assert.deepEqual(await page.evaluate(() => chatReads), [
+      { messageId: "700000000000000000000001" },
+    ]);
     await page.keyboard.press("Escape");
     // Achievement selection sends a real legal move; opponents see card backs.
     let solo = hosted.init(1, [], {}, "browser-solo");
