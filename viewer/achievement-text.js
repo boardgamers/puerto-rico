@@ -1,4 +1,5 @@
 import { plainText, richText } from "./rich-text.js";
+import { icon } from "./icons.js";
 import { CARDS } from "../engine/achievements.js";
 export function achievementText(id, t) {
   const c = CARDS[id];
@@ -12,6 +13,6 @@ export function achievementText(id, t) {
     ...c,
     name: t(`achievementName.${id}`),
     text: plainText(message, t.catalog),
-    html: richText(message, t.catalog),
+    html: `${c.goal === "commercial" ? `${icon("building", 20)} ` : ""}${richText(message, t.catalog)}`,
   };
 }
