@@ -790,6 +790,8 @@ try {
       Math.abs(summaryBox.y) < 1,
       "player summary remains at viewport top",
     );
+    assert.equal(summaryBox.x, 0, "summary starts at the viewport edge");
+    assert.equal(summaryBox.width, width, "summary spans the full viewport");
     assert.ok(summaryBox.height < 80, "player summary stays compact on mobile");
     assert.equal(
       await page
