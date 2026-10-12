@@ -496,20 +496,6 @@ body:has(.pr-game) {
   color: var(--muted);
   font-size: 12px;
 }
-.pr-game .coin-badge {
-  position: absolute;
-  right: -12px;
-  top: -5px;
-  background: #e4bd6c;
-  color: #423212;
-  border-radius: 50%;
-  font-size: 11px;
-  font-weight: bold;
-  min-width: 19px;
-  height: 19px;
-  display: grid;
-  place-items: center;
-}
 .pr-game .role small {
   max-width: 100%;
   overflow: hidden;
@@ -2790,4 +2776,40 @@ body:has(.pr-game) {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+}
+
+.pr-game .role-coins {
+  position: absolute;
+  inset-inline-start: calc(100% - 5px);
+  top: -4px;
+  white-space: nowrap;
+  font-weight: bold;
+}
+.pr-game .role-coins .metric { gap: 1px; }
+.pr-game .role-coins .icon { width: 16px; height: 16px; }
+.pr-game .role-recruits { font-size: 11px; }
+.pr-game .role-recruits .icon { width: 15px; height: 15px; }
+.pr-game .role-picker { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: auto; align-items: start; }
+.pr-game .role-choice { min-width: 0; }
+.pr-game .role-choice > .role { width: 100%; min-height: 82px; }
+.pr-game .role-choice-warning {
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+.pr-game .role-choice-warning > .icon { margin-inline-end: 4px; vertical-align: middle; }
+.pr-game .recruitment-preview { border-top: 1px solid var(--line); padding-top: 12px; }
+.pr-game .recruitment-preview h3 { display: flex; align-items: center; gap: 6px; }
+.pr-game .recruitment-shares { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.pr-game .recruitment-shares > span { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.pr-game .recruitment-shares b { overflow-wrap: anywhere; }
+.pr-game .recruitment-preview p { font-size: 12px; margin-bottom: 0; }
+@media (max-width: 600px) {
+  .pr-game .role-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+.pr-game .role-recruits, .pr-game .recruitment-count, .pr-game .role-recruits > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }

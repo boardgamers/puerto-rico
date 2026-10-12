@@ -1,3 +1,4 @@
+import { recruitmentShares, recruitmentBonus } from "./recruitment.js";
 import { showBuildingPayment } from "./building-payment.js";
 import { FORCE_DARK_THEME } from "./theme.js";
 import { mergePreferences, imageUrl } from "./platform.js";
@@ -437,17 +438,7 @@ export function mountGame(
   function actionButton(m) {
     if (m.type === "produce")
       return `${moveButton(m, moveLabel(m), "craftsman", "primary")}<button class="quiet" data-custom-production="${encode(m)}" ${allowed() ? "" : "disabled"}>${t("selectQty")}</button>`;
-    if (m.type === "role") {
-      const role = state.roles.find((r) => r.id === m.id);
-      const warning = state.roleWarnings?.[m.id];
-      return moveButton(
-        m,
-        `${t(m.id)}${role.coins ? metric("coin", role.coins) : ""}${warning ? icon("warning", 18) : ""}`,
-        m.id === "adventurer2" ? "adventurer" : m.id,
-        "",
-        warning ? `${t(m.id)} — ${t(warning.reason)}` : "",
-      );
-    }
+    if (m.type === "role") return roleCard(state.roles.find((r) => r.id === m.id));
     const compact = compactAction(m);
     return compact
       ? moveButton(m, compact[0], null, "compact-action", compact[1])
@@ -477,6 +468,8 @@ export function mountGame(
     if (!allowed()) return "";
     const task = state.tasks[0],
       moves = actionMoves();
+    if (task.kind === "role")
+      return `<div class="roles role-picker">${moves.map((m) => `<div class="role-choice">${actionButton(m)}${state.roleWarnings?.[m.id] ? `<p class="role-choice-warning">${icon("warning", 15)}${esc([...new Intl.Segmenter(t.locale, { granularity: "sentence" }).segment(t(state.roleWarnings[m.id].reason))][0].segment)}</p>` : ""}</div>`).join("")}</div>${moves.some((m) => m.id === "recruiter") ? recruitmentPreview() : ""}`;
     if (["achievementChoose", "achievementDraft"].includes(task.kind))
       return `<p>${t(task.kind)} · ${state.players[seat].achievements.length}/4</p><div class="achievement-choices">${moves
         .map((m) => {
@@ -614,25 +607,31 @@ export function mountGame(
   function plantationHelp(id) {
     return `${t(id)} — ${t(id === "quarry" ? "quarryHelp" : id === "forest" ? "forestHelp" : id === "corn" ? "cornHelp" : "plantationHelp")}`;
   }
+  function recruitmentCount(n) {
+    return `<span class="recruitment-count" title="${esc(t("recruitmentPool"))}">${icon(!state.register.w && state.register.c ? "citizen" : "worker", 16)}${state.register.w && state.register.c ? icon("citizen", 16) : ""}<b>${n}</b></span>`;
+  }
+  function roleCard(r) {
+    const m = state.legal.find((m) => m.type === "role" && m.id === r.id),
+      selected = r.taken !== null,
+      current = !state.finished && state.tasks[0]?.kind !== "role" &&
+        r.id === (state.role === "adventurer"
+          ? state.events.filter((e) => e.type === "role").at(-1)?.id : state.role),
+      acting = allowed(),
+      warning = m && acting ? state.roleWarnings?.[r.id] : null;
+    return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="role-coins">${metric("coin", r.coins)}</span>` : ""}</span><b>${t(r.id)}</b>${r.id === "recruiter" && m ? `<span class="role-recruits">${recruitmentCount(recruitmentShares(state, seat)[seat])}${recruitmentBonus(state, seat) ? ` <span title="${esc(t("privilege"))}">+${metric("worker", recruitmentBonus(state, seat))}</span>` : ""}</span>` : ""}${selected ? playerMarker(r.taken) : ""}</button>`;
+  }
+  function recruitmentPreview() {
+    const shares = recruitmentShares(state, seat);
+    const owner = state.players[seat];
+    const bonus = recruitmentBonus(state, seat);
+    return `<section class="recruitment-preview"><h3>${icon("recruiter", 20)}${t("recruitmentPool")}</h3><div class="recruitment-shares">${state.players.map((p, i) => `<span>${playerMarker(i, true)}<b>${esc(p.name)}</b>${recruitmentCount(shares[i])}</span>`).join("")}</div>${bonus ? `<p>${t("privilege")} · ${esc(owner.name)} +${metric("worker", bonus)}</p>` : ""}</section>`;
+  }
   function sharedBoard() {
     const festivalTag = desktopLayout.matches ? "section" : "details";
     const festivalHeadingTag = desktopLayout.matches ? "header" : "summary";
-    const acting = allowed(),
-      task = state.tasks[0];
-    const currentRole =
-      !state.finished && task && task.kind !== "role"
-        ? state.role === "adventurer"
-          ? state.events.filter((e) => e.type === "role").at(-1)?.id
-          : state.role
-        : null;
+    const acting = allowed(), task = state.tasks[0];
     return `<section class="shared-board"><div class="roles">${state.roles
-      .map((r) => {
-        const m = state.legal.find((m) => m.type === "role" && m.id === r.id),
-          selected = r.taken !== null,
-          current = r.id === currentRole,
-          warning = m && acting ? state.roleWarnings?.[r.id] : null;
-        return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="coin-badge">${r.coins}</span>` : ""}</span><b>${t(r.id)}</b>${selected ? playerMarker(r.taken) : ""}</button>`;
-      })
+      .map(roleCard)
       .join(
         "",
       )}<button type="button" class="role role-help" data-roles-help title="${esc(t("rolesHelp"))}" aria-label="${esc(t("rolesHelp"))}">${icon("help", 32)}</button></div><div class="recruitment-pool" role="group" aria-label="${esc(t("recruitmentPool"))}"><strong>${icon("recruiter", 20)}${t("recruitmentPool")}</strong>${metric("worker", state.register.w, "registerWorkers")}${state.register.c ? metric("citizen", state.register.c, "registerCitizens") : ""}</div><div class="port panel"><header><h2>${t("harborTitle")}</h2><div>${metric("vp", Math.max(0, state.vpSupply), "vpSupply")}</div></header><div class="goods-supply" role="group" aria-label="${esc(t("goodsSupply"))}"><strong>${t("goodsSupply")}</strong>${GOODS.map((g) => `<span class="supply-good ${state.supply[g] === 0 ? "depleted" : ""}">${metric(g, state.supply[g])}</span>`).join("")}</div><div class="ships">${state.ships.map((sh, i) => `<article class="ship ${sh.amount === sh.capacity ? "full" : ""}">${shipGraphic(sh)}<div>${sh.good ? icon(sh.good, 25) : icon("ship", 25)}<b>${sh.amount}<small> / ${sh.capacity}</small></b></div></article>`).join("")}</div><div class="trade-row"><span>${icon("trader", 18)} ${t("tradingHouse")}</span>${Array.from({ length: 4 }, (_, i) => `<span class="trade-slot">${state.trade[i] ? icon(state.trade[i], 26) : "·"}</span>`).join("")}</div></div><section class="plantation-supply"><header>${icon("planter", 20)}<h3>${t("plantedOffer")}</h3></header><div class="estate-offer">${state.offer

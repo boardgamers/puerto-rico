@@ -366,6 +366,18 @@ try {
         () => document.documentElement.scrollWidth > innerWidth + 1,
       );
     assert.equal(await overflow(), false, `No page overflow at ${width}`);
+    await page.locator(".action-dock [data-actions]").click();
+    assert.ok(await page.locator(".role-picker .role").count() > 0);
+    assert.ok(await page.locator(".role-choice-warning").count() > 0);
+    assert.equal(await page.locator(".recruitment-shares > span").count(), original.players.length);
+    assert.equal(
+      await page.locator('.role-picker [data-role-id="recruiter"]').innerHTML(),
+      await page.locator('.shared-board [data-role-id="recruiter"]').innerHTML(),
+      "role picker reuses board role cards",
+    );
+    assert.equal(await overflow(), false);
+    await page.screenshot({ path: `.local/qa/${width}-role-picker.png` });
+    await page.keyboard.press("Escape");
     const craftsman = page.locator('[data-role-id="craftsman"]');
     assert.equal(await craftsman.locator(".role-warning").count(), 1);
     await craftsman.click();
