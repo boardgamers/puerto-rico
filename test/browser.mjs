@@ -988,9 +988,15 @@ try {
       "another placement preserves our draft and editor",
     );
     await page.keyboard.press("Escape");
+    await page.screenshot({ path: `.local/qa/${width}-placement-dock.png` });
+    if (width <= 760) {
+      const bar = await page.locator(".action-dock").boundingBox();
+      assert.ok(bar.height < 115, "mobile placement bar stays within two rows");
+      await page.locator(".action-dock [data-actions]").click();
+    }
     await page
       .locator(
-        '.action-dock [data-move="%7B%22type%22%3A%22orderedPlacement%22%7D"]',
+        `${width <= 760 ? ".pr-modal" : ".action-dock"} [data-move="%7B%22type%22%3A%22orderedPlacement%22%7D"]`,
       )
       .click();
     assert.equal(

@@ -821,7 +821,7 @@ export function mountGame(
             { type: "orderedPlacement" },
             t("orderedPlacement"),
             "governor",
-            "quiet",
+            "quiet dock-order",
           )
         : "";
     const undo =

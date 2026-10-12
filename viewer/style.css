@@ -1668,6 +1668,15 @@ body:has(.pr-game) {
   .pr-game .action-dock strong {
     font-size: 12px;
   }
+  .pr-game .action-dock .dock-order {
+    display: none;
+  }
+  .pr-game .action-dock:not(.action-dock-compact) .dock-controls > button:not(.dock-order) {
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    justify-content: center;
+  }
   .pr-game .action-dock-compact {
     flex-wrap: nowrap;
     gap: 10px;
