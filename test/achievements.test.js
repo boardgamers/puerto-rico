@@ -186,9 +186,9 @@ test("completing a card reveals it and scores only at game end without VP tokens
     "masterCollector",
   );
 });
-test("Big Spender can decline discounts, while arbitrary overpayment is rejected", () => {
+test("Big Spender can decline the privilege but must retain quarry discounts", () => {
   let s = fresh();
-  s.players[0].coins = 10;
+  s.players[0].coins = 6;
   s.players[0].estates = Array.from({ length: 4 }, () => tile("quarry", 1));
   s.players[0].achievements = [
     { id: "bigSpender", completed: false },
@@ -196,14 +196,16 @@ test("Big Spender can decline discounts, while arbitrary overpayment is rejected
   ];
   s = E.move(s, { type: "role", id: "builder" }, 0);
   assert.equal(E.cost(s, 0, "fireStation"), 5);
-  assert(E.legal(s, 0).some((m) => m.id === "fireStation" && m.pay === 10));
+  assert(E.legal(s, 0).some((m) => m.id === "fireStation" && m.pay === 6));
+  s.players[0].coins = 10;
   assert.throws(() =>
-    E.move(s, { type: "build", id: "fireStation", pay: 11 }, 0),
+    E.move(s, { type: "build", id: "fireStation", pay: 10 }, 0),
   );
-  const r = E.move(s, { type: "build", id: "fireStation", pay: 10 }, 0);
+  s.players[0].coins = 6;
+  const r = E.move(s, { type: "build", id: "fireStation", pay: 6 }, 0);
   assert.equal(r.players[0].coins, 0);
   assert.equal(r.players[0].achievements[0].completed, true);
-  assert.equal(r.players[0].achievements[1].completed, false);
+  assert.equal(r.players[0].achievements[1].completed, true);
 });
 test("Puertoma scores every humans incomplete cards, never the completed cards", () => {
   const s = E.init(

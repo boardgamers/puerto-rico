@@ -1,3 +1,4 @@
+import { showBuildingPayment } from "./building-payment.js";
 import { FORCE_DARK_THEME } from "./theme.js";
 import { mergePreferences, imageUrl } from "./platform.js";
 import { achievementProgress } from "./achievement-progress.js";
@@ -427,6 +428,7 @@ export function mountGame(
     return state.legal.filter(
       (m) =>
         m.type !== "bohio" &&
+        showBuildingPayment(state.players[seat], m) &&
         (m.type !== "pass" || m.decline?.length) &&
         // Zero production has the same bonus choices as passing.
         !(m.type === "produce" && !GOODS.some((g) => m.goods[g])),
@@ -980,7 +982,8 @@ export function mountGame(
         : null;
     const b = B[id],
       moves = state.legal.filter(
-        (m) => ["build", "draft"].includes(m.type) && m.id === id,
+        (m) => ["build", "draft"].includes(m.type) && m.id === id &&
+          showBuildingPayment(state.players[seat], m),
       );
     show(
       t(id),

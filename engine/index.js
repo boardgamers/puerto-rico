@@ -359,7 +359,7 @@ export function cost(s, p, id, move = {}) {
         : 0;
   return move.pay ?? Math.max(0, base - discount);
 }
-function buildingPayments(s, p, id) {
+function buildingPayments(s, p, id, legacyQuarries = false) {
   const a = s.players[p],
     b = B[id];
   const base =
@@ -390,7 +390,9 @@ function buildingPayments(s, p, id) {
         ? 1
         : 0
     : 0;
-  let reductions = Array.from({ length: quarries + 1 }, (_, i) => i);
+  let reductions = legacyQuarries
+    ? Array.from({ length: quarries + 1 }, (_, i) => i)
+    : [quarries];
   for (const bonus of [privilege, lumber, notary])
     if (bonus)
       reductions = [...new Set(reductions.flatMap((n) => [n, n + bonus]))];
@@ -414,7 +416,7 @@ function workerSources(a) {
       .map((kind) => ({ key, kind })),
   );
 }
-export function buildOptions(s, p) {
+export function buildOptions(s, p, legacyQuarries = false) {
   if (s.players[p].puertoma) return P.buildings(s, p);
   const a = s.players[p],
     out = [];
@@ -435,9 +437,9 @@ export function buildOptions(s, p) {
     const short = cost(s, p, id) - a.coins;
     if (short <= 0) {
       out.push({ type: "build", id });
-      // Quarry reductions and role Advantages may be declined (rulebook pp. 9, 12).
+      // Role Advantages and building functions may be declined; quarries always apply.
       // Explicit higher Coin payments let Big Spender use this legal choice.
-      for (const pay of buildingPayments(s, p, id))
+      for (const pay of buildingPayments(s, p, id, legacyQuarries))
         if (pay > cost(s, p, id) && pay <= a.coins)
           out.push({ type: "build", id, pay });
       continue;
@@ -1410,7 +1412,7 @@ export function resolveForcedActions(state) {
   }
   throw Error("Forced action loop");
 }
-function applyMove(state, m, p) {
+function applyMove(state, m, p, historical = false) {
   assert(m && typeof m === "object" && !Array.isArray(m));
   assert(JSON.stringify(m).length <= 8192, "Move payload is too large");
   assert(integer(p) && !!state.players[p], "Invalid player");
@@ -1448,7 +1450,12 @@ function applyMove(state, m, p) {
           new Set(m.decline).size === m.decline.length &&
           m.decline.every((id) => optionalPoints(s, p, m).includes(id)),
       );
-  } else assert(legal(s, p).some((x) => sameMove(x, m)));
+  } else assert(
+    legal(s, p).some((x) => sameMove(x, m)) ||
+      // Preserve already-recorded payments from before mandatory quarry discounts.
+      (historical && t.kind === "build" &&
+        buildOptions(s, p, true).some((x) => sameMove(x, m))),
+  );
   if (m.target)
     extra.targetId =
       m.target === "reserve" ? "reserve" : tileRef(a, m.target).id;
@@ -1988,7 +1995,7 @@ export function replay(s, options = {}) {
   assert(integer(to) && to >= 1 && to <= logLength(s));
   const c = s.config;
   let r = init(c.n, c.expansions, c.options, c.seed);
-  for (const h of s.history.slice(0, to - 1)) r = applyMove(r, h.move, h.p);
+  for (const h of s.history.slice(0, to - 1)) r = applyMove(r, h.move, h.p, true);
   r.players.forEach((p, i) => {
     p.name = s.players[i].name;
     p.bot = s.players[i].bot;
@@ -2007,7 +2014,7 @@ export function logSlice(
   for (let i = Math.max(0, start); i <= Math.min(end, logLength(s) - 1); i++) {
     frames.push(stripSecret(position, player));
     const h = s.history[i];
-    if (h && i < end) position = applyMove(position, h.move, h.p);
+    if (h && i < end) position = applyMove(position, h.move, h.p, true);
   }
   return { frames };
 }
