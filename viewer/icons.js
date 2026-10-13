@@ -1,4 +1,5 @@
 const paths = {
+  edit: '<path d="m4 16 11-11 4 4-11 11-5 1Z"/><path d="m13 7 4 4m-13 5 4 4"/>',
   stock:
     '<rect x="3" y="8" width="13" height="13" rx="1"/><path d="M7 5h12v12M10 2h12v12"/>',
   cityFootprint:

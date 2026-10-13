@@ -2813,3 +2813,18 @@ body:has(.pr-game) {
   align-items: center;
   gap: 2px;
 }
+
+.pr-game .produce-goods { display: inline-flex; flex-wrap: wrap; gap: 4px 8px; }
+.pr-game .produce-action > span { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 760px) {
+  .pr-game .action-dock .produce-label,
+  .pr-game .action-dock .production-custom > span { display: none; }
+  .pr-game .action-dock:not(.action-dock-compact) .dock-controls > button.production-custom {
+    flex: 0 0 44px;
+    padding: 8px;
+  }
+  .pr-game .action-dock:not(.action-dock-compact) .dock-controls:has(.produce-action) > button.dock-pass {
+    flex: 0 0 auto;
+  }
+  .pr-game .action-dock .produce-action { flex: 1 1 auto; }
+}

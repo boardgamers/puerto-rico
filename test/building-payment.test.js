@@ -59,3 +59,17 @@ test("historical quarry overpayments remain replayable but cannot be submitted n
   }
   assert.fail("Expected a historical quarry payment fixture");
 });
+
+test("building choices automatically take the Church bonus", async () => {
+  const E = await import("../engine/index.js");
+  let s = E.init(3, [], {}, "church-payment");
+  s.players[0].coins = 20;
+  s.players[0].buildings = [{ id: "church", w: 1, c: 0 }];
+  s.market.monument = 1;
+  s = E.move(s, { type: "role", id: "builder" }, 0);
+  const offered = E.legal(s, 0).filter((m) => m.type === "build" && m.id === "monument" && showBuildingPayment(s.players[0], m));
+  assert.equal(offered.length, 1);
+  assert.equal(offered[0].decline, undefined);
+  const after = E.move(s, offered[0], 0);
+  assert.equal(after.players[0].vp, s.players[0].vp + 2);
+});

@@ -2,6 +2,7 @@ import { BUILDINGS } from "../engine/catalog.js";
 
 // Keep the minimum payment visible. Extra payments matter only for Big Spender.
 export function showBuildingPayment(player, move) {
+  if (move.type === "build" && move.decline?.includes("church")) return false;
   return (
     move.type !== "build" ||
     move.pay === undefined ||

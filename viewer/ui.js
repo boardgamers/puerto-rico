@@ -437,7 +437,7 @@ export function mountGame(
   }
   function actionButton(m) {
     if (m.type === "produce")
-      return `${moveButton(m, moveLabel(m), "craftsman", "primary")}<button class="quiet" data-custom-production="${encode(m)}" ${allowed() ? "" : "disabled"}>${t("selectQty")}</button>`;
+      return `${moveButton(m, `<span class="produce-label">${t("produce")}</span><span class="produce-goods">${goodsRow(m.goods)}</span>`, "check", "primary produce-action", t("produce"))}<button class="quiet production-custom" data-custom-production="${encode(m)}" title="${esc(t("selectQty"))}" aria-label="${esc(t("selectQty"))}" ${allowed() ? "" : "disabled"}>${icon("edit")}<span>${t("selectQty")}</span></button>`;
     if (m.type === "role") return roleCard(state.roles.find((r) => r.id === m.id));
     const compact = compactAction(m);
     return compact
