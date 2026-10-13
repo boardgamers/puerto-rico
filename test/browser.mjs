@@ -778,7 +778,11 @@ try {
       ),
     );
     // Journal and final scoring remain scrollable even on the smallest viewport.
-    await page.evaluate((s) => host.emit("state", s), E.stripSecret(full, 0));
+    await page.evaluate((s) => host.emit("state", s), full);
+    for (let i = 0; i < full.players.length; i++) {
+      const counter = page.locator(`.player-strip [data-score="${i}"]`);
+      assert.ok((await counter.getAttribute("aria-label")).endsWith(`: ${E.scoreBreakdown(full, i).total}`));
+    }
     await page.locator('[data-panel="journal"]').click();
     const log = page.locator(".pr-modal .modal-body");
     await log.evaluate((el) => (el.scrollTop = 0));
@@ -790,7 +794,7 @@ try {
     await page.locator("[data-scores]").click();
     assert.equal(await overflow(), false);
     assert.ok((await page.locator(".scores article").count()) === 3);
-    await page.locator('.scores [data-score="1"]').click();
+    await page.locator('.scores [data-score="1"]').last().click();
     assert.match(await page.locator(".score-total").innerText(), /Total final/);
     await page.keyboard.press("Escape");
     // Scroll starts on disabled controls without interception.

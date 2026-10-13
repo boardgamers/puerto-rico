@@ -122,3 +122,19 @@ test("another player placement does not acknowledge our pending submission", asy
   assert.equal(done, true);
   viewer.destroy();
 });
+
+test("finished BGS saves are converted to a complete public viewer state", async () => {
+  const E = await import("../engine/index.js");
+  const raw = E.init(3, [], {}, "finished-view");
+  raw.finished = true;
+  raw.players[1].vp = 17;
+  const { calls, viewer } = fixture();
+  viewer.onPlayer({ index: 0 });
+  viewer.onState(raw);
+  const state = calls.findLast(([kind]) => kind === "render")[1];
+  assert.deepEqual(state.legal, []);
+  assert.equal(state.players[1].vp, 17);
+  assert.equal(state.results[1].total, E.scoreBreakdown(raw, 1).total);
+  assert.equal(state.historyLength, E.logLength(raw));
+  assert.equal(state.history, undefined);
+});

@@ -1,3 +1,4 @@
+import { stripSecret } from "../engine/index.js";
 /** Host preferences arrive separately from theme changes. Preserve seat appearance. */
 export function mergePreferences(previous, update) {
   return { ...previous, ...update };
@@ -53,6 +54,8 @@ export function viewerLifecycle(ctx, ui, chat) {
     },
     chat,
     onState(s) {
+      // BGS returns the raw saved engine state after the game ends.
+      if (s.finished && Array.isArray(s.history)) s = stripSecret(s, playerIndex);
       live = s;
       const awaitingPlacement =
         pending &&

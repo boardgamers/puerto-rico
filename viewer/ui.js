@@ -16,6 +16,7 @@ import {
   cost,
   citySize,
   production,
+  scoreBreakdown,
 } from "../engine/index.js";
 import { translator } from "./i18n.js";
 import { icon, scoreToken } from "./icons.js";
@@ -156,7 +157,7 @@ export function mountGame(
       ? `<span class="building-type-icon" role="img" title="${label}" aria-label="${label}">${drawing}</span>`
       : drawing;
   };
-  const scoreButton = (i, n = state.players[i].vp) =>
+  const scoreButton = (i, n = state.finished ? state.results?.[i]?.total : state.players[i].vp) =>
     Number.isFinite(n)
       ? `<button type="button" class="score-button" data-score="${i}" title="${esc(t("scoreDetails"))}" aria-label="${esc(`${t("scoreDetails")} · ${state.players[i].name} : ${n}`)}">${scoreToken(n)}</button>`
       : `<span title="${esc(t("scoreHidden"))}">${metric("vp", "?")}</span>`;
@@ -866,7 +867,9 @@ export function mountGame(
   }
   function render(s, awaitingMove = false) {
     if (s) {
-      state = s;
+      state = s.finished
+        ? { ...s, results: s.results ?? s.players.map((_, i) => scoreBreakdown(s, i)) }
+        : s;
       pending = awaitingMove;
     }
     if (!state) return;
@@ -1072,11 +1075,11 @@ export function mountGame(
       `<div class="scores">${(state.results ?? [])
         .map(
           (r, i) =>
-            `<article><header><h3>${esc(state.players[i].name)}</h3>${scoreButton(i, r.total)}</header><p>${t("tokens")} <b>${r.tokens}</b></p><p>${t("market")} <b>${r.buildings}</b></p><p>${t("citizens")} <b>${r.citizens}</b></p>${Object.entries(
+            `<article><header><h3>${esc(state.players[i].name)}</h3>${scoreButton(i, r.total)}</header><p>${t("tokens")} <b>${r.tokens}</b></p><p>${t("scoreBuildings")} <b>${r.buildings}</b></p><p>${t("citizens")} <b>${r.citizens}</b></p>${Object.entries(
               r.bonus,
             )
               .map(([id, n]) => `<p>${t(id)} <b>${n}</b></p>`)
-              .join("")}<p>${t("tie")} <b>${r.tie}</b></p></article>`,
+              .join("")}<p>${t("tie")} <b>${r.tie}</b></p><button type="button" data-score="${i}">${t("scoreDetails")}</button></article>`,
         )
         .join("")}</div>`,
     );

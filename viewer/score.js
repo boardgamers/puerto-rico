@@ -82,7 +82,7 @@ export function scoreContent(state, player, t) {
     .join("");
   return `<div class="score-detail">
     <section><header><h3>${t("scoreEarned")}</h3>${points(score.tokens)}</header>
-      <p class="score-note">${t("scoreCounterHint")}</p>
+      ${state.finished ? "" : `<p class="score-note">${t("scoreCounterHint")}</p>`}
       ${sources.length ? `<ul class="score-lines">${sources.map(({ id, points: n }) => row(label(id), n, id === "scoreShippingBonus" ? t("scoreShippingBonusHint") : id === "hiddenMarket" ? t("scoreSpent") : "")).join("")}</ul>` : `<p class="score-note">${t("scoreNoTokens")}</p>`}
       ${history.length ? `<details class="score-history"><summary>${t("scoreHistory")}</summary>${journalContent({ ...state, events: history }, t)}</details>` : ""}
     </section>
