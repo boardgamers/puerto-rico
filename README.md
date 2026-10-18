@@ -62,7 +62,7 @@ This private version still needs broader playtesting. The Festival marker interp
 
 `pnpm publish:private` builds the bundles, packages only the self-contained engine and its manifest, checks complete 1–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, refuses to replace a public version, and verifies the private/listed flags and CDN bytes. It grants beta access to `coyotte508` if needed. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
 
-The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Tutorials are not yet registered.
+The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Four playable tutorial chapters are registered.
 
 Enable “Show everyone’s VP” at game creation to reveal accumulated VP tokens to all players and spectators. It is off by default; uncompleted Achievement cards remain private. For a separate local preview with visible VP, add `&showVP=true` to the URL.
 
@@ -72,16 +72,13 @@ The journal retains the latest 200 events. Older score contributions are accumul
 
 Chat opens from the button next to the journal. On a host/SDK exposing `openChat` and advertising `platformChat`, it opens the native BGS chat. Protocol 0.9 hosts retain the functional SDK chat dialog. Native chat requires the corresponding platform PR and a protocol package upgrade; no unsupported messages are sent to older hosts.
 
-The publisher sets **Puerto Rico** as the title and **1897 Special Edition** as the subtitle, uploads the original tightly cropped vector pictogram, and selects it as the BGS icon. It uploads hand-written metadata and setup-label translations through the manual translation endpoint. If an older host returns 404 for that endpoint, the game upload completes and the script explicitly reports `translationsPending`; the overlays remain ready in `.local/release/manual-translations.json`. Run the publisher again after the platform endpoint is deployed to apply them. It never calls automatic translation endpoints.
+The publisher sets **Puerto Rico** as the title and **1897 Special Edition** as the subtitle, uploads the tightly cropped vector pictogram, and selects it as the BGS icon. Catalog description, credits and setup labels use the platform metadata translation service, skipping translations whose source hash is current. Game UI, engine messages, tutorial content and CMS rules use directly authored translations; they never go through that service.
 
-`pnpm publish:metadata` updates the description, credits, links, tags and the
-`puerto-rico:rules` CMS page in all 16 supported languages without uploading the
-engine or viewer. Rules content is assembled from the manually authored player
-instructions in `viewer/locales`; it contains no interface walkthrough. The rules
-field contains only a link to `/page/puerto-rico/rules`. Both publication commands
-back up existing CMS pages before updating them. Game metadata language overlays
-remain queued in `.local/release/manual-translations.json` when the host does not
-yet expose the manual translation endpoint; no translation API is used.
+`pnpm publish:metadata` updates the description, credits, links, tags and the `puerto-rico:rules` CMS page in all 16 supported languages without uploading the engine or viewer. The rules field contains only a link to `/page/puerto-rico/rules`. Both publication commands back up existing CMS pages before updating them.
+
+`pnpm release:gallery` creates three distinct screenshots of the built viewer (board, building market, mobile) in ignored `.local/release/gallery/`, using a deterministic isolated game. It also checks protocol diagnostics, native chat opening and hiding chat during analysis. Review the images, then run `pnpm publish:gallery` to upload them and verify anonymous image access. Dark variants are unnecessary while the viewer forces the same dark theme for everyone.
+
+The protocol SDK is pinned as a reproducible artifact under `vendor/`, with its source revision in `vendor/provenance.json`. Replace this file dependency with the equivalent registry version when published.
 
 ## Playable tutorials
 
@@ -104,5 +101,4 @@ preview server (or replace the chapter ID above). `pnpm test` covers legality,
 conservation, replay, progress and translation completeness. `pnpm test:tutorials`
 plays every chapter through the actual controls on mobile and desktop and checks
 all languages at 320 px. `pnpm publish:private` registers the chapter metadata with
-the viewer; translated BGS chapter-list labels use the same pending manual
-metadata endpoint as other game translations.
+the viewer; translated BGS chapter-list labels use the platform metadata service.

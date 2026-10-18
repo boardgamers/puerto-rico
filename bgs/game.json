@@ -8,7 +8,8 @@
   "links": {
     "publisher": "https://awakenrealms.com/games/awaken-realms/puerto-rico",
     "source": "https://codeberg.org/boardgamers/puerto-rico",
-    "bgg": "https://boardgamegeek.com/boardgame/415843/puerto-rico-1897-special-edition"
+    "bgg": "https://boardgamegeek.com/boardgame/415843/puerto-rico-1897-special-edition",
+    "purchase": "https://gamefound.com/en/projects/awaken-realms/puerto-rico-special-edition"
   },
   "viewer": {
     "url": "",
@@ -67,7 +68,7 @@
       "default": false
     }
   ],
-  "tags": ["eurogame", "economic"],
+  "tags": ["eurogame", "economic", "role-selection"],
   "tutorial": {
     "chapters": [
       {
@@ -95,5 +96,6 @@
         "description": "Solve a coffee shortage using the Smuggler and a Festival objective."
       }
     ]
-  }
+  },
+  "releaseYear": 2025
 }

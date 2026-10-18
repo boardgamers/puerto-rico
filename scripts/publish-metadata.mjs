@@ -1,3 +1,4 @@
+import { translatePlatformMetadata } from "./translate-platform-metadata.mjs";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import assert from "node:assert/strict";
@@ -29,31 +30,14 @@ await writeFile(
   JSON.stringify(before, null, 2),
 );
 const languages = await publishCmsRules(token);
-const { metadata, translations } = await releaseMetadata();
+const { metadata } = await releaseMetadata();
 await api("/meta", metadata);
-let translationsPending = false;
-for (const [lang, overlay] of Object.entries(translations)) {
-  try {
-    await api(`/meta/translations/${lang}`, overlay);
-  } catch (error) {
-    if (error.status !== 404) throw error;
-    translationsPending = true;
-    break;
-  }
-}
-await writeFile(
-  ".local/release/manual-translations.json",
-  JSON.stringify(translations, null, 2),
-);
+await translatePlatformMetadata(token, metadata);
+const translationsPending = false;
 const saved = await api("/meta");
 for (const [key, value] of Object.entries(metadata)) {
   if (value !== null) assert.deepEqual(saved[key], value, key);
 }
-if (!translationsPending)
-  for (const [lang, overlay] of Object.entries(translations)) {
-    for (const key of ["description", "rules", "credits"])
-      assert.equal(saved.translations?.[lang]?.[key], overlay[key]);
-  }
 assert.equal(saved.iconMode, before.iconMode);
 console.log(
   JSON.stringify({

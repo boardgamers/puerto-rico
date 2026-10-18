@@ -1,3 +1,4 @@
+import { translatePlatformMetadata } from "./translate-platform-metadata.mjs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { createHash } from "node:crypto";
@@ -71,7 +72,7 @@ await api("/1", "PUT", {
   viewer: { ...defaults.viewer, url: uploaded.url, scriptBytes: bytes.length },
 });
 // Listed in the beta catalog; the actual playable version stays private.
-const { metadata, translations } = await releaseMetadata();
+const { metadata } = await releaseMetadata();
 await publishCmsRules(token);
 await api("/meta", "PUT", metadata);
 await api(
@@ -82,22 +83,8 @@ await api(
   "image/svg+xml",
 );
 await api("/icon", "PUT", { mode: "pictogram" });
-let translationsPending = false;
-for (const [lang, translation] of Object.entries(translations)) {
-  try {
-    await api(`/meta/translations/${lang}`, "PUT", translation);
-  } catch (error) {
-    // Older hosts do not yet expose the manual translation endpoint. Keep the
-    // manually authored overlays ready to upload once the platform PR is live.
-    if (error.status !== 404) throw error;
-    translationsPending = true;
-    break;
-  }
-}
-await writeFile(
-  ".local/release/manual-translations.json",
-  JSON.stringify(translations, null, 2),
-);
+await translatePlatformMetadata(token, metadata);
+const translationsPending = false;
 const access = await api("/beta-users");
 if (!access.some((u) => u.username === "coyotte508"))
   await api("/beta-users", "POST", { usernameOrEmail: "coyotte508" });
@@ -121,16 +108,6 @@ assert.equal(
 assert.deepEqual(published.preferences, defaults.preferences);
 assert.deepEqual(published.settings, defaults.settings);
 assert.deepEqual(published.tutorial, defaults.tutorial);
-if (!translationsPending) {
-  for (const [lang, translation] of Object.entries(translations)) {
-    assert.equal(
-      meta.translations?.[lang]?.description,
-      translation.description,
-    );
-    for (const [key, label] of Object.entries(translation.optionTranslations))
-      assert.equal(meta.optionTranslations?.[lang]?.[key]?.label, label);
-  }
-}
 const downloaded = await fetch(uploaded.url);
 assert.ok(downloaded.ok, `CDN ${downloaded.status}`);
 assert.equal(hash(Buffer.from(await downloaded.arrayBuffer())), hash(bytes));

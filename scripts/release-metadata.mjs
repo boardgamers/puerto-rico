@@ -64,6 +64,7 @@ export async function releaseMetadata() {
       credits: source.credits,
       links: source.links,
       tags: source.tags,
+      releaseYear: source.releaseYear,
       unlisted: null,
     },
     translations,

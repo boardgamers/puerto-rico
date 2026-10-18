@@ -157,7 +157,10 @@ export function mountGame(
       ? `<span class="building-type-icon" role="img" title="${label}" aria-label="${label}">${drawing}</span>`
       : drawing;
   };
-  const scoreButton = (i, n = state.finished ? state.results?.[i]?.total : state.players[i].vp) =>
+  const scoreButton = (
+    i,
+    n = state.finished ? state.results?.[i]?.total : state.players[i].vp,
+  ) =>
     Number.isFinite(n)
       ? `<button type="button" class="score-button" data-score="${i}" title="${esc(t("scoreDetails"))}" aria-label="${esc(`${t("scoreDetails")} · ${state.players[i].name} : ${n}`)}">${scoreToken(n)}</button>`
       : `<span title="${esc(t("scoreHidden"))}">${metric("vp", "?")}</span>`;
@@ -439,7 +442,8 @@ export function mountGame(
   function actionButton(m) {
     if (m.type === "produce")
       return `${moveButton(m, `<span class="produce-label">${t("produce")}</span><span class="produce-goods">${goodsRow(m.goods)}</span>`, "check", "primary produce-action", t("produce"))}<button class="quiet production-custom" data-custom-production="${encode(m)}" title="${esc(t("selectQty"))}" aria-label="${esc(t("selectQty"))}" ${allowed() ? "" : "disabled"}>${icon("edit")}<span>${t("selectQty")}</span></button>`;
-    if (m.type === "role") return roleCard(state.roles.find((r) => r.id === m.id));
+    if (m.type === "role")
+      return roleCard(state.roles.find((r) => r.id === m.id));
     const compact = compactAction(m);
     return compact
       ? moveButton(m, compact[0], null, "compact-action", compact[1])
@@ -614,9 +618,13 @@ export function mountGame(
   function roleCard(r) {
     const m = state.legal.find((m) => m.type === "role" && m.id === r.id),
       selected = r.taken !== null,
-      current = !state.finished && state.tasks[0]?.kind !== "role" &&
-        r.id === (state.role === "adventurer"
-          ? state.events.filter((e) => e.type === "role").at(-1)?.id : state.role),
+      current =
+        !state.finished &&
+        state.tasks[0]?.kind !== "role" &&
+        r.id ===
+          (state.role === "adventurer"
+            ? state.events.filter((e) => e.type === "role").at(-1)?.id
+            : state.role),
       acting = allowed(),
       warning = m && acting ? state.roleWarnings?.[r.id] : null;
     return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="role-coins">${metric("coin", r.coins)}</span>` : ""}</span><b>${t(r.id)}</b>${r.id === "recruiter" && m ? `<span class="role-recruits">${recruitmentCount(recruitmentShares(state, seat)[seat])}${recruitmentBonus(state, seat) ? ` <span title="${esc(t("privilege"))}">+${metric("worker", recruitmentBonus(state, seat))}</span>` : ""}</span>` : ""}${selected ? playerMarker(r.taken) : ""}</button>`;
@@ -630,7 +638,8 @@ export function mountGame(
   function sharedBoard() {
     const festivalTag = desktopLayout.matches ? "section" : "details";
     const festivalHeadingTag = desktopLayout.matches ? "header" : "summary";
-    const acting = allowed(), task = state.tasks[0];
+    const acting = allowed(),
+      task = state.tasks[0];
     return `<section class="shared-board"><div class="roles">${state.roles
       .map(roleCard)
       .join(
@@ -868,7 +877,10 @@ export function mountGame(
   function render(s, awaitingMove = false) {
     if (s) {
       state = s.finished
-        ? { ...s, results: s.results ?? s.players.map((_, i) => scoreBreakdown(s, i)) }
+        ? {
+            ...s,
+            results: s.results ?? s.players.map((_, i) => scoreBreakdown(s, i)),
+          }
         : s;
       pending = awaitingMove;
     }
@@ -890,7 +902,7 @@ export function mountGame(
       "is-building",
       isTurn() && ["build", "draft"].includes(state.tasks[0]?.kind),
     );
-    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}${id === "chat" ? '<span class="chat-unread" aria-hidden="true" hidden></span>' : ""}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
+    const html = `<div class="pr-content"><header class="game-header"><div class="wordmark"><span>PUERTO RICO</span><small>${t("metadata.subtitle")}</small></div><span class="round-indicator">${t("round")} <b>${state.round}</b></span><nav>${["rules", "journal", ...(chat && !preferences.analysis ? ["chat"] : [])].map((id) => `<button class="icon-button" data-panel="${id}" title="${esc(t(id))}" aria-label="${esc(t(id))}">${icon(id)}${id === "chat" ? '<span class="chat-unread" aria-hidden="true" hidden></span>' : ""}</button>`).join("")}</nav></header><div class="player-strip${state.players.length > 3 ? " many-players" : ""}">${state.players.map(playerCard).join("")}</div>${playerSummary()}${localControls ? `<div class="local-controls"><span>${t("local")}</span><button data-local="undo" title="${esc(t("undo"))}" aria-label="${esc(t("undo"))}">${icon("undo", 18)}</button><button data-local="opponents" title="${esc(t("opponents"))}" aria-label="${esc(t("opponents"))}">${icon("pass", 18)}</button><button data-local="reset" title="${esc(t("newGame"))}" aria-label="${esc(t("newGame"))}">${icon("reset", 18)}</button>${FORCE_DARK_THEME ? "" : `<button data-local="dark" title="${esc(t("toggleTheme"))}" aria-label="${esc(t("toggleTheme"))}">${icon("dark", 18)}</button>`}</div>` : ""}<div class="board-layout">${sharedBoard()}${playerBoard()}${market()}</div>${bottom()}</div>`;
     morphdom(content, html, {
       childrenOnly: true,
       onBeforeElUpdated(from, to) {
@@ -984,7 +996,9 @@ export function mountGame(
         : null;
     const b = B[id],
       moves = state.legal.filter(
-        (m) => ["build", "draft"].includes(m.type) && m.id === id &&
+        (m) =>
+          ["build", "draft"].includes(m.type) &&
+          m.id === id &&
           showBuildingPayment(state.players[seat], m),
       );
     show(
@@ -1079,7 +1093,9 @@ export function mountGame(
               r.bonus,
             )
               .map(([id, n]) => `<p>${t(id)} <b>${n}</b></p>`)
-              .join("")}<p>${t("tie")} <b>${r.tie}</b></p><button type="button" data-score="${i}">${t("scoreDetails")}</button></article>`,
+              .join(
+                "",
+              )}<p>${t("tie")} <b>${r.tie}</b></p><button type="button" data-score="${i}">${t("scoreDetails")}</button></article>`,
         )
         .join("")}</div>`,
     );
@@ -1208,6 +1224,7 @@ export function mountGame(
     }
     if (el.dataset.panel) {
       if (el.dataset.panel === "chat") {
+        if (preferences.analysis) return;
         if (preferences.platformChat === true && onOpenChat) {
           onOpenChat();
           return;
@@ -1460,6 +1477,10 @@ export function mountGame(
     setPreferences(p) {
       const previousLocale = preferences.locale ?? preferences.language ?? "en";
       preferences = mergePreferences(preferences, p);
+      if (preferences.analysis) {
+        if (chatDialog.open) dismiss(chatDialog);
+        chat?.setOpen(false);
+      }
       t = translator(preferences.locale ?? preferences.language ?? "en");
       shell.lang = t.locale;
       shell.dir = t.locale === "fa" ? "rtl" : "ltr";

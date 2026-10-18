@@ -1,0 +1,10 @@
+{
+  "package": "@boardgamers/protocol",
+  "version": "0.11.0",
+  "source": "https://codeberg.org/boardgamers/boardgamers",
+  "commit": "38de11d3",
+  "directory": "packages/protocol",
+  "pullRequest": "https://codeberg.org/boardgamers/boardgamers/pulls/571",
+  "build": "pnpm --filter @boardgamers/protocol build && npm pack",
+  "reason": "Pinned SDK artifact includes native chat opening. Registry publishing credentials were unavailable; replace with the registry dependency once 0.11.0 is published."
+}
