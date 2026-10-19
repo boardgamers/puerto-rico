@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "小教堂和公證處：各一位市民。兩座種植園和水果倉庫：各一位工人。",
   "tutorial.citizens.produce.title": "小教堂獎勵其中的人員",
   "tutorial.citizens.produce.text": "對手選擇了工匠。生產一份玉米和一份水果。小教堂裡的市民還會獲得一分；如果是工人，則會獲得一枚金幣。",
-  "tutorial.citizens.produce.hint": "確認一份玉米和一份水果，不要放棄小教堂的分數。",
+  "tutorial.citizens.produce.hint": "確認生產 1 個玉米和 1 個水果；教堂的勝利點會自動獲得。",
   "tutorial.citizens.build.title": "使用公證處折扣",
   "tutorial.citizens.build.text": "對手選擇了建築師。公證處裡的市民讓擴建建築便宜兩枚金幣。以八枚購買市政廳。如果公證處裡是工人，則會讓一般建築便宜一枚金幣。",
   "tutorial.citizens.build.hint": "選擇市政廳。折扣後費用為八枚金幣。",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "本章完成",
   "tutorial.guide.learn": "學習遊戲",
   "tutorial.basics.intro.title": "建設你的島嶼",
-  "tutorial.basics.intro.text": "透過運輸貨物與建設城市取得最多分數。拓荒者增加種植園，建築師購買建築，招募者分配工人。這座島已安排好人員：先從生產開始。"
+  "tutorial.basics.intro.text": "透過運輸貨物與建設城市取得最多分數。拓荒者增加種植園，建築師購買建築，招募者分配工人。這座島已安排好人員：先從生產開始。",
+  "tutorial.basics.round.title": "一輪中的角色選擇",
+  "tutorial.basics.round.text": "總督先選擇角色。大多數角色由選擇者開始，所有玩家依序執行行動，選擇者另享有特權。接著下一位玩家選擇其他角色。每人都選過後，在每個未被選擇的角色上放 1 枚錢幣（走私者除外），並將總督交給下一位玩家。"
 }

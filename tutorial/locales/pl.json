@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Kaplica i Notariusz: po jednym obywatelu. Obie plantacje i skład owoców: po jednym robotniku.",
   "tutorial.citizens.produce.title": "Kaplica nagradza swojego mieszkańca",
   "tutorial.citizens.produce.text": "Przeciwnik wybrał Rzemieślnika. Wyprodukuj kukurydzę i owoc. Obywatel w Kaplicy daje też punkt zwycięstwa; robotnik dałby tam monetę.",
-  "tutorial.citizens.produce.hint": "Potwierdź kukurydzę i owoc, nie rezygnując z punktu Kaplicy.",
+  "tutorial.citizens.produce.hint": "Potwierdź jedną kukurydzę i jeden owoc; punkt z Kaplicy otrzymasz automatycznie.",
   "tutorial.citizens.build.title": "Wykorzystaj zniżkę Notariusza",
   "tutorial.citizens.build.text": "Przeciwnik wybrał Budowniczego. Obywatel u Notariusza obniża koszt rozbudowanych budynków o dwie monety. Kup Ratusz za osiem. Robotnik u Notariusza obniżałby zamiast tego koszt zwykłych budynków o monetę.",
   "tutorial.citizens.build.hint": "Wybierz Ratusz. Koszt po zniżce to osiem monet.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Rozdział ukończony",
   "tutorial.guide.learn": "Naucz się grać",
   "tutorial.basics.intro.title": "Rozwijaj swoją wyspę",
-  "tutorial.basics.intro.text": "Zdobądź najwięcej punktów, transportując towary i budując miasto. Plantator dodaje plantacje, Budowniczy kupuje budynki, a Werbownik rozmieszcza robotników. Ta wyspa jest już obsadzona: zacznij od produkcji."
+  "tutorial.basics.intro.text": "Zdobądź najwięcej punktów, transportując towary i budując miasto. Plantator dodaje plantacje, Budowniczy kupuje budynki, a Werbownik rozmieszcza robotników. Ta wyspa jest już obsadzona: zacznij od produkcji.",
+  "tutorial.basics.round.title": "Runda wyboru ról",
+  "tutorial.basics.round.text": "Gubernator wybiera rolę jako pierwszy. W przypadku większości ról wszyscy wykonują ich akcję, zaczynając od wybierającego, który otrzymuje też przywilej. Następnie kolejny gracz wybiera inną rolę. Gdy wszyscy wybiorą, połóżcie monetę na każdej niewybranej roli (oprócz Przemytnika) i przekażcie gubernatora kolejnemu graczowi."
 }

@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Kapel og Notar: én borger hver. Begge plantager og frugtlageret: én arbejder hver.",
   "tutorial.citizens.produce.title": "Kapellet belønner sin beboer",
   "tutorial.citizens.produce.text": "En modstander valgte Håndværker. Producer én majs og én frugt. Din borger i Kapellet får også ét sejrspoint; en arbejder der ville få én mønt.",
-  "tutorial.citizens.produce.hint": "Bekræft én majs og én frugt uden at afstå fra Kapellets point.",
+  "tutorial.citizens.produce.hint": "Bekræft én majs og én frugt; kapellets point gives automatisk.",
   "tutorial.citizens.build.title": "Brug Notarens rabat",
   "tutorial.citizens.build.text": "En modstander valgte Bygmester. Din borger hos Notaren giver to mønters rabat på udvidede bygninger. Køb Rådhuset for otte. En arbejder hos Notaren ville i stedet give én mønts rabat på almindelige bygninger.",
   "tutorial.citizens.build.hint": "Vælg Rådhus. Prisen efter rabat er otte mønter.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Kapitel færdigt",
   "tutorial.guide.learn": "Lær at spille",
   "tutorial.basics.intro.title": "Udvikl din ø",
-  "tutorial.basics.intro.text": "Få flest point ved at afskibe varer og bygge din by. Planteren tilføjer plantager, Bygmesteren køber bygninger, og Rekruttøren fordeler arbejdere. Denne ø er allerede bemandet: begynd med at producere."
+  "tutorial.basics.intro.text": "Få flest point ved at afskibe varer og bygge din by. Planteren tilføjer plantager, Bygmesteren køber bygninger, og Rekruttøren fordeler arbejdere. Denne ø er allerede bemandet: begynd med at producere.",
+  "tutorial.basics.round.title": "En runde med roller",
+  "tutorial.basics.round.text": "Guvernøren vælger først en rolle. Ved de fleste roller udfører alle handlingen, begyndende med den, der valgte rollen og også får et privilegium. Derefter vælger næste spiller en anden rolle. Når alle har valgt, lægges en mønt på hver ubrugt rolle (undtagen Smugleren), og guvernøren går videre til næste spiller."
 }

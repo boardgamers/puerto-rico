@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Capela e Cartório: um cidadão em cada. Ambas as plantações e o depósito de frutas: um trabalhador em cada.",
   "tutorial.citizens.produce.title": "A Capela recompensa seu ocupante",
   "tutorial.citizens.produce.text": "Um adversário escolheu Artesão. Produza um milho e uma fruta. Seu cidadão na Capela também ganha um ponto de vitória; um trabalhador ali ganharia uma moeda.",
-  "tutorial.citizens.produce.hint": "Confirme um milho e uma fruta sem recusar o ponto da Capela.",
+  "tutorial.citizens.produce.hint": "Confirme um milho e uma fruta; o ponto da Capela é automático.",
   "tutorial.citizens.build.title": "Use o desconto do Cartório",
   "tutorial.citizens.build.text": "Um adversário escolheu Construtor. Seu cidadão no Cartório dá duas moedas de desconto em edifícios ampliados. Compre a Prefeitura por oito. Um trabalhador no Cartório daria uma moeda de desconto em edifícios comuns.",
   "tutorial.citizens.build.hint": "Escolha Prefeitura. O custo com desconto é oito moedas.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Capítulo concluído",
   "tutorial.guide.learn": "Aprenda a jogar",
   "tutorial.basics.intro.title": "Desenvolva sua ilha",
-  "tutorial.basics.intro.text": "Ganhe mais pontos embarcando mercadorias e construindo sua cidade. O Fazendeiro acrescenta plantações, o Construtor compra edifícios e o Recrutador distribui trabalhadores. Esta ilha já está ocupada: comece produzindo."
+  "tutorial.basics.intro.text": "Ganhe mais pontos embarcando mercadorias e construindo sua cidade. O Fazendeiro acrescenta plantações, o Construtor compra edifícios e o Recrutador distribui trabalhadores. Esta ilha já está ocupada: comece produzindo.",
+  "tutorial.basics.round.title": "Uma rodada de papéis",
+  "tutorial.basics.round.text": "O Governador escolhe um papel primeiro. Na maioria dos papéis, todos realizam a ação, começando por quem o escolheu, que também recebe um privilégio. Depois, o próximo jogador escolhe outro papel. Quando todos tiverem escolhido, coloque uma moeda em cada papel não escolhido (exceto Contrabandista) e passe o Governador ao próximo jogador."
 }

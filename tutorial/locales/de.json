@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Kapelle und Notar: je ein Bürger. Beide Plantagen und das Obstlager: je ein Arbeiter.",
   "tutorial.citizens.produce.title": "Die Kapelle belohnt ihren Bewohner",
   "tutorial.citizens.produce.text": "Ein Gegner hat Handwerker gewählt. Produziere einen Mais und ein Obst. Dein Bürger in der Kapelle bringt zusätzlich einen Siegpunkt; ein Arbeiter dort brächte eine Münze.",
-  "tutorial.citizens.produce.hint": "Bestätige einen Mais und ein Obst, ohne auf den Kapellenpunkt zu verzichten.",
+  "tutorial.citizens.produce.hint": "Bestätige einen Mais und eine Frucht; den Kapellenpunkt erhältst du automatisch.",
   "tutorial.citizens.build.title": "Nutze den Notarrabatt",
   "tutorial.citizens.build.text": "Ein Gegner hat Baumeister gewählt. Dein Bürger beim Notar senkt die Kosten für Großgebäude um zwei Münzen. Kaufe das Rathaus für acht. Ein Arbeiter beim Notar würde stattdessen normale Gebäude um eine Münze verbilligen.",
   "tutorial.citizens.build.hint": "Wähle das Rathaus. Der Preis nach Rabatt beträgt acht Münzen.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Kapitel abgeschlossen",
   "tutorial.guide.learn": "Spielen lernen",
   "tutorial.basics.intro.title": "Entwickle deine Insel",
-  "tutorial.basics.intro.text": "Erhalte die meisten Punkte durch Verschiffung und den Ausbau deiner Stadt. Pflanzer fügt Plantagen hinzu, Baumeister kauft Gebäude und Anwerber verteilt Arbeiter. Diese Insel ist bereits besetzt: Beginne mit der Produktion."
+  "tutorial.basics.intro.text": "Erhalte die meisten Punkte durch Verschiffung und den Ausbau deiner Stadt. Pflanzer fügt Plantagen hinzu, Baumeister kauft Gebäude und Anwerber verteilt Arbeiter. Diese Insel ist bereits besetzt: Beginne mit der Produktion.",
+  "tutorial.basics.round.title": "Eine Runde mit Rollen",
+  "tutorial.basics.round.text": "Der Gouverneur wählt zuerst eine Rolle. Bei den meisten Rollen führen alle die Aktion aus, beginnend mit dem Wählenden, der auch ein Privileg erhält. Dann wählt der nächste Spieler eine andere Rolle. Nachdem jeder gewählt hat, legt ihr eine Münze auf jede ungenutzte Rolle (außer Schmuggler) und gebt den Gouverneur an den nächsten Spieler weiter."
 }

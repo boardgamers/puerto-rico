@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Kapel en Notaris: elk één burger. Beide plantages en het fruitdepot: elk één arbeider.",
   "tutorial.citizens.produce.title": "De Kapel beloont zijn bewoner",
   "tutorial.citizens.produce.text": "Een tegenstander koos Ambachtsman. Produceer één maïs en één fruit. Je burger in de Kapel verdient ook één overwinningspunt; een arbeider daar zou één munt verdienen.",
-  "tutorial.citizens.produce.hint": "Bevestig één maïs en één fruit zonder het Kapelpunt af te slaan.",
+  "tutorial.citizens.produce.hint": "Bevestig één maïs en één fruit; het kapelpunt krijg je automatisch.",
   "tutorial.citizens.build.title": "Gebruik de Notariskorting",
   "tutorial.citizens.build.text": "Een tegenstander koos Bouwmeester. Je burger bij de Notaris geeft twee munten korting op uitgebreide gebouwen. Koop het Stadhuis voor acht. Een arbeider bij de Notaris zou gewone gebouwen één munt goedkoper maken.",
   "tutorial.citizens.build.hint": "Kies Stadhuis. De prijs na korting is acht munten.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Hoofdstuk voltooid",
   "tutorial.guide.learn": "Leer spelen",
   "tutorial.basics.intro.title": "Ontwikkel je eiland",
-  "tutorial.basics.intro.text": "Verdien de meeste punten door goederen te verschepen en je stad te bouwen. Planter voegt plantages toe, Bouwmeester koopt gebouwen en Ronselaar verdeelt arbeiders. Dit eiland is al bezet: begin met produceren."
+  "tutorial.basics.intro.text": "Verdien de meeste punten door goederen te verschepen en je stad te bouwen. Planter voegt plantages toe, Bouwmeester koopt gebouwen en Ronselaar verdeelt arbeiders. Dit eiland is al bezet: begin met produceren.",
+  "tutorial.basics.round.title": "Een ronde met rollen",
+  "tutorial.basics.round.text": "De gouverneur kiest als eerste een rol. Bij de meeste rollen voert iedereen de actie uit, te beginnen met de speler die de rol koos en ook een privilege krijgt. Daarna kiest de volgende speler een andere rol. Als iedereen heeft gekozen, leg je een munt op elke ongekozen rol (behalve Smokkelaar) en geef je de gouverneur aan de volgende speler."
 }

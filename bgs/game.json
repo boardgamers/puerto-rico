@@ -73,7 +73,7 @@
     "chapters": [
       {
         "id": "basics",
-        "version": 1,
+        "version": 2,
         "title": "Roles, production and trade",
         "description": "Choose a role, produce goods and sell them. See how unchosen roles gain coins."
       },

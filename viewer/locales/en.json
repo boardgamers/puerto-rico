@@ -591,5 +591,8 @@
   "metadata.autoStore": "Automatically store when everything fits",
   "metadata.autoForcedActions": "Automatically play forced moves",
   "metadata.description": "Choose roles, develop your island, produce goods and ship them for points. Includes all six expansions and solo play against two Puertomas.",
-  "metadata.rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins."
+  "metadata.rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins.",
+  "smugglerRaidHelp": "Take up to 3 goods from one ship; return the rest to the supply.",
+  "smugglerPlunderHelp": "Return all trading-house goods to the supply; gain 1 VP per good.",
+  "smugglerPoachHelp": "Take up to 3 surplus workers and place them immediately."
 }

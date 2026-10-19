@@ -1,3 +1,4 @@
+import { actionBonuses, actionVictoryPoints } from "./action-bonuses.js";
 import { recruitmentShares, recruitmentBonus } from "./recruitment.js";
 import { showBuildingPayment } from "./building-payment.js";
 import { FORCE_DARK_THEME } from "./theme.js";
@@ -227,12 +228,32 @@ export function mountGame(
   const isTurn = () => enabled && seat === state?.tasks[0]?.p;
   const allowed = () => isTurn() && !pending;
   const moveButton = (m, label, pictogram, classes = "", description = "") => {
-    const hint =
-      description +
-      (description && m.decline?.length
-        ? ` · ${t("withoutBonus")} : ${m.decline.map((id) => t(id)).join(", ")}`
-        : "");
-    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" aria-label="${esc(hint)}"` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${m.decline?.length ? `<small>${t("withoutBonus")} · ${m.decline.map((id) => t(id)).join(", ")}</small>` : ""}</span></button>`;
+    const bonuses = actionBonuses(state, seat, m);
+    const bonusTitle = bonuses
+      .map(
+        (b) =>
+          `${t(b.building)}: +${b.vp || b.coins} ${t(b.vp ? "vp" : "coins")}`,
+      )
+      .join(" · ");
+    const smugglerHint = {
+      raid: "smugglerRaidHelp",
+      plunder: "smugglerPlunderHelp",
+      poach: "smugglerPoachHelp",
+    }[m.type];
+    const vp = actionVictoryPoints(state, seat, m);
+    const hint = [
+      description || (smugglerHint ? t(smugglerHint) : ""),
+      vp ? `+${vp} ${t("vp")}` : "",
+      bonusTitle,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const coins = bonuses.reduce((n, b) => n + b.coins, 0);
+    const bonus =
+      vp || coins
+        ? `<span class="action-bonus" title="${esc(bonusTitle)}">(+${vp ? metric("vp", vp) : ""}${vp && coins ? " +" : ""}${coins ? metric("coin", coins) : ""})</span>`
+        : "";
+    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
   };
   function show(title, html, mode = "") {
     if (!modal.open) lastFocus = document.activeElement;
@@ -366,7 +387,9 @@ export function mountGame(
       case "zoneSell":
         return `${t(m.type === "park" ? "park" : "zoneSell")} · ${t(state.players[seat].estates[m.estate].id)}`;
       case "raid":
-        return `${t("raid")} · ${state.ships[m.ship].capacity} ${metric(state.ships[m.ship].good, m.amount)}`;
+        return `${t("raid")} · ${metric("ship", state.ships[m.ship].capacity)} → ${metric(state.ships[m.ship].good, m.amount)}`;
+      case "plunder":
+        return t("plunder");
       case "capture":
         return `${t("capture")} · ${t(m.id)}`;
       default:
@@ -422,7 +445,7 @@ export function mountGame(
       }
       case "pension":
         return [
-          `${metric(m.good, 1)}${arrow}${metric("vp", 1)}`,
+          `${metric(m.good, 1)}${arrow}`,
           `${t("pensionOffice")} : ${t(m.good)} → 1 ${t("vp")}`,
         ];
       default:
@@ -434,8 +457,8 @@ export function mountGame(
       (m) =>
         m.type !== "bohio" &&
         showBuildingPayment(state.players[seat], m) &&
-        (m.type !== "pass" || m.decline?.length) &&
-        // Zero production has the same bonus choices as passing.
+        m.type !== "pass" &&
+        // Zero production is already available through passing.
         !(m.type === "produce" && !GOODS.some((g) => m.goods[g])),
     );
   }
@@ -876,6 +899,9 @@ export function mountGame(
   }
   function render(s, awaitingMove = false) {
     if (s) {
+      // Present the bonus-taking version of every action, including dialogs.
+      // Keep engine support for declined bonuses so historical moves still replay.
+      s = { ...s, legal: s.legal.filter((m) => !m.decline?.length) };
       state = s.finished
         ? {
             ...s,
@@ -957,7 +983,19 @@ export function mountGame(
   function roleReference(id) {
     const solo = id === "smuggler" || id.startsWith("adventurer");
     const privilege = t.rolePrivilege(id);
-    return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small><p>${t.roleActionHtml(id)}</p>${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
+    return `<article class="role-reference"><h3>${icon(id.startsWith("adventurer") ? "adventurer" : id, 32)}${t(id)}</h3><div><small>${t(solo ? "chooserOnly" : "everyone")}</small>${
+      id === "smuggler"
+        ? `<ul class="smuggler-effects">${[
+            ["raid", "smugglerRaidHelp"],
+            ["plunder", "smugglerPlunderHelp"],
+            ["poach", "smugglerPoachHelp"],
+          ]
+            .map(
+              ([action, help]) => `<li><b>${t(action)}</b> — ${t(help)}</li>`,
+            )
+            .join("")}<li><b>${t("capture")}</b></li></ul>`
+        : `<p>${t.roleActionHtml(id)}</p>`
+    }${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
   }
   function confirmRole(m) {
     const warning = state.roleWarnings?.[m.id];
@@ -1429,7 +1467,21 @@ export function mountGame(
           "",
         )}<button type="submit" class="primary">${t("confirm")}</button></form>`,
     );
-    body.querySelector("form").onsubmit = (ev) => {
+    const form = body.querySelector("form");
+    const chosenGoods = () =>
+      Object.fromEntries(
+        GOODS.map((g) => [g, Number(new FormData(form).get(g) ?? 0)]),
+      );
+    const updateReward = () => {
+      const goods = chosenGoods();
+      const points = actionVictoryPoints(state, seat, { ...m, goods });
+      const button = form.querySelector('[type="submit"]');
+      button.innerHTML = `${t("confirm")} ${goodsRow(goods)}${points ? ` <span class="action-bonus">(+${metric("vp", points)})</span>` : ""}`;
+      button.disabled = m.type === "smallWharf" && !sum(Object.values(goods));
+    };
+    form.oninput = updateReward;
+    updateReward();
+    form.onsubmit = (ev) => {
       ev.preventDefault();
       const data = new FormData(ev.currentTarget),
         goods = Object.fromEntries(

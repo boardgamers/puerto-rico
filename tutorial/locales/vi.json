@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Nhà nguyện và Công chứng viên: mỗi nơi một công dân. Hai đồn điền và kho trái cây: mỗi nơi một công nhân.",
   "tutorial.citizens.produce.title": "Nhà nguyện thưởng theo người bên trong",
   "tutorial.citizens.produce.text": "Đối thủ đã chọn Thợ thủ công. Sản xuất một ngô và một trái cây. Công dân trong Nhà nguyện cũng nhận một điểm chiến thắng; công nhân ở đó sẽ nhận một đồng.",
-  "tutorial.citizens.produce.hint": "Xác nhận một ngô và một trái cây mà không từ chối điểm Nhà nguyện.",
+  "tutorial.citizens.produce.hint": "Xác nhận một ngô và một trái cây; điểm Nhà nguyện được cộng tự động.",
   "tutorial.citizens.build.title": "Dùng giảm giá của Công chứng viên",
   "tutorial.citizens.build.text": "Đối thủ đã chọn Thợ xây. Công dân trong Công chứng viên giảm hai đồng cho công trình mở rộng. Mua Tòa thị chính với tám đồng. Công nhân ở đó sẽ giảm một đồng cho công trình thường.",
   "tutorial.citizens.build.hint": "Chọn Tòa thị chính. Giá sau giảm là tám đồng.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Đã hoàn thành chương",
   "tutorial.guide.learn": "Học cách chơi",
   "tutorial.basics.intro.title": "Phát triển hòn đảo",
-  "tutorial.basics.intro.text": "Giành nhiều điểm nhất bằng vận chuyển hàng và xây thành phố. Chủ đồn điền thêm đồn điền, Thợ xây mua công trình, Người tuyển dụng phân công công nhân. Đảo này đã có người làm: hãy bắt đầu sản xuất."
+  "tutorial.basics.intro.text": "Giành nhiều điểm nhất bằng vận chuyển hàng và xây thành phố. Chủ đồn điền thêm đồn điền, Thợ xây mua công trình, Người tuyển dụng phân công công nhân. Đảo này đã có người làm: hãy bắt đầu sản xuất.",
+  "tutorial.basics.round.title": "Một vòng chọn vai trò",
+  "tutorial.basics.round.text": "Thống đốc chọn vai trò trước. Với hầu hết vai trò, mọi người đều thực hiện hành động, bắt đầu từ người chọn; người này còn được đặc quyền. Sau đó người chơi tiếp theo chọn vai trò khác. Khi mọi người đã chọn, đặt một đồng lên mỗi vai trò chưa được chọn (trừ Kẻ buôn lậu) và chuyển Thống đốc cho người tiếp theo."
 }

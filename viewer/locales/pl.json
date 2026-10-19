@@ -591,5 +591,8 @@
   "metadata.autoStore": "Przechowuj automatycznie, gdy wszystko się mieści",
   "metadata.autoForcedActions": "Automatycznie wykonuj wymuszone ruchy",
   "metadata.description": "Wybieraj role, rozwijaj wyspę, produkuj towary i wysyłaj je za punkty. Wszystkie sześć rozszerzeń i gra solo przeciwko dwóm Puertomom.",
-  "metadata.rules": "Wybierz rolę: wszyscy wykonują jej akcję, a ty otrzymujesz przywilej. Sadź, werbuj, buduj, produkuj, handluj i wysyłaj. Wygrywa najwięcej punktów za wysyłkę, budynki i premie."
+  "metadata.rules": "Wybierz rolę: wszyscy wykonują jej akcję, a ty otrzymujesz przywilej. Sadź, werbuj, buduj, produkuj, handluj i wysyłaj. Wygrywa najwięcej punktów za wysyłkę, budynki i premie.",
+  "smugglerRaidHelp": "Weź do 3 towarów z jednego statku; resztę zwróć do zasobów.",
+  "smugglerPlunderHelp": "Zwróć wszystkie towary z domu handlowego do zasobów; zdobądź 1 PZ za każdy towar.",
+  "smugglerPoachHelp": "Weź do 3 nadmiarowych robotników i natychmiast ich rozmieść."
 }

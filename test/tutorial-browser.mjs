@@ -134,7 +134,9 @@ try {
         { id, locale: width === 390 ? "fr" : "en" },
       );
       let state = chapters[id].initialState();
-      if (await page.locator('[data-tutorial-control="continue"]').isVisible())
+      while (
+        await page.locator('[data-tutorial-control="continue"]').isVisible()
+      )
         await page.locator('[data-tutorial-control="continue"]').click();
       assert.equal(
         await page.evaluate(

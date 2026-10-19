@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Chapel and Notary: one citizen each. Both plantations and the fruit depot: one worker each.",
   "tutorial.citizens.produce.title": "The Chapel rewards its occupant",
   "tutorial.citizens.produce.text": "An opponent chose Craftsman. Produce one corn and one fruit. Your citizen in the Chapel also earns one victory point; a worker there would earn one coin.",
-  "tutorial.citizens.produce.hint": "Confirm one corn and one fruit without declining the Chapel point.",
+  "tutorial.citizens.produce.hint": "Confirm one corn and one fruit; the Chapel point is automatic.",
   "tutorial.citizens.build.title": "Use the Notary discount",
   "tutorial.citizens.build.text": "An opponent chose Builder. Your citizen in the Notary discounts expanded buildings by two coins. Buy City Hall for eight. A worker in the Notary would instead discount regular buildings by one.",
   "tutorial.citizens.build.hint": "Choose City Hall. Its discounted cost is eight coins.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Chapter complete",
   "tutorial.guide.learn": "Learn to play",
   "tutorial.basics.intro.title": "Build your island",
-  "tutorial.basics.intro.text": "Earn the most points by shipping goods and building your city. Planter adds plantations, Builder buys buildings, and Recruiter assigns workers. This island is already staffed: start by producing."
+  "tutorial.basics.intro.text": "Earn the most points by shipping goods and building your city. Planter adds plantations, Builder buys buildings, and Recruiter assigns workers. This island is already staffed: start by producing.",
+  "tutorial.basics.round.title": "A round of roles",
+  "tutorial.basics.round.text": "The Governor chooses a role first. For most roles, everyone takes the action, starting with its chooser, who also gets a privilege. Then the next player chooses another role. Once everyone has chosen, put one coin on each unused role (except Smuggler) and pass the Governor to the next player."
 }

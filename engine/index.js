@@ -615,12 +615,12 @@ function matched(values, have, amount = 1, amounts = null) {
     need[values[i]] = (need[values[i]] ?? 0) + (amounts?.[i] ?? amount);
   return Object.entries(need).every(([k, v]) => (have[k] ?? 0) >= v);
 }
-function checkFestival(s, p, e) {
+export function completedFestivals(s, p, e) {
   const a = s.players[p],
     est = {};
   for (const t of a.estates) est[t.id] = (est[t.id] ?? 0) + 1;
-  for (const f of s.festivals) {
-    if (f.claimed !== undefined) continue;
+  return s.festivals.filter((f) => {
+    if (f.claimed !== undefined) return false;
     const t = f.targets;
     let ok = false;
     if (f.goal === "estates") ok = matched(t.estates, est, f.amount);
@@ -645,7 +645,13 @@ function checkFestival(s, p, e) {
           (f.goal === "dispatchBig"
             ? Math.max(...s.ships.map((x) => x.capacity))
             : Math.min(...s.ships.map((x) => x.capacity)));
-    if (!ok) continue;
+    return ok;
+  });
+}
+function checkFestival(s, p, e) {
+  const a = s.players[p];
+  for (const f of completedFestivals(s, p, e)) {
+    const t = f.targets;
     f.claimed = p;
     for (const g of t.goods) s.supply[g]++;
     s.bag.push(...t.estates);
@@ -1450,12 +1456,14 @@ function applyMove(state, m, p, historical = false) {
           new Set(m.decline).size === m.decline.length &&
           m.decline.every((id) => optionalPoints(s, p, m).includes(id)),
       );
-  } else assert(
-    legal(s, p).some((x) => sameMove(x, m)) ||
-      // Preserve already-recorded payments from before mandatory quarry discounts.
-      (historical && t.kind === "build" &&
-        buildOptions(s, p, true).some((x) => sameMove(x, m))),
-  );
+  } else
+    assert(
+      legal(s, p).some((x) => sameMove(x, m)) ||
+        // Preserve already-recorded payments from before mandatory quarry discounts.
+        (historical &&
+          t.kind === "build" &&
+          buildOptions(s, p, true).some((x) => sameMove(x, m))),
+    );
   if (m.target)
     extra.targetId =
       m.target === "reserve" ? "reserve" : tileRef(a, m.target).id;
@@ -1995,7 +2003,8 @@ export function replay(s, options = {}) {
   assert(integer(to) && to >= 1 && to <= logLength(s));
   const c = s.config;
   let r = init(c.n, c.expansions, c.options, c.seed);
-  for (const h of s.history.slice(0, to - 1)) r = applyMove(r, h.move, h.p, true);
+  for (const h of s.history.slice(0, to - 1))
+    r = applyMove(r, h.move, h.p, true);
   r.players.forEach((p, i) => {
     p.name = s.players[i].name;
     p.bot = s.players[i].bot;

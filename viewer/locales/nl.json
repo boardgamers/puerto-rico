@@ -591,5 +591,8 @@
   "metadata.autoStore": "Automatisch opslaan als alles past",
   "metadata.autoForcedActions": "Gedwongen zetten automatisch spelen",
   "metadata.description": "Kies rollen, ontwikkel je eiland, produceer goederen en verscheep ze voor punten. Met alle zes uitbreidingen en solospel tegen twee Puertoma’s.",
-  "metadata.rules": "Kies een rol: iedereen voert de actie uit en jij krijgt een privilege. Plant, rekruteer, bouw, produceer, handel en verscheep. De meeste punten uit verscheping, gebouwen en bonussen winnen."
+  "metadata.rules": "Kies een rol: iedereen voert de actie uit en jij krijgt een privilege. Plant, rekruteer, bouw, produceer, handel en verscheep. De meeste punten uit verscheping, gebouwen en bonussen winnen.",
+  "smugglerRaidHelp": "Neem maximaal 3 goederen van één schip; leg de rest terug in de voorraad.",
+  "smugglerPlunderHelp": "Leg alle goederen uit het handelshuis terug in de voorraad; ontvang 1 overwinningspunt per goed.",
+  "smugglerPoachHelp": "Neem maximaal 3 overtollige arbeiders en plaats ze onmiddellijk."
 }

@@ -591,5 +591,8 @@
   "metadata.autoStore": "Conserva automaticamente quando c’è spazio per tutto",
   "metadata.autoForcedActions": "Esegui automaticamente le mosse obbligate",
   "metadata.description": "Scegli ruoli, sviluppa l’isola, produci merci e spediscile per ottenere punti. Include tutte le sei espansioni e il solitario contro due Puertoma.",
-  "metadata.rules": "Scegli un ruolo: tutti eseguono la sua azione e tu ricevi un privilegio. Pianta, recluta, costruisci, produci, commercia e spedisci. Vince chi ottiene più punti da spedizioni, edifici e bonus."
+  "metadata.rules": "Scegli un ruolo: tutti eseguono la sua azione e tu ricevi un privilegio. Pianta, recluta, costruisci, produci, commercia e spedisci. Vince chi ottiene più punti da spedizioni, edifici e bonus.",
+  "smugglerRaidHelp": "Prendi fino a 3 merci da una nave; rimetti le altre nella riserva.",
+  "smugglerPlunderHelp": "Rimetti tutte le merci dell’emporio nella riserva; ottieni 1 PV per merce.",
+  "smugglerPoachHelp": "Prendi fino a 3 lavoratori in eccedenza e collocali subito."
 }

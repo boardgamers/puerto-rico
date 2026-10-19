@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "예배당과 공증소에 시민 한 명씩. 두 농장과 과일 창고에 일꾼 한 명씩.",
   "tutorial.citizens.produce.title": "예배당은 배치된 인원에 따라 보상합니다",
   "tutorial.citizens.produce.text": "상대가 장인을 선택했습니다. 옥수수 하나와 과일 하나를 생산하세요. 예배당의 시민은 승점 일 점도 받습니다. 일꾼이라면 동전 하나를 받습니다.",
-  "tutorial.citizens.produce.hint": "예배당 점수를 포기하지 않고 옥수수 하나와 과일 하나를 확인하세요.",
+  "tutorial.citizens.produce.hint": "옥수수 1개와 과일 1개를 확정하세요. 예배당 점수는 자동으로 받습니다.",
   "tutorial.citizens.build.title": "공증소 할인을 사용하세요",
   "tutorial.citizens.build.text": "상대가 건축가를 선택했습니다. 공증소의 시민은 확장 건물을 동전 두 개 할인합니다. 시청을 여덟 개에 사세요. 공증소에 일꾼이 있다면 대신 일반 건물을 동전 하나 할인합니다.",
   "tutorial.citizens.build.hint": "시청을 선택하세요. 할인된 가격은 동전 여덟 개입니다.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "챕터 완료",
   "tutorial.guide.learn": "게임 배우기",
   "tutorial.basics.intro.title": "섬을 발전시키세요",
-  "tutorial.basics.intro.text": "상품을 선적하고 도시를 지어 가장 많은 점수를 얻으세요. 농장주는 농장을 추가하고, 건축가는 건물을 사고, 모집관은 일꾼을 배치합니다. 이 섬은 이미 인원이 배치되어 있으니 생산부터 시작하세요."
+  "tutorial.basics.intro.text": "상품을 선적하고 도시를 지어 가장 많은 점수를 얻으세요. 농장주는 농장을 추가하고, 건축가는 건물을 사고, 모집관은 일꾼을 배치합니다. 이 섬은 이미 인원이 배치되어 있으니 생산부터 시작하세요.",
+  "tutorial.basics.round.title": "한 라운드의 역할 선택",
+  "tutorial.basics.round.text": "총독이 먼저 역할을 선택합니다. 대부분의 역할에서는 선택한 사람부터 모두 행동을 하며, 선택한 사람은 특권도 받습니다. 다음 플레이어가 다른 역할을 선택합니다. 모두 선택했다면 선택되지 않은 역할마다 동전 1개를 놓고(밀수업자 제외), 총독을 다음 플레이어에게 넘깁니다."
 }

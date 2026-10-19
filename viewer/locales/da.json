@@ -591,5 +591,8 @@
   "metadata.autoStore": "Opbevar automatisk, når alt kan være der",
   "metadata.autoForcedActions": "Spil tvungne træk automatisk",
   "metadata.description": "Vælg roller, udvikl din ø, producer varer, og afskib dem for point. Omfatter alle seks udvidelser og solospil mod to Puertomaer.",
-  "metadata.rules": "Vælg en rolle: alle udfører handlingen, og du får et privilegium. Plant, rekrutter, byg, producer, handl og afskib. Flest point fra afskibning, bygninger og bonusser vinder."
+  "metadata.rules": "Vælg en rolle: alle udfører handlingen, og du får et privilegium. Plant, rekrutter, byg, producer, handl og afskib. Flest point fra afskibning, bygninger og bonusser vinder.",
+  "smugglerRaidHelp": "Tag op til 3 varer fra ét skib; læg resten tilbage i forsyningen.",
+  "smugglerPlunderHelp": "Læg alle handelshusets varer tilbage i forsyningen; få 1 sejrspoint pr. vare.",
+  "smugglerPoachHelp": "Tag op til 3 overskydende arbejdere, og placér dem straks."
 }

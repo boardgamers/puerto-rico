@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Cappella e Notaio: un cittadino ciascuno. Entrambe le piantagioni e il deposito di frutta: un lavoratore ciascuno.",
   "tutorial.citizens.produce.title": "La Cappella ricompensa chi la occupa",
   "tutorial.citizens.produce.text": "Un avversario ha scelto Artigiano. Produci un mais e una frutta. Il cittadino nella Cappella guadagna anche un punto vittoria; un lavoratore lì guadagnerebbe una moneta.",
-  "tutorial.citizens.produce.hint": "Conferma un mais e una frutta senza rinunciare al punto della Cappella.",
+  "tutorial.citizens.produce.hint": "Conferma un mais e un frutto; il punto della Cappella è automatico.",
   "tutorial.citizens.build.title": "Usa lo sconto del Notaio",
   "tutorial.citizens.build.text": "Un avversario ha scelto Costruttore. Il cittadino dal Notaio riduce di due monete il costo degli edifici ampliati. Compra il Municipio per otto. Un lavoratore dal Notaio ridurrebbe invece di una moneta il costo degli edifici normali.",
   "tutorial.citizens.build.hint": "Scegli Municipio. Il costo scontato è di otto monete.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Capitolo completato",
   "tutorial.guide.learn": "Impara a giocare",
   "tutorial.basics.intro.title": "Sviluppa la tua isola",
-  "tutorial.basics.intro.text": "Ottieni più punti spedendo merci e costruendo la città. Il Piantatore aggiunge piantagioni, il Costruttore compra edifici e il Reclutatore assegna lavoratori. Quest’isola è già occupata: inizia producendo."
+  "tutorial.basics.intro.text": "Ottieni più punti spedendo merci e costruendo la città. Il Piantatore aggiunge piantagioni, il Costruttore compra edifici e il Reclutatore assegna lavoratori. Quest’isola è già occupata: inizia producendo.",
+  "tutorial.basics.round.title": "Un round di ruoli",
+  "tutorial.basics.round.text": "Il Governatore sceglie per primo un ruolo. Per la maggior parte dei ruoli, tutti eseguono l’azione, iniziando da chi l’ha scelto, che riceve anche un privilegio. Poi il giocatore successivo sceglie un altro ruolo. Quando tutti hanno scelto, mettete una moneta su ogni ruolo inutilizzato (tranne il Contrabbandiere) e passate il Governatore al giocatore successivo."
 }

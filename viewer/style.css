@@ -2828,3 +2828,6 @@ body:has(.pr-game) {
   }
   .pr-game .action-dock .produce-action { flex: 1 1 auto; }
 }
+
+.pr-game .action-bonus { display: inline-flex; align-items: center; gap: 3px; margin-inline-start: 6px; white-space: nowrap; font-size: .85em; }
+.pr-game .action-bonus .icon, .pr-game .action-bonus .score-token { width: 20px; height: 20px; }

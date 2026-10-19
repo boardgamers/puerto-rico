@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Capelă și Notar: câte un cetățean. Ambele plantații și depozitul de fructe: câte un muncitor.",
   "tutorial.citizens.produce.title": "Capela își recompensează ocupantul",
   "tutorial.citizens.produce.text": "Un adversar a ales Meșteșugar. Produce un porumb și un fruct. Cetățeanul din Capelă câștigă și un punct de victorie; un muncitor acolo ar primi o monedă.",
-  "tutorial.citizens.produce.hint": "Confirmă un porumb și un fruct fără a refuza punctul Capelei.",
+  "tutorial.citizens.produce.hint": "Confirmă un porumb și un fruct; punctul Capelei se acordă automat.",
   "tutorial.citizens.build.title": "Folosește reducerea Notarului",
   "tutorial.citizens.build.text": "Un adversar a ales Constructor. Cetățeanul de la Notar reduce cu două monede prețul clădirilor extinse. Cumpără Primăria pentru opt. Un muncitor la Notar ar reduce în schimb cu o monedă prețul clădirilor obișnuite.",
   "tutorial.citizens.build.hint": "Alege Primăria. Costul redus este de opt monede.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Capitol încheiat",
   "tutorial.guide.learn": "Învață să joci",
   "tutorial.basics.intro.title": "Dezvoltă-ți insula",
-  "tutorial.basics.intro.text": "Obține cele mai multe puncte transportând bunuri și construind orașul. Plantatorul adaugă plantații, Constructorul cumpără clădiri, iar Recrutorul repartizează muncitori. Această insulă este deja ocupată: începe cu producția."
+  "tutorial.basics.intro.text": "Obține cele mai multe puncte transportând bunuri și construind orașul. Plantatorul adaugă plantații, Constructorul cumpără clădiri, iar Recrutorul repartizează muncitori. Această insulă este deja ocupată: începe cu producția.",
+  "tutorial.basics.round.title": "O rundă de roluri",
+  "tutorial.basics.round.text": "Guvernatorul alege primul un rol. Pentru majoritatea rolurilor, toți execută acțiunea, începând cu cel care l-a ales și care primește și un privilegiu. Apoi următorul jucător alege alt rol. După ce toți au ales, puneți o monedă pe fiecare rol neales (exceptând Contrabandistul) și transmiteți guvernatorul următorului jucător."
 }

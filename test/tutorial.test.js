@@ -133,11 +133,11 @@ for (const id of chapterIds) {
     const options = tutorialOptions(id, translate);
     assert.equal(
       options.steps.length,
-      chapters[id].steps.length + Number(id === "basics"),
+      chapters[id].steps.length + (id === "basics" ? 2 : 0),
     );
     assert(
       options.steps
-        .filter((s) => s.id !== "intro")
+        .filter((s) => !["intro", "round"].includes(s.id))
         .every(
           (s) => s.complete && s.validateMove && s.title && s.text && s.hint,
         ),
@@ -163,6 +163,7 @@ for (const id of chapterIds) {
     if (id === "basics") {
       const introState = clone(tutorial.snapshot.state);
       assert.equal(tutorial.snapshot.canContinue, true);
+      assert.equal(await tutorial.continue(), true);
       assert.equal(await tutorial.continue(), true);
       assert.deepEqual(tutorial.snapshot.state, introState);
     }
@@ -212,6 +213,7 @@ test("basics demonstrates accumulated role coins, production, privilege and unch
   assert.equal(produced.players[0].goods.fruit, 1);
   assert.equal(bonus.players[0].goods.fruit, 2);
   assert.equal(bonus.round, start.round + 1);
+  assert.equal(bonus.governor, (start.governor + 1) % start.players.length);
   assert.equal(bonus.roles.find((r) => r.id === "builder").coins, 1);
   assert.equal(bonus.roles.find((r) => r.id === "craftsman").coins, 0);
   assert.equal(sold.players[0].coins, bonus.players[0].coins + 1);

@@ -367,12 +367,17 @@ try {
       );
     assert.equal(await overflow(), false, `No page overflow at ${width}`);
     await page.locator(".action-dock [data-actions]").click();
-    assert.ok(await page.locator(".role-picker .role").count() > 0);
-    assert.ok(await page.locator(".role-choice-warning").count() > 0);
-    assert.equal(await page.locator(".recruitment-shares > span").count(), original.players.length);
+    assert.ok((await page.locator(".role-picker .role").count()) > 0);
+    assert.ok((await page.locator(".role-choice-warning").count()) > 0);
+    assert.equal(
+      await page.locator(".recruitment-shares > span").count(),
+      original.players.length,
+    );
     assert.equal(
       await page.locator('.role-picker [data-role-id="recruiter"]').innerHTML(),
-      await page.locator('.shared-board [data-role-id="recruiter"]').innerHTML(),
+      await page
+        .locator('.shared-board [data-role-id="recruiter"]')
+        .innerHTML(),
       "role picker reuses board role cards",
     );
     assert.equal(await overflow(), false);
@@ -781,7 +786,11 @@ try {
     await page.evaluate((s) => host.emit("state", s), full);
     for (let i = 0; i < full.players.length; i++) {
       const counter = page.locator(`.player-strip [data-score="${i}"]`);
-      assert.ok((await counter.getAttribute("aria-label")).endsWith(`: ${E.scoreBreakdown(full, i).total}`));
+      assert.ok(
+        (await counter.getAttribute("aria-label")).endsWith(
+          `: ${E.scoreBreakdown(full, i).total}`,
+        ),
+      );
     }
     await page.locator('[data-panel="journal"]').click();
     const log = page.locator(".pr-modal .modal-body");
@@ -976,6 +985,46 @@ try {
       path: `.local/qa/${width}-production-comparison.png`,
     });
     await page.keyboard.press("Escape");
+    const chapelProduction = E.move(original, { type: "role", id: "craftsman" }, 0);
+    chapelProduction.tasks = [{ kind: "produce", p: 0 }];
+    chapelProduction.role = "craftsman";
+    chapelProduction.owner = 0;
+    chapelProduction.players[0].estates = [{ id: "corn", w: 1, c: 0 }];
+    chapelProduction.players[0].buildings = [{ id: "chapel", w: 0, c: 1 }];
+    assert(
+      E.legal(chapelProduction, 0).some((m) => m.decline?.includes("chapel")),
+    );
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 0 });
+        host.emit("preferences", { locale: "en" });
+        host.emit("state", s);
+      },
+      E.stripSecret(chapelProduction, 0),
+    );
+    assert.equal(await page.locator(".action-dock .produce-action").count(), 1);
+    assert.equal(
+      await page.locator(".action-dock .production-custom").count(),
+      1,
+    );
+    assert.doesNotMatch(
+      await page.locator(".action-dock").innerText(),
+      /Without bonus/,
+    );
+    assert.match(
+      await page.locator(".produce-action .action-bonus").getAttribute("title"),
+      /Chapel: \+1 Victory points/,
+    );
+    assert.equal(await overflow(), false, `Production bonus at ${width}`);
+    await page.screenshot({ path: `.local/qa/${width}-production-bonus.png` });
+    await page.locator(".action-dock .produce-action").click();
+    const productionMove = await page.evaluate(() => played.at(-1));
+    assert.equal(productionMove.decline, undefined);
+    assert.equal(
+      E.move(chapelProduction, productionMove, 0).players[0].vp,
+      chapelProduction.players[0].vp + 1,
+    );
+    await page.evaluate(() => host.emit("preferences", { locale: "fr" }));
     let parallel = E.init(3, [], {}, "browser-parallel");
     parallel = E.move(parallel, { type: "role", id: "recruiter" }, 0);
     parallel = E.move(parallel, { type: "recruitBonus" }, 0);

@@ -591,5 +591,8 @@
   "metadata.autoStore": "Tự động lưu kho khi đủ chỗ cho tất cả",
   "metadata.autoForcedActions": "Tự động thực hiện nước đi bắt buộc",
   "metadata.description": "Chọn vai trò, phát triển đảo, sản xuất và giao hàng lấy điểm. Gồm cả sáu bản mở rộng và chơi đơn với hai Puertoma.",
-  "metadata.rules": "Chọn vai trò: mọi người thực hiện hành động, bạn nhận đặc quyền. Trồng trọt, tuyển người, xây dựng, sản xuất, buôn bán và giao hàng. Ai có nhiều điểm nhất từ giao hàng, tòa nhà và thưởng sẽ thắng."
+  "metadata.rules": "Chọn vai trò: mọi người thực hiện hành động, bạn nhận đặc quyền. Trồng trọt, tuyển người, xây dựng, sản xuất, buôn bán và giao hàng. Ai có nhiều điểm nhất từ giao hàng, tòa nhà và thưởng sẽ thắng.",
+  "smugglerRaidHelp": "Lấy tối đa 3 hàng hóa từ một tàu; trả số còn lại về kho chung.",
+  "smugglerPlunderHelp": "Trả toàn bộ hàng hóa trong nhà buôn về kho chung; nhận 1 điểm chiến thắng cho mỗi hàng hóa.",
+  "smugglerPoachHelp": "Lấy tối đa 3 công nhân dư và bố trí ngay."
 }

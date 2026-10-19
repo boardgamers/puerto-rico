@@ -252,7 +252,7 @@ export const chapters = Object.fromEntries(
       id,
       {
         id,
-        version: id === "shipping" ? 2 : 1,
+        version: ["shipping", "basics"].includes(id) ? 2 : 1,
         titleKey: `tutorial.${id}.title`,
         descriptionKey: `tutorial.${id}.description`,
         initialState: definition.initialState,
@@ -298,6 +298,11 @@ export function tutorialOptions(id, translate) {
               id: "intro",
               title: translate("tutorial.basics.intro.title"),
               text: translate("tutorial.basics.intro.text"),
+            },
+            {
+              id: "round",
+              title: translate("tutorial.basics.round.title"),
+              text: translate("tutorial.basics.round.text"),
             },
           ]
         : []),

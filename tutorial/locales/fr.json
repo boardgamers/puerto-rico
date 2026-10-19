@@ -38,7 +38,7 @@
   "tutorial.citizens.assign.hint": "Chapelle et Notaire : un citoyen chacun. Les deux plantations et le dépôt de fruits : un ouvrier chacun.",
   "tutorial.citizens.produce.title": "La Chapelle récompense son occupant",
   "tutorial.citizens.produce.text": "Un adversaire a choisi l’Artisan. Produisez un maïs et un fruit. Votre citoyen dans la Chapelle rapporte aussi un point de victoire ; un ouvrier y rapporterait une pièce.",
-  "tutorial.citizens.produce.hint": "Confirmez un maïs et un fruit sans renoncer au point de la Chapelle.",
+  "tutorial.citizens.produce.hint": "Confirmez un maïs et un fruit ; le PV de la Chapelle est automatique.",
   "tutorial.citizens.build.title": "Utilisez la réduction du Notaire",
   "tutorial.citizens.build.text": "Un adversaire a choisi le Bâtisseur. Votre citoyen chez le Notaire réduit de deux pièces le coût des bâtiments étendus. Achetez l’Hôtel de ville pour huit. Un ouvrier chez le Notaire réduirait plutôt d’une pièce les bâtiments ordinaires.",
   "tutorial.citizens.build.hint": "Choisissez l’Hôtel de ville. Son coût réduit est de huit pièces.",
@@ -71,5 +71,7 @@
   "tutorial.guide.complete": "Chapitre terminé",
   "tutorial.guide.learn": "Apprendre à jouer",
   "tutorial.basics.intro.title": "Développez votre île",
-  "tutorial.basics.intro.text": "Gagnez le plus de points en expédiant des marchandises et en construisant votre ville. Le Planteur ajoute des plantations, le Bâtisseur achète des bâtiments et le Recruteur place les ouvriers. Cette île est déjà occupée : commencez par produire."
+  "tutorial.basics.intro.text": "Gagnez le plus de points en expédiant des marchandises et en construisant votre ville. Le Planteur ajoute des plantations, le Bâtisseur achète des bâtiments et le Recruteur place les ouvriers. Cette île est déjà occupée : commencez par produire.",
+  "tutorial.basics.round.title": "Le tour des rôles",
+  "tutorial.basics.round.text": "Le gouverneur choisit un rôle en premier. Pour la plupart des rôles, tous en font l’action, en commençant par celui qui l’a choisi, qui reçoit aussi un privilège. Puis le joueur suivant choisit un autre rôle. Quand chacun a choisi, ajoutez une pièce sur chaque rôle inutilisé (sauf le Contrebandier) et passez le gouverneur au joueur suivant."
 }

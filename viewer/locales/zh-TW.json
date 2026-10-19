@@ -591,5 +591,8 @@
   "metadata.autoStore": "可全部儲存時自動儲存",
   "metadata.autoForcedActions": "自動執行唯一可行的行動",
   "metadata.description": "選擇角色、發展島嶼、生產貨物並運出賺分。包含全部六個擴充，以及對抗兩個 Puertoma 的單人模式。",
-  "metadata.rules": "選擇角色：所有玩家執行其行動，而你獲得特權。開墾、招募、建造、生產、交易及運輸。運輸、建築與獎勵總分最高者獲勝。"
+  "metadata.rules": "選擇角色：所有玩家執行其行動，而你獲得特權。開墾、招募、建造、生產、交易及運輸。運輸、建築與獎勵總分最高者獲勝。",
+  "smugglerRaidHelp": "從一艘船上拿取最多 3 個貨物，其餘貨物放回供應區。",
+  "smugglerPlunderHelp": "將交易所內所有貨物放回供應區，每個貨物獲得 1 勝利點。",
+  "smugglerPoachHelp": "拿取最多 3 名多餘的工人並立即配置。"
 }

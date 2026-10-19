@@ -591,5 +591,8 @@
   "metadata.autoStore": "Armazenar automaticamente quando tudo couber",
   "metadata.autoForcedActions": "Jogar automaticamente as jogadas obrigatórias",
   "metadata.description": "Escolha papéis, desenvolva sua ilha, produza mercadorias e embarque-as por pontos. Inclui as seis expansões e jogo solo contra dois Puertomas.",
-  "metadata.rules": "Escolha um papel: todos realizam a ação e você recebe um privilégio. Plante, recrute, construa, produza, negocie e embarque. Vence quem tiver mais pontos de embarques, edifícios e bônus."
+  "metadata.rules": "Escolha um papel: todos realizam a ação e você recebe um privilégio. Plante, recrute, construa, produza, negocie e embarque. Vence quem tiver mais pontos de embarques, edifícios e bônus.",
+  "smugglerRaidHelp": "Pegue até 3 mercadorias de um navio; devolva o restante à reserva.",
+  "smugglerPlunderHelp": "Devolva todas as mercadorias da casa de comércio à reserva; ganhe 1 PV por mercadoria.",
+  "smugglerPoachHelp": "Pegue até 3 trabalhadores excedentes e coloque-os imediatamente."
 }
