@@ -9,7 +9,7 @@
     "build": "node scripts/build.mjs",
     "dev": "node scripts/dev.mjs",
     "test:browser": "node test/browser.mjs && node test/locales-browser.mjs",
-    "publish:private": "pnpm build && node scripts/publish-private.mjs",
+    "publish:bgs": "pnpm build && node scripts/publish-release.mjs",
     "publish:metadata": "node scripts/publish-metadata.mjs",
     "test:tutorials": "node test/tutorial-browser.mjs",
     "release:gallery": "pnpm build && node scripts/release-gallery.mjs",

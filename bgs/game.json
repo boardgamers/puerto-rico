@@ -1,6 +1,6 @@
 {
   "label": "🏝️ Puerto Rico",
-  "public": false,
+  "public": true,
   "players": [1, 2, 3, 4, 5],
   "description": "Choose roles to develop your island, produce goods, and ship them for victory points. Every role helps your rivals too, so timing matters as much as building a strong economy. This adaptation of Puerto Rico 1897: Special Edition includes all six expansions and solo play against two Puertomas.",
   "rules": "[How to play](/page/puerto-rico/rules)",

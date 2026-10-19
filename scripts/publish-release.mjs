@@ -9,7 +9,7 @@ import { supportedLocales } from "../viewer/i18n.js";
 import { packageEngine } from "./package-engine.mjs";
 
 const defaults = JSON.parse(await readFile("bgs/game.json", "utf8"));
-assert.equal(defaults.public, false);
+assert.equal(defaults.public, true);
 const { tarball, version } = await packageEngine();
 const token = (await readFile(`${homedir()}/.bgs`, "utf8")).trim();
 const base = "https://admin.boardgamers.space/api/admin/gameinfo/puerto-rico";
@@ -42,8 +42,8 @@ async function api(
 }
 const versions = await api("/versions");
 const existing = versions.some((v) => v.version === 1) ? await api("/1") : null;
-if (existing?.public)
-  throw Error("The private publisher cannot replace a public version.");
+if (!existing?.public)
+  throw Error("The release publisher requires an already public version.");
 await mkdir(".local/release", { recursive: true });
 await writeFile(
   `.local/release/before-${Date.now()}.json`,
@@ -71,7 +71,7 @@ await api("/1", "PUT", {
   engine: { ...engine.engine, entryPoint: "dist/engine.js" },
   viewer: { ...defaults.viewer, url: uploaded.url, scriptBytes: bytes.length },
 });
-// Listed in the beta catalog; the actual playable version stays private.
+// Keep the released game listed in the catalog.
 const { metadata } = await releaseMetadata();
 await publishCmsRules(token);
 await api("/meta", "PUT", metadata);
@@ -85,12 +85,9 @@ await api(
 await api("/icon", "PUT", { mode: "pictogram" });
 await translatePlatformMetadata(token, metadata);
 const translationsPending = false;
-const access = await api("/beta-users");
-if (!access.some((u) => u.username === "coyotte508"))
-  await api("/beta-users", "POST", { usernameOrEmail: "coyotte508" });
 const published = await api("/1"),
   meta = await api("/meta");
-assert.equal(published.public, false);
+assert.equal(published.public, true);
 assert.deepEqual(published.players, defaults.players);
 assert.ok(!meta.unlisted);
 assert.equal(published.engine.package.version, version);

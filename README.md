@@ -2,7 +2,7 @@
 
 [Play now at boardgamers.space](https://boardgamers.space/boardgame/puerto-rico)
 
-Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **private beta** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.3.0`. The viewer follows the global BGS language preference.
+Implementation for Boardgamers Space, targeting **Puerto Rico 1897: Special Edition** and the official June 2026 errata. Version 1 is published as a **public release** on [BGS](https://boardgamers.space/boardgame/puerto-rico), with Unlisted disabled. The engine package is `@boardgamers/puerto-rico@0.3.5`. The viewer follows the global BGS language preference.
 
 ```sh
 pnpm install
@@ -56,11 +56,11 @@ pnpm build          # dist/engine.js, dist/viewer.js, local sandbox
 pnpm test:browser   # 320/390/768/1440px, real viewer events, chat/journal scrolling
 ```
 
-This private version still needs broader playtesting. The Festival marker interpretation is noted above. Original vector UI artwork is in `viewer/icons.js`; reference scans in `.local/` are ignored and never bundled.
+Further playtesting remains welcome. The Festival marker interpretation is noted above. Original vector UI artwork is in `viewer/icons.js`; reference scans in `.local/` are ignored and never bundled.
 
-## Private BGS publication
+## BGS publication
 
-`pnpm publish:private` builds the bundles, packages only the self-contained engine and its manifest, checks complete 1–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, refuses to replace a public version, and verifies the private/listed flags and CDN bytes. It grants beta access to `coyotte508` if needed. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
+`pnpm publish:bgs` builds the bundles, packages only the self-contained engine and its manifest, checks complete 1–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, requires an already public version, and verifies the public/listed flags and CDN bytes. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
 
 The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Four playable tutorial chapters are registered.
 
@@ -100,5 +100,5 @@ After `pnpm build`, open `/tutorial.html?chapter=basics&locale=fr` on the local
 preview server (or replace the chapter ID above). `pnpm test` covers legality,
 conservation, replay, progress and translation completeness. `pnpm test:tutorials`
 plays every chapter through the actual controls on mobile and desktop and checks
-all languages at 320 px. `pnpm publish:private` registers the chapter metadata with
+all languages at 320 px. `pnpm publish:bgs` registers the chapter metadata with
 the viewer; translated BGS chapter-list labels use the platform metadata service.
