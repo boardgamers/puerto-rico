@@ -11,6 +11,7 @@ import it from "./locales/it.json" with { type: "json" };
 import fa from "./locales/fa.json" with { type: "json" };
 import pt_BR from "./locales/pt-BR.json" with { type: "json" };
 import de from "./locales/de.json" with { type: "json" };
+import zh_CN from "./locales/zh-CN.json" with { type: "json" };
 import zh_TW from "./locales/zh-TW.json" with { type: "json" };
 import ro from "./locales/ro.json" with { type: "json" };
 import hi from "./locales/hi.json" with { type: "json" };
@@ -32,6 +33,7 @@ export const catalogs = {
   fr: fr,
   de: de,
   "zh-TW": zh_TW,
+  "zh-CN": zh_CN,
 };
 export const supportedLocales = [
   "en",
@@ -46,6 +48,7 @@ export const supportedLocales = [
   "pt-BR",
   "ko",
   "zh-TW",
+  "zh-CN",
   "vi",
   "it",
   "nl",
@@ -58,7 +61,9 @@ export function normalizeLocale(locale = "en") {
   );
   return (
     exact ??
-    { pt: "pt-BR", zh: "zh-TW" }[String(locale).split("-")[0]] ??
+    (/^zh-(?:tw|hk|mo|hant)(?:-|$)/.test(locale) ? "zh-TW" : undefined) ??
+    (/^zh(?:-|$)/.test(locale) ? "zh-CN" : undefined) ??
+    { pt: "pt-BR" }[String(locale).split("-")[0]] ??
     supportedLocales.find((x) => x === String(locale).split("-")[0]) ??
     "en"
   );

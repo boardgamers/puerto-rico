@@ -15,7 +15,7 @@ test("release metadata keeps title separate and prepares every manual locale ove
   assert.deepEqual(
     Object.keys(translations).sort(),
     supportedLocales
-      .filter((l) => l !== "en")
+      .filter((l) => l !== "en" && l !== "zh-CN")
       .map((l) => l.split("-")[0])
       .sort(),
   );

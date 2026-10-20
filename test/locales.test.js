@@ -41,6 +41,11 @@ test("locale normalization accepts regional and case variants", () => {
     ["pt", "pt-BR"],
     ["PT_br", "pt-BR"],
     ["zh-Hant", "zh-TW"],
+    ["zh-HK", "zh-TW"],
+    ["zh", "zh-CN"],
+    ["zh-Hans-SG", "zh-CN"],
+    ["ZH_cn", "zh-CN"],
+    ["zh-SG", "zh-CN"],
     ["fa-IR", "fa"],
     ["unknown", "en"],
   ])

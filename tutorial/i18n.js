@@ -10,6 +10,7 @@ import ru from "./locales/ru.json" with { type: "json" };
 import da from "./locales/da.json" with { type: "json" };
 import pt_BR from "./locales/pt-BR.json" with { type: "json" };
 import ko from "./locales/ko.json" with { type: "json" };
+import zh_CN from "./locales/zh-CN.json" with { type: "json" };
 import zh_TW from "./locales/zh-TW.json" with { type: "json" };
 import vi from "./locales/vi.json" with { type: "json" };
 import it from "./locales/it.json" with { type: "json" };
@@ -29,6 +30,7 @@ export const tutorialCatalogs = {
   "pt-BR": pt_BR,
   ko: ko,
   "zh-TW": zh_TW,
+  "zh-CN": zh_CN,
   vi: vi,
   it: it,
   nl: nl,

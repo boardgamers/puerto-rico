@@ -8,7 +8,8 @@ export async function releaseMetadata() {
   );
   const translations = {};
   for (const locale of supportedLocales) {
-    if (locale === "en") continue;
+    // Simplified Chinese game copy is independent of admin-managed metadata.
+    if (locale === "en" || locale === "zh-CN") continue;
     const catalog = JSON.parse(
       await readFile(
         new URL(`../viewer/locales/${locale}.json`, import.meta.url),
