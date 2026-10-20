@@ -52,7 +52,7 @@ const paths = {
   craftsman:
     '<path fill="#9ca9b0" d="m14 2 3 1-1 5-3 2-3-1-6 11-3-2 7-10-1-3 2-3 1 4 3 1Z"/><path fill="#cfa474" d="m13 14 3-3 7 9-3 2Z"/>',
   trader:
-    '<path fill="#d6b994" d="M5 9h14v13H5Z"/><path fill="#c27952" d="M2 3h20v6H2Z"/><path d="M8 3v6m8-6v6M10 22v-8h4v8"/>',
+    '<path d="M4 9v12m16-12v12"/><path fill="#d6b994" d="M3 16h18v6H3Z"/><path fill="#f3e6c9" d="M4 2h16l2 6H2Z"/><path fill="#c27952" stroke="none" d="M4 2h4L7 8H2Zm8 0h4l1 6h-5Z"/><path fill="#c27952" d="M2 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#f3e6c9" d="M7 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#c27952" d="M12 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#f3e6c9" d="M17 8h5v1a2.5 2.5 0 0 1-5 0Z"/>',
   captain:
     '<path fill="#bb8d60" d="m2 16 4 6h13l3-6Z"/><path fill="#f3e6c9" d="M12 2v13H3Zm2 2v11h7Z"/>',
   adventurer:
