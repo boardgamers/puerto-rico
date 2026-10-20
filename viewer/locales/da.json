@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Ved pengemangel: aflever højst {worker:1}, {crate:1} og {vp:1}; hver betaler {coin:1}.",
   "effect.storehouse": "Behold {crate:3} ekstra af vilkårlige typer.",
   "effect.bohio": "Flyt når som helst en {worker} fra Bohío til en ledig plantage- eller bygningsplads. Den bliver der indtil næste Rekruttør.",
-  "effect.merchantOutpost": "I handelsfasen kan du sælge op til 1 vare til lageret i stedet for handelshuset. Få normalprisen og handelsprivilegiet, hvis det gælder, men ingen bonusser fra Lille marked eller Stort marked.",
+  "effect.merchantOutpost": "{trader}: sælg op til {crate:1} til lageret i stedet for handelshuset til normalprisen i {coin}. Handlerens privilegium gælder; ingen bonusser fra Lille marked eller Stort marked.",
   "effect.church": "Byg en {vp:2/3}-bygning: {vp:+1}. Byg en {expanded}: {vp:+2}.",
   "effect.smallWharf": "Én gang pr. {captain}: afskib blandet last for {vp:1} pr. {crate:2}.",
   "effect.lighthouse": "{coin:+1} pr. afskibning; {coin:+1}, hvis du er {captain}.",

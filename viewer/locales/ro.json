@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Dacă nu ai bani, returnează cel mult {worker:1}, {crate:1} și {vp:1}; fiecare plătește {coin:1}.",
   "effect.storehouse": "Păstrează {crate:3} suplimentare, de orice tip.",
   "effect.bohio": "Oricând, mută un {worker} din Bohío pe un loc liber al unei plantații sau clădiri. Rămâne acolo până la următorul Recrutor.",
-  "effect.merchantOutpost": "În faza Negustorului, vinde cel mult 1 marfă rezervei în locul casei de comerț. Primești prețul normal și privilegiul Negustorului, dacă se aplică, fără bonusurile Pieței mici sau Pieței mari.",
+  "effect.merchantOutpost": "{trader}: vinde cel mult {crate:1} rezervei în locul casei de comerț, la prețul normal în {coin}. Privilegiul Negustorului se aplică; fără bonusurile Pieței mici sau Pieței mari.",
   "effect.church": "Construiește o clădire {vp:2/3}: {vp:+1}. Construiește o {expanded}: {vp:+2}.",
   "effect.smallWharf": "O dată pe {captain}: expediază încărcătură mixtă pentru {vp:1} la fiecare {crate:2}.",
   "effect.lighthouse": "{coin:+1} pe expediere; {coin:+1} dacă ești {captain}.",

@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Se mancano monete, restituisci al massimo {worker:1}, {crate:1} e {vp:1}; ciascuno paga {coin:1}.",
   "effect.storehouse": "Conserva {crate:3} aggiuntive di qualsiasi tipo.",
   "effect.bohio": "In qualsiasi momento, sposta un {worker} dal Bohío a un posto libero in una piantagione o edificio. Vi resta fino al prossimo Reclutatore.",
-  "effect.merchantOutpost": "Nella fase del Mercante, vendi al massimo 1 merce alla riserva anziché all’emporio. Ottieni il prezzo normale e il privilegio del Mercante, se applicabile, ma non i bonus del Piccolo mercato o del Grande mercato.",
+  "effect.merchantOutpost": "{trader}: vendi al massimo {crate:1} alla riserva anziché all’emporio, al normale prezzo in {coin}. Il privilegio del Mercante si applica; nessun bonus del Piccolo mercato o del Grande mercato.",
   "effect.church": "Costruisci un edificio da {vp:2/3}: {vp:+1}. Costruisci un {expanded}: {vp:+2}.",
   "effect.smallWharf": "Una volta per {captain}: spedisci un carico misto, per {vp:1} ogni {crate:2}.",
   "effect.lighthouse": "{coin:+1} per spedizione; {coin:+1} se sei il {captain}.",

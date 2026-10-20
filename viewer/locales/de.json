@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Bei Geldmangel höchstens {worker:1}, {crate:1} und {vp:1} zurückgeben; jedes zahlt {coin:1}.",
   "effect.storehouse": "Zusätzlich {crate:3} beliebiger Sorten behalten.",
   "effect.bohio": "Versetze jederzeit einen {worker} aus dem Bohío auf einen freien Plantagen- oder Gebäudeplatz. Er bleibt bis zum nächsten Anwerber dort.",
-  "effect.merchantOutpost": "In der Händlerphase bis zu 1 Ware an den Vorrat statt ans Handelshaus verkaufen. Es gelten der normale Preis und gegebenenfalls das Händlerprivileg, aber keine Boni von Kleinem und Großem Markt.",
+  "effect.merchantOutpost": "{trader}: Bis zu {crate:1} an den Vorrat statt ans Handelshaus verkaufen, zum normalen {coin}-Preis. Händlerprivileg gilt; keine Boni von Kleinem oder Großem Markt.",
   "effect.church": "Gebäude mit {vp:2/3} bauen: {vp:+1}. Ein {expanded} bauen: {vp:+2}.",
   "effect.smallWharf": "Einmal pro {captain}: gemischte Fracht für {vp:1} je {crate:2} verschiffen.",
   "effect.lighthouse": "{coin:+1} pro Verschiffung; {coin:+1}, wenn du {captain} bist.",
