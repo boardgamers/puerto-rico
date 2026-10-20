@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Si l’argent manque, rendez au plus {worker:1}, {crate:1} et {vp:1} ; chacun paie {coin:1}.",
   "effect.storehouse": "Gardez {crate:3} supplémentaires, de types libres.",
   "effect.bohio": "À tout moment, déplacez un {worker} du Bohío vers une case libre d’une plantation ou d’un bâtiment. Il y reste jusqu’au prochain Recruteur.",
-  "effect.merchantOutpost": "Vendez directement à la réserve, sans bonus des marchés.",
+  "effect.merchantOutpost": "Vendez directement à la réserve, sans les bonus du Petit marché ni du Grand marché.",
   "effect.church": "Bâtiment de {vp:2/3} construit : {vp:+1}. Un {expanded} : {vp:+2}.",
   "effect.smallWharf": "Une fois au {captain} : cargaison mixte, {vp:1} par {crate:2}.",
   "effect.lighthouse": "{coin:+1} par chargement ; {coin:+1} si vous êtes {captain}.",

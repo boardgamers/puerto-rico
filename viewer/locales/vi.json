@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Nếu thiếu tiền, trả tối đa {worker:1}, {crate:1} và {vp:1}; mỗi thứ trả thay {coin:1}.",
   "effect.storehouse": "Giữ thêm {crate:3} bất kỳ loại nào.",
   "effect.bohio": "Bất cứ lúc nào, chuyển {worker} từ Bohío đến ô trống của đồn điền hoặc tòa nhà. Người đó ở đến pha Tuyển dụng tiếp theo.",
-  "effect.merchantOutpost": "Bán thẳng về kho chung, không có thưởng chợ.",
+  "effect.merchantOutpost": "Bán thẳng về kho chung, không nhận thưởng từ Chợ nhỏ hoặc Chợ lớn.",
   "effect.church": "Xây tòa nhà {vp:2/3}: {vp:+1}. Xây {expanded}: {vp:+2}.",
   "effect.smallWharf": "Một lần mỗi {captain}: giao hàng hỗn hợp bất kỳ, được {vp:1} mỗi {crate:2}.",
   "effect.lighthouse": "{coin:+1} mỗi lần giao; {coin:+1} nếu bạn là {captain}.",

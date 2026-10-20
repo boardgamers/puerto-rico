@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "现金不足时，至多归还{worker:1}、{crate:1}和{vp:1}；每项抵付{coin:1}。",
   "effect.storehouse": "额外保留任意种类的{crate:3}。",
   "effect.bohio": "随时可将茅屋中的一名{worker}移动至空置种植园或建筑空位。该工人在下次招募者阶段前留在那里。",
-  "effect.merchantOutpost": "直接出售给供应区，不获得市场奖励。",
+  "effect.merchantOutpost": "直接出售给供应区，不获得小市场或大市场的奖励。",
   "effect.church": "建造{vp:2/3}建筑：获得{vp:+1}。建造{expanded}：获得{vp:+2}。",
   "effect.smallWharf": "每个{captain}阶段一次：运输任意混合货物，每{crate:2}获得{vp:1}。",
   "effect.lighthouse": "每次运输获得{coin:+1}；若你选择了{captain}，再获得{coin:+1}。",

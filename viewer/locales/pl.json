@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Gdy brakuje monet, oddaj najwyżej {worker:1}, {crate:1} i {vp:1}; każde zastępuje {coin:1}.",
   "effect.storehouse": "Zachowaj dodatkowe {crate:3} dowolnych typów.",
   "effect.bohio": "W dowolnym momencie przenieś {worker} z Bohío na puste miejsce plantacji lub budynku. Zostaje tam do następnego Werbownika.",
-  "effect.merchantOutpost": "Sprzedawaj bezpośrednio do zasobów, bez premii targów.",
+  "effect.merchantOutpost": "Sprzedawaj bezpośrednio do zasobów, bez premii Małego i Dużego targu.",
   "effect.church": "Zbuduj budynek {vp:2/3}: {vp:+1}. Zbuduj {expanded}: {vp:+2}.",
   "effect.smallWharf": "Raz na {captain}: wyślij mieszany ładunek za {vp:1} za każde {crate:2}.",
   "effect.lighthouse": "{coin:+1} za wysyłkę; {coin:+1}, jeśli jesteś {captain}.",

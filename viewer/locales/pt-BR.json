@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Se faltar dinheiro, devolva no máximo {worker:1}, {crate:1} e {vp:1}; cada um paga {coin:1}.",
   "effect.storehouse": "Guarde {crate:3} extras, de quaisquer tipos.",
   "effect.bohio": "A qualquer momento, mova um {worker} do Bohío para um espaço vazio de plantação ou edifício. Ele fica lá até o próximo Recrutador.",
-  "effect.merchantOutpost": "Venda diretamente à reserva, sem bônus de mercado.",
+  "effect.merchantOutpost": "Venda diretamente à reserva, sem os bônus do Pequeno mercado ou do Grande mercado.",
   "effect.church": "Construa um edifício de {vp:2/3}: {vp:+1}. Construa um {expanded}: {vp:+2}.",
   "effect.smallWharf": "Uma vez por {captain}: embarque carga mista, por {vp:1} a cada {crate:2}.",
   "effect.lighthouse": "{coin:+1} por embarque; {coin:+1} se você for {captain}.",
