@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "If short of cash, return at most {worker:1}, {crate:1} and {vp:1}; each pays {coin:1}.",
   "effect.storehouse": "Keep {crate:3} extra, of any types.",
   "effect.bohio": "At any time, move a {worker} from Bohío to an empty plantation or building slot. It stays there until the next Recruiter.",
-  "effect.merchantOutpost": "Sell directly to the supply, without the Small market or Large market bonuses.",
+  "effect.merchantOutpost": "During the Trader phase, sell up to 1 good to the supply instead of the Trading House. Gain its normal price plus the Trader privilege, if applicable, but no Small market or Large market bonuses.",
   "effect.church": "Build a {vp:2/3} building: {vp:+1}. Build an {expanded}: {vp:+2}.",
   "effect.smallWharf": "Once per {captain}: ship any mixed cargo, for {vp:1} per {crate:2}.",
   "effect.lighthouse": "{coin:+1} per shipment; {coin:+1} if you are {captain}.",

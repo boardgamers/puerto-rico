@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "돈이 부족하면 최대 {worker:1}, {crate:1}, {vp:1}을 반환할 수 있으며 각각 {coin:1}을 대신합니다.",
   "effect.storehouse": "종류 무관 {crate:3} 추가 보관.",
   "effect.bohio": "언제든 보히오의 {worker}을 빈 농장 또는 건물 칸으로 옮깁니다. 다음 모집관 단계까지 그곳에 머뭅니다.",
-  "effect.merchantOutpost": "소형 시장이나 대형 시장의 보너스 없이 공용 공급처에 직접 판매합니다.",
+  "effect.merchantOutpost": "상인 단계에 교역소 대신 공용 공급처에 상품을 최대 1개 판매합니다. 정상 가격과 해당하는 상인 특권을 받지만, 소형 시장이나 대형 시장의 보너스는 받지 않습니다.",
   "effect.church": "{vp:2/3} 건물 건설: {vp:+1}. {expanded} 건설: {vp:+2}.",
   "effect.smallWharf": "{captain}마다 한 번: 혼합 화물을 {crate:2}당 {vp:1}로 배송합니다.",
   "effect.lighthouse": "배송당 {coin:+1}; 내가 {captain}이면 {coin:+1}.",

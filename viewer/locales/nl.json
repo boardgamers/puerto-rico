@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "Geef bij geldgebrek hoogstens {worker:1}, {crate:1} en {vp:1} terug; elk betaalt {coin:1}.",
   "effect.storehouse": "Bewaar {crate:3} extra van willekeurige soorten.",
   "effect.bohio": "Verplaats op elk moment een {worker} van het Bohío naar een vrije plantage- of gebouwplaats. Die blijft daar tot de volgende Ronselaar.",
-  "effect.merchantOutpost": "Verkoop direct aan de voorraad, zonder de bonussen van de Kleine markt of Grote markt.",
+  "effect.merchantOutpost": "Verkoop tijdens de handelaarsfase maximaal 1 goed aan de voorraad in plaats van het handelshuis. Ontvang de normale prijs en zo nodig het handelaarsprivilege, zonder de bonussen van de Kleine markt of Grote markt.",
   "effect.church": "Bouw een gebouw van {vp:2/3}: {vp:+1}. Bouw een {expanded}: {vp:+2}.",
   "effect.smallWharf": "Eenmaal per {captain}: verscheep gemengde lading voor {vp:1} per {crate:2}.",
   "effect.lighthouse": "{coin:+1} per verscheping; {coin:+1} als je {captain} bent.",

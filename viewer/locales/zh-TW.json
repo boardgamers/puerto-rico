@@ -440,7 +440,7 @@
   "effect.hiddenMarket": "金幣不足時，可各歸還最多{worker:1}、{crate:1}及{vp:1}，各抵{coin:1}。",
   "effect.storehouse": "額外保留任意種類的{crate:3}。",
   "effect.bohio": "隨時將茅屋的{worker}移至種植園或建築空格。該工人留在那裡直到下次招募者階段。",
-  "effect.merchantOutpost": "直接賣回供應區，不享有小市場或大市場的獎勵。",
+  "effect.merchantOutpost": "商人階段時，可將最多1件貨物賣回供應區，取代向交易所出售。獲得正常售價及適用的商人特權，但不享有小市場或大市場的獎勵。",
   "effect.church": "建造{vp:2/3}的建築：{vp:+1}。建造{expanded}：{vp:+2}。",
   "effect.smallWharf": "每次{captain}可運輸混合貨物一次，每{crate:2}得{vp:1}。",
   "effect.lighthouse": "每次運輸{coin:+1}；若你是{captain}，再{coin:+1}。",
