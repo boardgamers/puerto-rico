@@ -50,7 +50,7 @@ const paths = {
   builder:
     '<path fill="#b87955" d="m4 18 10-11 3 3L7 21Z"/><path fill="#abbac0" d="m10 5 4-4 9 8-5 4Z"/>',
   craftsman:
-    '<path fill="#9ca9b0" d="m14 2 3 1-1 5-3 2-3-1-6 11-3-2 7-10-1-3 2-3 1 4 3 1Z"/><path fill="#cfa474" d="m13 14 3-3 7 9-3 2Z"/>',
+    '<path fill="#9ca9b0" d="M15 2h4v8h-4Z"/><path fill="#d6b994" d="M3 11h16v10H3Z"/><path fill="#b16b4e" d="m1 11 10-8 10 8Z"/><path fill="#526b68" d="M6 14h4v7H6Z"/><g stroke-width="1"><path fill="#806959" d="M17 13c3 2 2 6-1 8s-6 0-5-3 4-7 6-5Z"/><path d="M17 14c-1 3-4 3-5 6"/><path fill="#79a965" d="M20 17c-4-3-6 3-2 5 1 1 2 0 2 0 4 2 6-7 0-5Z"/><path d="M20 17v-3m0 1 2-1"/></g>',
   trader:
     '<path d="M4 9v12m16-12v12"/><path fill="#d6b994" d="M3 16h18v6H3Z"/><path fill="#f3e6c9" d="M4 2h16l2 6H2Z"/><path fill="#c27952" stroke="none" d="M4 2h4L7 8H2Zm8 0h4l1 6h-5Z"/><path fill="#c27952" d="M2 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#f3e6c9" d="M7 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#c27952" d="M12 8h5v1a2.5 2.5 0 0 1-5 0Z"/><path fill="#f3e6c9" d="M17 8h5v1a2.5 2.5 0 0 1-5 0Z"/>',
   captain:
