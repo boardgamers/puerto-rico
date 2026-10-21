@@ -589,7 +589,7 @@ export function mountGame(
     const rows = state.players
       .map((p, i) => {
         const capacity = p.puertoma ? null : production(p);
-        return `<tbody><tr><th colspan="6" class="comparison-player">${playerMarker(i, true)} ${esc(p.name)}</th></tr><tr><th scope="row">${t("stockLabel")}</th>${GOODS.map((g) => `<td>${p.goods[g]}</td>`).join("")}</tr><tr><th scope="row">${t("productionTitle")}</th>${GOODS.map((g) => `<td>${capacity ? capacity[g] : "—"}</td>`).join("")}</tr></tbody>`;
+        return `<tbody><tr><th colspan="6" class="comparison-player">${playerMarker(i, true)} ${esc(p.name)}</th></tr><tr><th scope="row">${t("stockLabel")}</th>${GOODS.map((g) => `<td>${p.goods[g]}</td>`).join("")}</tr><tr><th scope="row">${t("otherProduction")}</th>${GOODS.map((g) => `<td>${capacity ? capacity[g] : "—"}</td>`).join("")}</tr></tbody>`;
       })
       .join("");
     return `<p>${t("productionComparisonHelp")}</p><table class="production-comparison"><thead><tr><th></th>${resourceHeaders}</tr><tr><th scope="row">${t("goodsSupply")}</th>${GOODS.map((g) => `<td>${state.supply[g]}</td>`).join("")}</tr></thead>${rows}</table>`;
