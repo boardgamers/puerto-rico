@@ -82,7 +82,6 @@ await api(
   true,
   "image/svg+xml",
 );
-await api("/icon", "PUT", { mode: "pictogram" });
 await translatePlatformMetadata(token, metadata);
 const translationsPending = false;
 const published = await api("/1"),
@@ -94,7 +93,6 @@ assert.equal(published.engine.package.version, version);
 assert.equal(published.viewer.url, uploaded.url);
 assert.equal(meta.displayTitle.title, metadata.displayTitle.title);
 assert.equal(meta.displayTitle.subtitle, metadata.displayTitle.subtitle);
-assert.equal(meta.iconMode, "pictogram");
 assert.ok(meta.assets?.pictogram?.url);
 const pictogram = await fetch(meta.assets.pictogram.url);
 assert.ok(pictogram.ok, `Pictogram CDN ${pictogram.status}`);
