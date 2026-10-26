@@ -2831,3 +2831,35 @@ body:has(.pr-game) {
 
 .pr-game .action-bonus { display: inline-flex; align-items: center; gap: 3px; margin-inline-start: 6px; white-space: nowrap; font-size: .85em; }
 .pr-game .action-bonus .icon, .pr-game .action-bonus .score-token { width: 20px; height: 20px; }
+
+.pr-game .building-face .owned-building-name {
+  flex: 1;
+  min-width: 0;
+}
+.pr-game .current-building-effect {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 5px;
+  margin-left: auto;
+  max-width: 45%;
+  font-size: 12px;
+}
+.pr-game .current-building-effect > span {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 1px;
+}
+.pr-game .current-building-effect .metric {
+  margin: 0;
+  gap: 2px;
+}
+.pr-game .current-building-effect .icon {
+  width: 18px;
+  height: 18px;
+}
+.pr-game .current-building-effect.inactive {
+  opacity: 0.4;
+  filter: grayscale(1);
+}

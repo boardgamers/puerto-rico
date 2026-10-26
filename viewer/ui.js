@@ -1,3 +1,4 @@
+import { buildingEffects } from "./building-effects.js";
 import { actionBonuses, actionVictoryPoints } from "./action-bonuses.js";
 import { recruitmentShares, recruitmentBonus } from "./recruitment.js";
 import { showBuildingPayment } from "./building-payment.js";
@@ -601,7 +602,29 @@ export function mountGame(
     );
   }
   function playerAreas(a) {
-    return `<h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(GOODS.includes(x.id) ? `field-${x.id}` : x.id, 36)}<span class="estate-name">${t(x.id)}</span>${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(x.id === "monument" ? t(x.id) : t.effect(x.id))}">${buildingPictogram(x.id, 28)}<span>${t(x.id)}</span></button><div class="owned-building-bottom">${a.puertoma ? `<small>${t("level")} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}${pointsBadge(B[x.id].vp)}</div></article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>`;
+    const preview =
+      draft &&
+      state.tasks[0]?.kind === "assign" &&
+      view === seat &&
+      state.tasks[0]?.p === seat
+        ? {
+            ...a,
+            reserve: remaining(),
+            estates: a.estates.map((x, i) => ({ ...x, ...draft.estates[i] })),
+            buildings: a.buildings.map((x, i) => ({
+              ...x,
+              ...draft.buildings[i],
+            })),
+          }
+        : a;
+    const effects = buildingEffects(state, view, preview);
+    const effectBadge = (i) => {
+      const effect = effects[i];
+      if (!effect?.items.length) return "";
+      const label = `${t.effect(a.buildings[i].id)}${effect.enabled ? "" : ` · ${t("workerSpaces")}: 0/${B[a.buildings[i].id].workers}`}`;
+      return `<span class="current-building-effect ${effect.enabled ? "" : "inactive"}" title="${esc(label)}" aria-label="${esc(label)}">${effect.items.map((x) => `<span>${x.sign}${metric(x.icon, x.value)}</span>`).join("")}</span>`;
+    };
+    return `<h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(GOODS.includes(x.id) ? `field-${x.id}` : x.id, 36)}<span class="estate-name">${t(x.id)}</span>${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(x.id === "monument" ? t(x.id) : t.effect(x.id))}">${buildingPictogram(x.id, 28)}<span class="owned-building-name">${t(x.id)}</span>${effectBadge(i)}</button><div class="owned-building-bottom">${a.puertoma ? `<small>${t("level")} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}${pointsBadge(B[x.id].vp)}</div></article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>`;
   }
   function playerBoard() {
     const a = state.players[view];
