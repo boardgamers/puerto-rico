@@ -1465,7 +1465,7 @@ export function mountGame(
         )
         .join(
           "",
-        )}<button type="submit" class="primary">${t("confirm")}</button></form>`,
+        )}<button type="button" data-cargo-confirm class="primary">${t("confirm")}</button></form>`,
     );
     const form = body.querySelector("form");
     const chosenGoods = () =>
@@ -1475,20 +1475,27 @@ export function mountGame(
     const updateReward = () => {
       const goods = chosenGoods();
       const points = actionVictoryPoints(state, seat, { ...m, goods });
-      const button = form.querySelector('[type="submit"]');
+      const button = form.querySelector("[data-cargo-confirm]");
       button.innerHTML = `${t("confirm")} ${goodsRow(goods)}${points ? ` <span class="action-bonus">(+${metric("vp", points)})</span>` : ""}`;
       button.disabled = m.type === "smallWharf" && !sum(Object.values(goods));
     };
     form.oninput = updateReward;
     updateReward();
-    form.onsubmit = (ev) => {
-      ev.preventDefault();
-      const data = new FormData(ev.currentTarget),
-        goods = Object.fromEntries(
-          GOODS.map((g) => [g, Number(data.get(g) ?? 0)]),
-        );
+    // BGS iframes deliberately omit allow-forms. Send through the viewer bridge
+    // directly instead of relying on the browser's native submit action.
+    const confirm = form.querySelector("[data-cargo-confirm]");
+    confirm.onclick = () => {
+      if (!form.reportValidity()) return;
+      const goods = chosenGoods();
       if (m.type === "produce" || sum(Object.values(goods)))
         send({ ...m, goods });
+    };
+    form.onsubmit = (ev) => ev.preventDefault();
+    form.onkeydown = (ev) => {
+      if (ev.key === "Enter" && ev.target.matches("input")) {
+        ev.preventDefault();
+        confirm.click();
+      }
     };
   }
   function onCancel(ev) {

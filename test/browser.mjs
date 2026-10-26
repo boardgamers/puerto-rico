@@ -151,7 +151,7 @@ try {
           await dock.locator("[data-custom-production]").click();
           assert.equal(await page.locator(".cargo-form").count(), 1);
           await page.locator('.cargo-form input[name="corn"]').fill("1");
-          await page.locator('.cargo-form button[type="submit"]').click();
+          await page.locator('.cargo-form [data-cargo-confirm]').click();
           assert.equal(await page.evaluate(() => played[0].goods.corn), 1);
         }
       }
