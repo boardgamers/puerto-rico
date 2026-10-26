@@ -2842,8 +2842,9 @@ body:has(.pr-game) {
   justify-content: flex-end;
   gap: 2px 5px;
   margin-left: auto;
-  max-width: 45%;
-  font-size: 12px;
+  max-width: 55%;
+  font-size: 15px;
+  font-weight: 600;
 }
 .pr-game .current-building-effect > span {
   display: inline-flex;
@@ -2851,13 +2852,14 @@ body:has(.pr-game) {
   white-space: nowrap;
   gap: 1px;
 }
-.pr-game .current-building-effect .metric {
+.pr-game .building-face .current-building-effect .metric {
+  font-size: 15px;
   margin: 0;
   gap: 2px;
 }
-.pr-game .current-building-effect .icon {
-  width: 18px;
-  height: 18px;
+.pr-game .building-face .current-building-effect .icon {
+  width: 24px;
+  height: 24px;
 }
 .pr-game .current-building-effect.inactive {
   opacity: 0.4;
