@@ -151,7 +151,7 @@ try {
           await dock.locator("[data-custom-production]").click();
           assert.equal(await page.locator(".cargo-form").count(), 1);
           await page.locator('.cargo-form input[name="corn"]').fill("1");
-          await page.locator('.cargo-form [data-cargo-confirm]').click();
+          await page.locator(".cargo-form [data-cargo-confirm]").click();
           assert.equal(await page.evaluate(() => played[0].goods.corn), 1);
         }
       }
@@ -985,7 +985,11 @@ try {
       path: `.local/qa/${width}-production-comparison.png`,
     });
     await page.keyboard.press("Escape");
-    const chapelProduction = E.move(original, { type: "role", id: "craftsman" }, 0);
+    const chapelProduction = E.move(
+      original,
+      { type: "role", id: "craftsman" },
+      0,
+    );
     chapelProduction.tasks = [{ kind: "produce", p: 0 }];
     chapelProduction.role = "craftsman";
     chapelProduction.owner = 0;
@@ -1078,6 +1082,55 @@ try {
       0,
       "ordered request waits for earlier player",
     );
+    const bonusPlacement = structuredClone(original);
+    bonusPlacement.tasks = [{ kind: "bonusAssign", p: 0, remaining: 2 }];
+    bonusPlacement.players[0].reserve.w = 2;
+    bonusPlacement.players[0].estates = [
+      { id: "fruit", w: 1, c: 0 },
+      { id: "coffee", w: 0, c: 0 },
+    ];
+    bonusPlacement.players[0].buildings = [{ id: "canal", w: 0, c: 0 }];
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 0 });
+        host.emit("state", s);
+      },
+      E.stripSecret(bonusPlacement, 0),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    assert.equal(
+      await page.locator(".placement-editor [data-slot]").count(),
+      0,
+      "existing workers cannot be rearranged",
+    );
+    assert.equal(
+      await page.locator(".placement-editor button.worker-slot").count(),
+      2,
+    );
+    await page.locator(".placement-editor button.worker-slot").first().click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "bonusAssign",
+      target: "e1",
+    });
+    const bonusAfter = E.move(
+      bonusPlacement,
+      { type: "bonusAssign", target: "e1" },
+      0,
+    );
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(bonusAfter, 0),
+    );
+    assert.equal(
+      await page.locator(".placement-editor button.worker-slot").count(),
+      1,
+      "bonus placement stays open for the remaining worker",
+    );
+    await page.locator(".placement-editor button.worker-slot").click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "bonusAssign",
+      target: "b0",
+    });
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(
       `Browser ${width}px: actions, allocation, layout, journal, chat and scrolling OK`,

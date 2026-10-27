@@ -57,12 +57,13 @@ export function actionVictoryPoints(state, seat, move) {
       (n, amount) => n + Math.floor(amount / 2),
       0,
     );
-  return points + festivalPoints(state, seat, move);
+  return points + festivalRewards(state, seat, move).vp;
 }
 
 // Forecast only public, deterministic outcomes; never inspect future plantation draws.
-function festivalPoints(state, seat, move) {
-  if (!state.festivals?.length) return 0;
+export function festivalRewards(state, seat, move) {
+  const rewards = { vp: 0, coins: 0, workers: 0 };
+  if (!state.festivals?.length) return rewards;
   const preview = { ...state };
   let event;
   if (move.type === "build") event = { type: "build", id: move.id };
@@ -131,12 +132,13 @@ function festivalPoints(state, seat, move) {
       capacity: ship?.capacity ?? null,
     };
   }
-  return event
-    ? completedFestivals(preview, seat, event).reduce(
-        (n, f) => n + (f.reward.vp ?? 0),
-        0,
-      )
-    : 0;
+  if (event)
+    for (const f of completedFestivals(preview, seat, event)) {
+      for (const key of Object.keys(rewards))
+        rewards[key] += f.reward[key] ?? 0;
+    }
+  rewards.workers = Math.min(rewards.workers, state.workerSupply ?? 0);
+  return rewards;
 }
 
 function playerGoods(state, seat) {

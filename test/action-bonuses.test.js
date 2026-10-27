@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as E from "../engine/index.js";
-import { actionVictoryPoints } from "../viewer/action-bonuses.js";
+import {
+  actionVictoryPoints,
+  festivalRewards,
+} from "../viewer/action-bonuses.js";
 import { RELEASE } from "../release-config.js";
 
 function fixture(role) {
@@ -78,11 +81,20 @@ test("Church, Pension Office, Park Authority and Assembly Hall show their immedi
   verify(s, { type: "pension", good: "corn" });
 });
 test("action previews include Festival VP earned by production, shipping and plantations", () => {
-  const festival = (goal, targets) => ({ id: "twins", goal, targets: { goods: [], estates: [], ...targets }, reward: { vp: 3 }, amount: 1 });
+  const festival = (goal, targets) => ({
+    id: "twins",
+    goal,
+    targets: { goods: [], estates: [], ...targets },
+    reward: { vp: 3 },
+    amount: 1,
+  });
   const produced = fixture("craftsman");
   produced.players[0].estates = [{ id: "corn", w: 1, c: 0 }];
   produced.festivals = [festival("produce", { goods: ["corn"] })];
-  verify(produced, E.legal(produced).find((m) => m.type === "produce" && !m.decline));
+  verify(
+    produced,
+    E.legal(produced).find((m) => m.type === "produce" && !m.decline),
+  );
   const shipped = fixture("captain");
   shipped.tasks = [{ kind: "ship", p: 0 }];
   shipped.players[0].goods.corn = 2;
@@ -93,4 +105,35 @@ test("action previews include Festival VP earned by production, shipping and pla
   planted.offer = ["fruit"];
   planted.festivals = [festival("estates", { estates: ["fruit"] })];
   verify(planted, { type: "plant", id: "fruit" });
+});
+
+test("bonus production previews every Festival reward and respects remaining worker supply", () => {
+  const s = fixture("craftsman");
+  s.tasks = [{ kind: "produceBonus", p: 0 }];
+  s.production[0].fruit = 2;
+  s.festivals = [
+    {
+      id: "crop",
+      goal: "produce",
+      amount: 3,
+      targets: { goods: ["fruit"], estates: [] },
+      reward: { vp: 1, coins: 2, workers: 3 },
+    },
+  ];
+  const move = { type: "produceBonus", good: "fruit" };
+  s.workerSupply = 2;
+  assert.deepEqual(festivalRewards(s, 0, move), {
+    vp: 1,
+    coins: 2,
+    workers: 2,
+  });
+  const after = verify(s, move);
+  assert.equal(after.players[0].coins - s.players[0].coins, 2);
+  assert.equal(after.players[0].reserve.w - s.players[0].reserve.w, 2);
+  s.workerSupply = 0;
+  assert.deepEqual(festivalRewards(s, 0, move), {
+    vp: 1,
+    coins: 2,
+    workers: 0,
+  });
 });

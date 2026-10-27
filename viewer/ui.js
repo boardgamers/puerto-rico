@@ -1,5 +1,9 @@
 import { buildingEffects } from "./building-effects.js";
-import { actionBonuses, actionVictoryPoints } from "./action-bonuses.js";
+import {
+  actionBonuses,
+  actionVictoryPoints,
+  festivalRewards,
+} from "./action-bonuses.js";
 import { recruitmentShares, recruitmentBonus } from "./recruitment.js";
 import { showBuildingPayment } from "./building-payment.js";
 import { FORCE_DARK_THEME } from "./theme.js";
@@ -249,13 +253,30 @@ export function mountGame(
     ]
       .filter(Boolean)
       .join(" · ");
-    const coins = bonuses.reduce((n, b) => n + b.coins, 0);
-    const bonus =
-      vp || coins
-        ? `<span class="action-bonus" title="${esc(bonusTitle)}">(+${vp ? metric("vp", vp) : ""}${vp && coins ? " +" : ""}${coins ? metric("coin", coins) : ""})</span>`
-        : "";
+    const bonus = rewardPreview(m);
     return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
   };
+  function rewardPreview(move) {
+    const festival = festivalRewards(state, seat, move);
+    const title = actionBonuses(state, seat, move)
+      .map(
+        (b) =>
+          `${t(b.building)}: +${b.vp || b.coins} ${t(b.vp ? "vp" : "coins")}`,
+      )
+      .join(" · ");
+    const rewards = [
+      ["vp", actionVictoryPoints(state, seat, move)],
+      [
+        "coin",
+        festival.coins +
+          actionBonuses(state, seat, move).reduce((n, b) => n + b.coins, 0),
+      ],
+      ["worker", festival.workers],
+    ].filter(([, n]) => n);
+    return rewards.length
+      ? `<span class="action-bonus" title="${esc(title)}">(+${rewards.map(([id, n]) => metric(id, n)).join(" ")})</span>`
+      : "";
+  }
   function show(title, html, mode = "") {
     if (!modal.open) lastFocus = document.activeElement;
     if (mode !== "building") marketReturn = null;
@@ -512,6 +533,8 @@ export function mountGame(
         .join("")}</div>`;
     if (task.kind === "assign")
       return `<div class="placement-editor">${assignmentTools()}${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
+    if (task.kind === "bonusAssign")
+      return `<div class="placement-editor"><div class="assignment-tools">${metric("worker", task.remaining)}</div>${playerAreas(state.players[seat])}</div>`;
     if (task.kind === "store")
       return `${storageEditor()}<footer class="action-editor-footer">${confirmation()}</footer>`;
     return `<div class="action-choices">${moves.map(actionButton).join("")}</div>`;
@@ -559,6 +582,17 @@ export function mountGame(
       const k = i < values.c ? "c" : i < values.c + values.w ? "w" : null;
       const unavailable =
         editable && !k && (tool === "erase" || remaining()[tool] === 0);
+      const bonusMove =
+        !k &&
+        view === seat &&
+        allowed() &&
+        state.tasks[0]?.kind === "bonusAssign"
+          ? state.legal.find(
+              (m) => m.type === "bonusAssign" && m.target === key,
+            )
+          : null;
+      if (bonusMove)
+        return `<button type="button" class="worker-slot" data-move="${encode(bonusMove)}" aria-label="${esc(`${t("workers")} · ${t(x.id)}`)}">+</button>`;
       return editable
         ? `<button class="worker-slot ${k ?? ""}" data-slot="${key}:${i}" ${unavailable ? "disabled" : ""} aria-label="${esc(`${t(k === "c" ? "citizens" : k === "w" ? "workers" : "empty")} · ${t(x.id)}`)}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : unavailable ? "·" : "+"}</button>`
         : `<span class="worker-slot ${k ?? ""}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : "·"}</span>`;
@@ -840,6 +874,7 @@ export function mountGame(
           "role",
           "plant",
           "assign",
+          "bonusAssign",
           "store",
           "achievementChoose",
           "achievementDraft",
@@ -851,11 +886,12 @@ export function mountGame(
             role: "roleChoices",
             plant: "plantationChoices",
             assign: "editAssignment",
+            bonusAssign: "editAssignment",
             store: "editStorage",
             achievementChoose: "achievements",
             achievementDraft: "achievements",
           }[task.kind] ?? "chooseAction";
-        choices = `<button class="primary" data-actions>${icon({ role: "governor", plant: "planter", assign: "worker", store: "storage", achievementChoose: "festival", achievementDraft: "festival" }[task.kind] ?? state.role ?? "check")} ${t(label)}</button>`;
+        choices = `<button class="primary" data-actions>${icon({ role: "governor", plant: "planter", assign: "worker", bonusAssign: "worker", store: "storage", achievementChoose: "festival", achievementDraft: "festival" }[task.kind] ?? state.role ?? "check")} ${t(label)}</button>`;
       } else choices = moves.map(actionButton).join("");
     }
     const special =
@@ -891,12 +927,16 @@ export function mountGame(
   }
   function openActions() {
     if (!allowed()) return;
-    if (state.tasks[0].kind === "assign") {
+    if (["assign", "bonusAssign"].includes(state.tasks[0].kind)) {
       view = seat;
       render();
     }
     actionContext = draftKey;
-    show(title(), actionPanel(), "actions");
+    show(
+      title(),
+      actionPanel(),
+      state.tasks[0]?.kind === "bonusAssign" ? "bonus-placement" : "actions",
+    );
   }
   let summaryFrame = 0;
   let observedDock;
@@ -971,6 +1011,13 @@ export function mountGame(
     }
     if (modal.open && modalMode === "comparison")
       body.innerHTML = productionComparison();
+    if (modal.open && modalMode === "bonus-placement") {
+      if (!isTurn() || state.tasks[0]?.kind !== "bonusAssign") hide(modal);
+      else
+        morphdom(body, `<div class="modal-body">${actionPanel()}</div>`, {
+          childrenOnly: true,
+        });
+    }
     if (modal.open && modalMode === "actions") {
       if (!allowed() || actionContext !== draftKey) hide(modal);
       else {
@@ -1236,7 +1283,12 @@ export function mountGame(
     render();
     try {
       await onMove(m);
-      if (modal.open && modalMode !== "journal") hide(modal);
+      if (
+        modal.open &&
+        modalMode !== "journal" &&
+        !(m.type === "bonusAssign" && state.tasks[0]?.kind === "bonusAssign")
+      )
+        hide(modal);
     } catch (err) {
       error.textContent = t("error");
       error.hidden = false;
@@ -1497,9 +1549,9 @@ export function mountGame(
       );
     const updateReward = () => {
       const goods = chosenGoods();
-      const points = actionVictoryPoints(state, seat, { ...m, goods });
+      const rewards = rewardPreview({ ...m, goods });
       const button = form.querySelector("[data-cargo-confirm]");
-      button.innerHTML = `${t("confirm")} ${goodsRow(goods)}${points ? ` <span class="action-bonus">(+${metric("vp", points)})</span>` : ""}`;
+      button.innerHTML = `${t("confirm")} ${goodsRow(goods)}${rewards}`;
       button.disabled = m.type === "smallWharf" && !sum(Object.values(goods));
     };
     form.oninput = updateReward;
