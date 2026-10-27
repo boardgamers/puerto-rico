@@ -1,4 +1,5 @@
 {
+  "finalRound": "Dernière manche",
   "noSpecialEffect": "Aucun effet spécial.",
   "quarryDiscountLimit": "Réduction maximale des carrières (pièces)",
   "quarryHelp": "Une carrière occupée réduit le coût des bâtiments de 1 pièce, dans la limite autorisée par le bâtiment. Accessible avec le privilège du Planteur ou un Chantier occupé.",

@@ -1,4 +1,5 @@
 {
+  "finalRound": "Ultimo round",
   "noSpecialEffect": "Nessun effetto speciale.",
   "quarryDiscountLimit": "Sconto massimo delle cave (monete)",
   "quarryHelp": "Una cava occupata riduce il costo di costruzione di 1 moneta, entro il limite dell’edificio. Si ottiene con il privilegio del Piantatore o un Cantiere occupato.",

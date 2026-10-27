@@ -1,4 +1,5 @@
 {
+  "finalRound": "Final round",
   "noSpecialEffect": "No special effect.",
   "quarryDiscountLimit": "Maximum quarry discount (coins)",
   "quarryHelp": "An occupied quarry reduces building costs by 1 coin, within the building’s quarry limit. Choose it with the Planter privilege or an occupied Builder’s Yard.",
