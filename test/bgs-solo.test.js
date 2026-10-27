@@ -101,3 +101,20 @@ test("building selection is opt-in and keeps the interactive draft", () => {
     host.init(3, [], { chooseBuildings: false }, "auto-market"),
   );
 });
+
+test("platform scores never reveal hidden totals in ongoing games", () => {
+  for (const n of [1, 3, 5]) {
+    const s = host.init(n, [], {}, "score-privacy");
+    s.players.forEach((p, i) => {
+      p.vp = 17 + i;
+    });
+    const before = structuredClone(s);
+    assert.deepEqual(host.scores(s), Array(n).fill(0));
+    assert.deepEqual(s, before);
+    s.options.showVP = true;
+    assert.deepEqual(host.scores(s), game.scores(s).slice(0, n));
+    s.options.showVP = false;
+    s.finished = true;
+    assert.deepEqual(host.scores(s), game.scores(s).slice(0, n));
+  }
+});

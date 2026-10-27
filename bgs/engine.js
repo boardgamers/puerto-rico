@@ -75,7 +75,11 @@ export function setPlayerMetaData(s, p, data) {
   return game.setPlayerMetaData(s, p, data);
 }
 export function scores(s) {
-  const result = game.scores(s);
+  // Platform scores are public, unlike the seat-filtered viewer state.
+  const result =
+    !s.finished && s.options.showVP !== true
+      ? s.players.map(() => 0)
+      : game.scores(s);
   return solo(s) ? result.slice(0, 1) : result;
 }
 export function rankings(s) {
