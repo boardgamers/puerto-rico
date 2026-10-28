@@ -1167,6 +1167,42 @@ try {
       await page.locator(".placement-editor [data-slot]").count(),
       "withdrawn placement can be edited",
     );
+    await page.keyboard.press("Escape");
+    const earlyCraftsman = structuredClone(original);
+    earlyCraftsman.role = "craftsman";
+    earlyCraftsman.owner = 0;
+    earlyCraftsman.festivals = [];
+    earlyCraftsman.tasks = [
+      { kind: "produce", p: 1 },
+      { kind: "produce", p: 2 },
+      { kind: "produceBonus", p: 0, remaining: 1 },
+      { kind: "phaseEnd" },
+    ];
+    earlyCraftsman.production = earlyCraftsman.players.map(() => ({
+      corn: 0,
+      fruit: 0,
+      sugar: 0,
+      tobacco: 0,
+      coffee: 0,
+    }));
+    earlyCraftsman.production[0].corn = 1;
+    earlyCraftsman.supply.corn = 10;
+    earlyCraftsman.players.forEach((p) => {
+      p.estates = [{ id: "corn", w: 1, c: 0 }];
+      p.buildings = [];
+    });
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 0 });
+        host.emit("state", s);
+      },
+      E.stripSecret(earlyCraftsman, 0),
+    );
+    await page.locator('.action-dock [data-move*="produceBonus"]').click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "produceBonus",
+      good: "corn",
+    });
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(
       `Browser ${width}px: actions, allocation, layout, journal, chat and scrolling OK`,

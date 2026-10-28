@@ -928,7 +928,7 @@ function optionalPoints(s, p, m) {
       out.push("publishingHouse");
   }
   if (
-    s.tasks[0]?.kind === "produce" &&
+    playerTask(s, p)?.kind === "produce" &&
     ["produce", "pass"].includes(m.type) &&
     citizen(a, "chapel")
   )
@@ -952,17 +952,65 @@ function assignmentForced(a) {
     !(w && c)
   );
 }
+// Production commutes only when every remaining maximum (including both
+// Publishing House bonuses) fits the supply. Festival rewards can add workers
+// and change later production, so keep any potentially completing phase ordered.
+function parallelProductionTasks(s) {
+  if (
+    !s.production ||
+    s.puertoma ||
+    !["produce", "produceBonus"].includes(s.tasks[0]?.kind)
+  )
+    return [];
+  const end = s.tasks.findIndex(
+    (t) => !["produce", "produceBonus"].includes(t.kind),
+  );
+  const tasks = s.tasks.slice(0, end < 0 ? undefined : end);
+  const demand = counts();
+  const possible = s.production.map((out) => ({ ...out }));
+  for (const t of tasks.filter((t) => t.kind === "produce")) {
+    const output = production(s.players[t.p]);
+    for (const g of GOODS) {
+      demand[g] += output[g];
+      possible[t.p][g] += output[g];
+    }
+  }
+  for (const t of tasks.filter((t) => t.kind === "produceBonus"))
+    for (const g of GOODS)
+      if (possible[t.p][g] > 0) {
+        demand[g] += t.remaining;
+        possible[t.p][g] += t.remaining;
+      }
+  if (GOODS.some((g) => demand[g] > s.supply[g])) return [];
+  const preview = { ...s, production: possible };
+  if (
+    tasks.some(
+      (t) => completedFestivals(preview, t.p, { type: "produce" }).length,
+    )
+  )
+    return [];
+  return tasks.filter(
+    (t, i) =>
+      tasks.findIndex((other) => other.p === t.p) === i &&
+      (t.kind !== "produceBonus" ||
+        GOODS.some((g) => s.production[t.p][g] > 0 && s.supply[g] > 0)),
+  );
+}
 function playerTask(s, p) {
   return (
     (!s.placementOrdered && placementTasks(s).find((t) => t.p === p)) ||
+    parallelProductionTasks(s).find((t) => t.p === p) ||
     s.tasks[0]
   );
 }
 export function currentPlayers(s) {
   if (s.finished) return [];
-  const placements = !s.placementOrdered && placementTasks(s);
-  return placements?.length
-    ? placements.map((t) => t.p)
+  const placements = (!s.placementOrdered && placementTasks(s)) || [];
+  const concurrent = placements.length
+    ? placements
+    : parallelProductionTasks(s);
+  return concurrent.length
+    ? concurrent.map((t) => t.p)
     : [s.tasks[0]?.p].filter(Number.isInteger);
 }
 export function legal(s, p = currentPlayer(s)) {
@@ -1361,8 +1409,9 @@ export function canUndo(s, p) {
           (old) => old.id === f.id && old.claimed !== undefined,
         ),
     ) &&
-    currentPlayers(before).length === 1 &&
-    currentPlayer(before) === p &&
+    (last.move.type === "assign"
+      ? currentPlayers(before).length === 1 && currentPlayer(before) === p
+      : currentPlayers(before).includes(p)) &&
     JSON.stringify(before.bag) === JSON.stringify(s.bag) &&
     JSON.stringify(before.random) === JSON.stringify(s.random)
   );
@@ -2036,12 +2085,8 @@ export function stripSecret(state, p) {
   s.canUndo = Number.isInteger(p) && canUndo(state, p);
   s.currentPlayers = currentPlayers(state);
   const ownTask = Number.isInteger(p) ? playerTask(state, p) : null;
-  if (
-    ownTask?.kind === "assign" &&
-    ownTask.p === p &&
-    ownTask !== state.tasks[0]
-  ) {
-    const index = s.tasks.findIndex((t) => t.kind === "assign" && t.p === p);
+  if (ownTask && ownTask.p === p && ownTask !== state.tasks[0]) {
+    const index = state.tasks.indexOf(ownTask);
     s.tasks.unshift(...s.tasks.splice(index, 1));
   }
   s.legal = Number.isInteger(p) ? legal(state, p) : [];
