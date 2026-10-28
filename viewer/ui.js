@@ -332,6 +332,8 @@ export function mountGame(
       };
       tool = a.reserve.w ? "w" : a.reserve.c ? "c" : "w";
     }
+    if (enabled && seat === task?.p && task?.kind === "bonusAssign")
+      draft = { targets: [] };
     if (enabled && seat === task?.p && task?.kind === "store")
       draft = autoStorage(state, seat);
   }
@@ -534,7 +536,7 @@ export function mountGame(
     if (task.kind === "assign")
       return `<div class="placement-editor">${assignmentTools()}${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
     if (task.kind === "bonusAssign")
-      return `<div class="placement-editor"><div class="assignment-tools">${metric("worker", task.remaining)}</div>${playerAreas(state.players[seat])}</div>`;
+      return `<div class="placement-editor"><div class="assignment-tools">${metric("worker", task.remaining - draft.targets.length)}</div>${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
     if (task.kind === "store")
       return `${storageEditor()}<footer class="action-editor-footer">${confirmation()}</footer>`;
     return `<div class="action-choices">${moves.map(actionButton).join("")}</div>`;
@@ -569,6 +571,11 @@ export function mountGame(
       .join("")}</div>`;
   }
   function peopleSlots(key, x, n = 1) {
+    const bonus =
+      draft && state.tasks[0]?.kind === "bonusAssign" && view === seat;
+    const added = bonus
+      ? draft.targets.filter((target) => target === key).length
+      : 0;
     const preview =
         draft &&
         state.tasks[0].kind === "assign" &&
@@ -577,22 +584,13 @@ export function mountGame(
       editable = preview && allowed(),
       values = preview
         ? draft[key[0] === "e" ? "estates" : "buildings"][Number(key.slice(1))]
-        : x;
+        : { ...x, w: x.w + added };
     return `<div class="worker-slots">${Array.from({ length: n }, (_, i) => {
       const k = i < values.c ? "c" : i < values.c + values.w ? "w" : null;
       const unavailable =
         editable && !k && (tool === "erase" || remaining()[tool] === 0);
-      const bonusMove =
-        !k &&
-        view === seat &&
-        allowed() &&
-        state.tasks[0]?.kind === "bonusAssign"
-          ? state.legal.find(
-              (m) => m.type === "bonusAssign" && m.target === key,
-            )
-          : null;
-      if (bonusMove)
-        return `<button type="button" class="worker-slot" data-move="${encode(bonusMove)}" aria-label="${esc(`${t("workers")} · ${t(x.id)}`)}">+</button>`;
+      if (bonus && i >= x.w + x.c)
+        return `<button type="button" class="worker-slot ${k ?? ""}" data-bonus-slot="${key}" data-bonus-occupied="${!!k}" ${!allowed() || (!k && draft.targets.length >= state.tasks[0].remaining) ? "disabled" : ""} aria-label="${esc(`${t("workers")} · ${t(x.id)}`)}">${k ? icon("worker", 20) : "+"}</button>`;
       return editable
         ? `<button class="worker-slot ${k ?? ""}" data-slot="${key}:${i}" ${unavailable ? "disabled" : ""} aria-label="${esc(`${t(k === "c" ? "citizens" : k === "w" ? "workers" : "empty")} · ${t(x.id)}`)}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : unavailable ? "·" : "+"}</button>`
         : `<span class="worker-slot ${k ?? ""}">${k ? icon(k === "c" ? "citizen" : "worker", 20) : "·"}</span>`;
@@ -847,6 +845,16 @@ export function mountGame(
         ),
         valid = assigned === Math.min(capacity, assigned + rest.w + rest.c);
       confirm = `<button class="primary" data-confirm-assign ${valid ? "" : "disabled"}>${icon("check")} ${t("confirm")}</button>`;
+    }
+    if (task.kind === "bonusAssign") {
+      const a = state.players[seat];
+      const spaces =
+        a.estates.reduce(
+          (n, x) => n + (x.id === "forest" ? 0 : 1 - x.w - x.c),
+          0,
+        ) + a.buildings.reduce((n, x) => n + B[x.id].workers - x.w - x.c, 0);
+      const valid = draft.targets.length === Math.min(task.remaining, spaces);
+      confirm = `<button class="primary" data-confirm-bonus ${valid ? "" : "disabled"}>${icon("check")} ${t("confirm")}</button>`;
     }
     if (task.kind === "store") {
       const n = sum(
@@ -1470,6 +1478,19 @@ export function mountGame(
           .map((m) => moveButton(m, moveLabel(m), m.id))
           .join("")}</div>`,
       );
+      return;
+    }
+    if (el.dataset.bonusSlot) {
+      const key = el.dataset.bonusSlot;
+      if (el.dataset.bonusOccupied === "true")
+        draft.targets.splice(draft.targets.lastIndexOf(key), 1);
+      else if (draft.targets.length < state.tasks[0].remaining)
+        draft.targets.push(key);
+      render();
+      return;
+    }
+    if (el.hasAttribute("data-confirm-bonus")) {
+      send({ type: "bonusAssignAll", targets: [...draft.targets] });
       return;
     }
     if (el.hasAttribute("data-confirm-assign")) {

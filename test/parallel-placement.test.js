@@ -152,8 +152,8 @@ test("withdrawing and re-confirming placement do not award another clock increme
     assert.equal(host.isLiveUpdate(s), i > 0);
     s = host.move(s, { type: "undo" }, 2);
     assert.equal(host.isLiveUpdate(s), true);
-    assert.deepEqual(s.placementUndoSeats, [2]);
-    assert.equal(host.stripSecret(s, 2).placementUndoSeats, undefined);
+    assert.deepEqual(s.undoResubmitSeats, [2]);
+    assert.equal(host.stripSecret(s, 2).undoResubmitSeats, undefined);
   }
   assert.equal(s.history.length, recruit().history.length);
 });

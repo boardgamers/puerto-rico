@@ -1342,14 +1342,7 @@ export function canUndo(s, p) {
   if (s.tutorial) return false;
   if (placementUndoState(s, p)) return true;
   const last = s.history.at(-1);
-  if (
-    !last ||
-    last.p !== p ||
-    s.finished ||
-    currentPlayers(s).length !== 1 ||
-    currentPlayer(s) !== p
-  )
-    return false;
+  if (!last || last.p !== p || s.finished) return false;
   const before = replay(s, logLength(s) - 1);
   return (
     !s.players.some((a, i) =>
@@ -1370,6 +1363,7 @@ export function canUndo(s, p) {
     ) &&
     currentPlayers(before).length === 1 &&
     currentPlayer(before) === p &&
+    JSON.stringify(before.bag) === JSON.stringify(s.bag) &&
     JSON.stringify(before.random) === JSON.stringify(s.random)
   );
 }
@@ -1479,6 +1473,7 @@ function applyMove(state, m, p, historical = false) {
   }
   const custom = {
     assign: "assign",
+    bonusAssignAll: "bonusAssign",
     produce: "produce",
     store: "store",
     smallWharf: "ship",
@@ -1660,6 +1655,26 @@ function applyMove(state, m, p, historical = false) {
         .filter((x) => x.w + x.c > 0)
         .map(({ id, w, c }) => ({ id, w, c }));
       extra.reserve = { ...a.reserve };
+      next();
+      break;
+    }
+    case "bonusAssignAll": {
+      assert(Array.isArray(m.targets) && m.targets.length <= t.remaining);
+      for (const target of m.targets) {
+        assert(destinations(a).includes(target), "Invalid bonus worker slot");
+        a.reserve.w--;
+        tileRef(a, target).w++;
+        t.remaining--;
+        event(s, "bonusAssign", p, {
+          target,
+          targetId: tileRef(a, target).id,
+          phase: t.kind,
+        });
+      }
+      assert(
+        t.remaining === 0 || destinations(a).length === 0,
+        "Place all available bonus workers",
+      );
       next();
       break;
     }
@@ -1907,7 +1922,7 @@ function applyMove(state, m, p, historical = false) {
     default:
       assert(false);
   }
-  if (!["role", "plant"].includes(m.type))
+  if (!["role", "plant", "bonusAssignAll"].includes(m.type))
     if (!["achievementChoose", "achievementDraft"].includes(m.type))
       event(s, m.type, p, { ...m, ...extra });
   s.history.push({ p, move: clone(m) });
@@ -1989,6 +2004,7 @@ export function stripSecret(state, p) {
   delete s.pendingMessages;
   delete s.liveUndo;
   delete s.placementUndoSeats;
+  delete s.undoResubmitSeats;
   s.bagCount = s.bag.length;
   delete s.bag;
   delete s.discard;

@@ -53,18 +53,16 @@ export function move(s, m, p) {
   checkSeat(s, p);
   const next = announceCompletions(s, opponents(game.move(s, m, p)));
   delete next.liveUndo;
-  // A withdrawn placement already earned its increment. Re-confirmation is
-  // also a live update, even when another player moves between the two.
-  const editing = new Set(s.placementUndoSeats ?? []);
+  // Reopening a completed choice must not earn a second clock increment.
+  // Keep this entitlement across other seats' independent placement updates.
+  const editing = new Set(s.undoResubmitSeats ?? s.placementUndoSeats ?? []);
   if (m?.type === "undo") {
     next.liveUndo = true;
-    if (s.tasks[0]?.kind === "assign" && !game.currentPlayers(s).includes(p))
-      editing.add(p);
-  }
-  if (m?.type === "assign" && editing.delete(p)) next.liveUndo = true;
-  if (next.tasks[0]?.kind !== "assign") editing.clear();
-  if (editing.size) next.placementUndoSeats = [...editing];
-  else delete next.placementUndoSeats;
+    if (!game.currentPlayers(s).includes(p)) editing.add(p);
+  } else if (editing.delete(p)) next.liveUndo = true;
+  delete next.placementUndoSeats;
+  if (editing.size) next.undoResubmitSeats = [...editing];
+  else delete next.undoResubmitSeats;
   return next;
 }
 export function moveAI(s, p = game.currentPlayer(s)) {

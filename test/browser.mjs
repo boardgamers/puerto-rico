@@ -1107,29 +1107,37 @@ try {
       await page.locator(".placement-editor button.worker-slot").count(),
       2,
     );
-    await page.locator(".placement-editor button.worker-slot").first().click();
-    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
-      type: "bonusAssign",
-      target: "e1",
-    });
-    const bonusAfter = E.move(
-      bonusPlacement,
-      { type: "bonusAssign", target: "e1" },
-      0,
-    );
-    await page.evaluate(
-      (s) => host.emit("state", s),
-      E.stripSecret(bonusAfter, 0),
+    const movesBeforeBonus = await page.evaluate(() => played.length);
+    await page.locator('.placement-editor [data-bonus-slot="e1"]').click();
+    assert.equal(
+      await page.evaluate(() => played.length),
+      movesBeforeBonus,
+      "slot clicks stay local",
     );
     assert.equal(
-      await page.locator(".placement-editor button.worker-slot").count(),
-      1,
-      "bonus placement stays open for the remaining worker",
+      await page.locator('.placement-editor [data-bonus-slot="e0"]').count(),
+      0,
+      "original worker is fixed",
     );
-    await page.locator(".placement-editor button.worker-slot").click();
+    await page.locator('.placement-editor [data-bonus-slot="e1"]').click();
+    assert.equal(
+      await page
+        .locator('.placement-editor [data-bonus-slot="e1"]')
+        .getAttribute("data-bonus-occupied"),
+      "false",
+      "new placement can be revised",
+    );
+    await page.locator('.placement-editor [data-bonus-slot="e1"]').click();
+    assert.equal(
+      await page.locator(".pr-modal [data-confirm-bonus]").isDisabled(),
+      true,
+    );
+    await page.locator('.placement-editor [data-bonus-slot="b0"]').click();
+    assert.equal(await page.evaluate(() => played.length), movesBeforeBonus);
+    await page.locator(".pr-modal [data-confirm-bonus]").click();
     assert.deepEqual(await page.evaluate(() => played.at(-1)), {
-      type: "bonusAssign",
-      target: "b0",
+      type: "bonusAssignAll",
+      targets: ["e1", "b0"],
     });
     let undoPlacement = E.init(3, [], {}, "browser-placement-undo");
     undoPlacement = E.move(undoPlacement, { type: "role", id: "recruiter" }, 0);
