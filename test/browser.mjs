@@ -1131,6 +1131,34 @@ try {
       type: "bonusAssign",
       target: "b0",
     });
+    let undoPlacement = E.init(3, [], {}, "browser-placement-undo");
+    undoPlacement = E.move(undoPlacement, { type: "role", id: "recruiter" }, 0);
+    undoPlacement = E.move(undoPlacement, { type: "recruitBonus" }, 0);
+    undoPlacement = E.move(
+      undoPlacement,
+      { type: "assign", ...E.autoAssignment(undoPlacement, 1) },
+      1,
+    );
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 1 });
+        host.emit("state", s);
+      },
+      E.stripSecret(undoPlacement, 1),
+    );
+    await page.locator(".action-dock .dock-undo").click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "undo",
+    });
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(E.move(undoPlacement, { type: "undo" }, 1), 1),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    assert.ok(
+      await page.locator(".placement-editor [data-slot]").count(),
+      "withdrawn placement can be edited",
+    );
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(
       `Browser ${width}px: actions, allocation, layout, journal, chat and scrolling OK`,

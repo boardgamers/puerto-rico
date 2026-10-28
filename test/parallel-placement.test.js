@@ -108,3 +108,62 @@ test("BGS currentPlayer exposes every simultaneous placement seat", async () => 
   const s = recruit();
   assert.deepEqual(host.currentPlayer(s), [0, 1, 2]);
 });
+
+test("a later seat can withdraw its placement without undoing another seat", () => {
+  const start = recruit();
+  let s = E.move(start, { type: "assign", ...E.autoAssignment(start, 1) }, 1);
+  s = E.move(s, { type: "assign", ...E.autoAssignment(s, 2) }, 2);
+  assert.equal(E.canUndo(s, 1), true);
+  assert.equal(E.canMoveOutOfTurn(s, { type: "undo" }, 1), true);
+  const restored = E.move(s, { type: "undo" }, 1);
+  assert.deepEqual(restored.players[1], start.players[1]);
+  assert.deepEqual(restored.players[2], s.players[2]);
+  assert.deepEqual(E.currentPlayers(restored), [0, 1]);
+  assert.equal(restored.history.length, s.history.length - 1);
+  assert.deepEqual(E.replay(restored), restored);
+  assert.equal(E.canUndo(restored, 1), false);
+  const firstDone = E.move(
+    restored,
+    { type: "assign", ...E.autoAssignment(restored, 0) },
+    0,
+  );
+  assert.equal(E.canUndo(firstDone, 2), true, "seat 1 still precedes seat 2");
+  const finished = E.move(
+    firstDone,
+    { type: "assign", ...E.autoAssignment(firstDone, 1) },
+    1,
+  );
+  assert.equal(E.canUndo(finished, 2), false);
+});
+
+test("an earlier seat cannot withdraw after only later seats remain", () => {
+  const start = recruit();
+  const s = E.move(start, { type: "assign", ...E.autoAssignment(start, 0) }, 0);
+  assert.equal(E.canUndo(s, 0), false);
+  assert.equal(E.canMoveOutOfTurn(s, { type: "undo" }, 0), false);
+  assert.throws(() => E.move(s, { type: "undo" }, 0));
+});
+
+test("withdrawing and re-confirming placement do not award another clock increment", async () => {
+  const host = await import("../bgs/engine.js");
+  let s = recruit();
+  for (let i = 0; i < 3; i++) {
+    s = host.move(s, { type: "assign", ...E.autoAssignment(s, 2) }, 2);
+    assert.equal(host.isLiveUpdate(s), i > 0);
+    s = host.move(s, { type: "undo" }, 2);
+    assert.equal(host.isLiveUpdate(s), true);
+    assert.deepEqual(s.placementUndoSeats, [2]);
+    assert.equal(host.stripSecret(s, 2).placementUndoSeats, undefined);
+  }
+  assert.equal(s.history.length, recruit().history.length);
+});
+
+test("placement undo never retracts a revealed achievement or Festival reward", () => {
+  const start = recruit();
+  const s = E.move(start, { type: "assign", ...E.autoAssignment(start, 2) }, 2);
+  s.players[2].achievements = [{ id: "revealed", completed: true }];
+  assert.equal(E.canUndo(s, 2), false);
+  s.players[2].achievements = [];
+  s.festivals = [{ id: "claimed", claimed: 2 }];
+  assert.equal(E.canUndo(s, 2), false);
+});

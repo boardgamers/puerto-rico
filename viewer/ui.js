@@ -254,7 +254,7 @@ export function mountGame(
       .filter(Boolean)
       .join(" · ");
     const bonus = rewardPreview(m);
-    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && m.type === "bohio") ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
+    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && (m.type === "bohio" || (m.type === "undo" && state.canUndo))) ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
   };
   function rewardPreview(move) {
     const festival = festivalRewards(state, seat, move);
@@ -918,7 +918,7 @@ export function mountGame(
           )
         : "";
     const undo =
-      state.canUndo && can
+      state.canUndo && enabled
         ? moveButton({ type: "undo" }, t("undo"), "undo", "quiet dock-undo")
         : "";
     const controls = special + undo + choices + confirm + passControl + order;
@@ -1273,8 +1273,9 @@ export function mountGame(
       !(
         enabled &&
         !pending &&
-        m.type === "bohio" &&
-        state.legal.some((x) => JSON.stringify(x) === JSON.stringify(m))
+        ((m.type === "undo" && state.canUndo) ||
+          (m.type === "bohio" &&
+            state.legal.some((x) => JSON.stringify(x) === JSON.stringify(m))))
       )
     )
       return;
@@ -1417,7 +1418,9 @@ export function mountGame(
       !el.hasAttribute("data-bohio") &&
       !(
         el.dataset.move &&
-        JSON.parse(decodeURIComponent(el.dataset.move)).type === "bohio"
+        ["bohio", ...(state.canUndo ? ["undo"] : [])].includes(
+          JSON.parse(decodeURIComponent(el.dataset.move)).type,
+        )
       )
     )
       return;

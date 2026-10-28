@@ -1303,8 +1303,44 @@ function sameMove(a, b) {
       : x;
   return JSON.stringify(normalize(a)) === JSON.stringify(normalize(b));
 }
+// Withdraw only this seat's independent placement while an earlier seat is
+// still deciding. Never rewind another player's move or a revealed reward.
+function placementUndoState(s, p) {
+  if (s.tutorial || s.finished || s.placementOrdered || !Number.isInteger(p))
+    return null;
+  const tasks = placementTasks(s);
+  const rank = (seat) => (seat - s.owner + s.players.length) % s.players.length;
+  if (
+    !tasks.length ||
+    tasks.some((t) => t.p === p) ||
+    !tasks.some((t) => rank(t.p) < rank(p))
+  )
+    return null;
+  const index = s.history.findLastIndex((h) => h.p === p);
+  if (
+    index < (s.roleHistoryStart ?? 0) ||
+    s.history[index]?.move.type !== "assign" ||
+    s.history.slice(index + 1).some((h) => h.move.type !== "assign")
+  )
+    return null;
+  const candidate = replay({
+    ...s,
+    history: s.history.filter((_, i) => i !== index),
+  });
+  const revealed = (state) =>
+    JSON.stringify([
+      state.players.map((a) =>
+        (a.achievements ?? []).filter((c) => c.completed),
+      ),
+      (state.festivals ?? []).filter((f) => f.claimed !== undefined),
+    ]);
+  if (revealed(candidate) !== revealed(s) || candidate.random !== s.random)
+    return null;
+  return candidate;
+}
 export function canUndo(s, p) {
   if (s.tutorial) return false;
+  if (placementUndoState(s, p)) return true;
   const last = s.history.at(-1);
   if (
     !last ||
@@ -1340,7 +1376,7 @@ export function canUndo(s, p) {
 export function move(state, m, p) {
   if (m?.type === "undo") {
     assert(canUndo(state, p), "This move can no longer be undone");
-    return replay(state, logLength(state) - 1);
+    return placementUndoState(state, p) ?? replay(state, logLength(state) - 1);
   }
   return resolveForcedActions(applyMove(state, m, p));
 }
@@ -1884,7 +1920,10 @@ export function currentPlayer(s) {
   return s.finished ? undefined : s.tasks[0]?.p;
 }
 export function canMoveOutOfTurn(s, m, p) {
-  return m?.type === "bohio" && legal(s, p).some((x) => sameMove(x, m));
+  return (
+    (m?.type === "undo" && canUndo(s, p)) ||
+    (m?.type === "bohio" && legal(s, p).some((x) => sameMove(x, m)))
+  );
 }
 export function ended(s) {
   return s.finished;
@@ -1949,6 +1988,7 @@ export function stripSecret(state, p) {
   delete s.history;
   delete s.pendingMessages;
   delete s.liveUndo;
+  delete s.placementUndoSeats;
   s.bagCount = s.bag.length;
   delete s.bag;
   delete s.discard;

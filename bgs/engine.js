@@ -53,7 +53,18 @@ export function move(s, m, p) {
   checkSeat(s, p);
   const next = announceCompletions(s, opponents(game.move(s, m, p)));
   delete next.liveUndo;
-  if (m?.type === "undo") next.liveUndo = true;
+  // A withdrawn placement already earned its increment. Re-confirmation is
+  // also a live update, even when another player moves between the two.
+  const editing = new Set(s.placementUndoSeats ?? []);
+  if (m?.type === "undo") {
+    next.liveUndo = true;
+    if (s.tasks[0]?.kind === "assign" && !game.currentPlayers(s).includes(p))
+      editing.add(p);
+  }
+  if (m?.type === "assign" && editing.delete(p)) next.liveUndo = true;
+  if (next.tasks[0]?.kind !== "assign") editing.clear();
+  if (editing.size) next.placementUndoSeats = [...editing];
+  else delete next.placementUndoSeats;
   return next;
 }
 export function moveAI(s, p = game.currentPlayer(s)) {
@@ -140,7 +151,7 @@ export function messages(s) {
   return { messages: s.pendingMessages ?? [], data };
 }
 
-// Undo updates the saved position without awarding another clock increment.
+// Undo and replacement placements update the position without another increment.
 export function isLiveUpdate(s) {
   return s.liveUndo === true;
 }
