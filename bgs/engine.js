@@ -56,9 +56,9 @@ export function move(s, m, p) {
   // Reopening a completed choice must not earn a second clock increment.
   // Keep this entitlement across other seats' independent placement updates.
   const editing = new Set(s.undoResubmitSeats ?? s.placementUndoSeats ?? []);
-  if (m?.type === "undo") {
+  if (["undo", "editPlacement", "editProduction"].includes(m?.type)) {
     next.liveUndo = true;
-    if (!game.currentPlayers(s).includes(p)) editing.add(p);
+    if (["editPlacement", "editProduction"].includes(m.type)) editing.add(p);
   } else if (editing.delete(p)) next.liveUndo = true;
   delete next.placementUndoSeats;
   if (editing.size) next.undoResubmitSeats = [...editing];

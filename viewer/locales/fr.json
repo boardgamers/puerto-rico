@@ -595,5 +595,7 @@
   "metadata.rules": "Choisissez un rôle : tous les joueurs effectuent son action et vous recevez un privilège. Plantez, recrutez, construisez, produisez, vendez et expédiez. Le plus de points grâce aux expéditions, bâtiments et bonus remporte la partie.",
   "smugglerRaidHelp": "Prenez jusqu’à 3 marchandises sur un bateau ; remettez le reste dans la réserve.",
   "smugglerPlunderHelp": "Remettez toutes les marchandises du comptoir dans la réserve ; gagnez 1 PV par marchandise.",
-  "smugglerPoachHelp": "Prenez jusqu’à 3 ouvriers excédentaires et placez-les immédiatement."
+  "smugglerPoachHelp": "Prenez jusqu’à 3 ouvriers excédentaires et placez-les immédiatement.",
+  "editPlacement": "Modifier le placement",
+  "editProduction": "Modifier la production"
 }

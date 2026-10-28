@@ -254,7 +254,7 @@ export function mountGame(
       .filter(Boolean)
       .join(" · ");
     const bonus = rewardPreview(m);
-    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && (m.type === "bohio" || (m.type === "undo" && state.canUndo))) ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
+    return `<button type="button" class="move ${classes}" data-move="${encode(m)}" ${hint ? `title="${esc(hint)}" ${description ? `aria-label="${esc(hint)}"` : ""}` : ""} ${allowed() || (enabled && !pending && (m.type === "bohio" || (m.type === "undo" && state.canUndo) || (m.type === "editPlacement" && state.canEditPlacement) || (m.type === "editProduction" && state.canEditProduction))) ? "" : "disabled"}>${pictogram ? icon(pictogram, 26) : ""}<span>${label}${bonus}</span></button>`;
   };
   function rewardPreview(move) {
     const festival = festivalRewards(state, seat, move);
@@ -929,7 +929,33 @@ export function mountGame(
       state.canUndo && enabled
         ? moveButton({ type: "undo" }, t("undo"), "undo", "quiet dock-undo")
         : "";
-    const controls = special + undo + choices + confirm + passControl + order;
+    const edit =
+      enabled && state.canEditPlacement
+        ? moveButton(
+            { type: "editPlacement" },
+            t("editPlacement"),
+            "worker",
+            "quiet dock-edit-placement",
+          )
+        : "";
+    const editProduction =
+      enabled && state.canEditProduction
+        ? moveButton(
+            { type: "editProduction" },
+            t("editProduction"),
+            "edit",
+            "quiet dock-edit-production",
+          )
+        : "";
+    const controls =
+      special +
+      undo +
+      edit +
+      editProduction +
+      choices +
+      confirm +
+      passControl +
+      order;
     const compact = (controls.match(/<button\b/g)?.length ?? 0) <= 1;
     return `<div class="action-dock${compact ? " action-dock-compact" : ""}"><div class="dock-prompt" aria-live="polite">${icon(task?.kind === "role" ? "governor" : (state.role ?? "building"), 26)}<strong>${title()}</strong></div><div class="dock-controls">${controls}</div></div>`;
   }
@@ -1282,6 +1308,8 @@ export function mountGame(
         enabled &&
         !pending &&
         ((m.type === "undo" && state.canUndo) ||
+          (m.type === "editPlacement" && state.canEditPlacement) ||
+          (m.type === "editProduction" && state.canEditProduction) ||
           (m.type === "bohio" &&
             state.legal.some((x) => JSON.stringify(x) === JSON.stringify(m))))
       )
@@ -1426,9 +1454,12 @@ export function mountGame(
       !el.hasAttribute("data-bohio") &&
       !(
         el.dataset.move &&
-        ["bohio", ...(state.canUndo ? ["undo"] : [])].includes(
-          JSON.parse(decodeURIComponent(el.dataset.move)).type,
-        )
+        [
+          "bohio",
+          ...(state.canUndo ? ["undo"] : []),
+          ...(state.canEditPlacement ? ["editPlacement"] : []),
+          ...(state.canEditProduction ? ["editProduction"] : []),
+        ].includes(JSON.parse(decodeURIComponent(el.dataset.move)).type)
       )
     )
       return;

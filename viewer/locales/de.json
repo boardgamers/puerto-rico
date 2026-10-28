@@ -595,5 +595,7 @@
   "metadata.rules": "Wähle eine Rolle: Alle führen ihre Aktion aus, du erhältst ein Privileg. Pflanze, wirb an, baue, produziere, handle und verschiffe. Die meisten Punkte aus Verschiffung, Gebäuden und Boni gewinnen.",
   "smugglerRaidHelp": "Nimm bis zu 3 Waren von einem Schiff; lege den Rest in den Vorrat zurück.",
   "smugglerPlunderHelp": "Lege alle Waren des Handelshauses in den Vorrat zurück; erhalte 1 SP pro Ware.",
-  "smugglerPoachHelp": "Nimm bis zu 3 überzählige Arbeiter und setze sie sofort ein."
+  "smugglerPoachHelp": "Nimm bis zu 3 überzählige Arbeiter und setze sie sofort ein.",
+  "editPlacement": "Platzierung ändern",
+  "editProduction": "Produktion ändern"
 }

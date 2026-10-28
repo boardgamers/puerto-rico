@@ -1154,13 +1154,13 @@ try {
       },
       E.stripSecret(undoPlacement, 1),
     );
-    await page.locator(".action-dock .dock-undo").click();
+    await page.locator(".action-dock .dock-edit-placement").click();
     assert.deepEqual(await page.evaluate(() => played.at(-1)), {
-      type: "undo",
+      type: "editPlacement",
     });
     await page.evaluate(
       (s) => host.emit("state", s),
-      E.stripSecret(E.move(undoPlacement, { type: "undo" }, 1), 1),
+      E.stripSecret(E.move(undoPlacement, { type: "editPlacement" }, 1), 1),
     );
     await page.locator(".action-dock [data-actions]").click();
     assert.ok(
@@ -1202,6 +1202,55 @@ try {
     assert.deepEqual(await page.evaluate(() => played.at(-1)), {
       type: "produceBonus",
       good: "corn",
+    });
+    let editProduction = E.init(3, [], {}, "production-edit");
+    editProduction = E.move(
+      editProduction,
+      { type: "role", id: "recruiter" },
+      0,
+    );
+    editProduction = E.move(editProduction, { type: "recruitBonus" }, 0);
+    while (editProduction.tasks[0].kind === "assign") {
+      const p = E.currentPlayer(editProduction);
+      editProduction = E.move(
+        editProduction,
+        { type: "assign", ...E.autoAssignment(editProduction, p) },
+        p,
+      );
+    }
+    editProduction = E.move(editProduction, { type: "role", id: "trader" }, 1);
+    while (editProduction.tasks[0].kind !== "role")
+      editProduction = E.move(
+        editProduction,
+        { type: "pass" },
+        E.currentPlayer(editProduction),
+      );
+    editProduction = E.move(
+      editProduction,
+      { type: "role", id: "craftsman" },
+      2,
+    );
+    editProduction = E.move(
+      editProduction,
+      E.legal(editProduction, 2).find((m) => m.type === "produce"),
+      2,
+    );
+    editProduction = E.move(
+      editProduction,
+      { type: "produceBonus", good: "corn" },
+      2,
+    );
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 2 });
+        host.emit("state", s);
+      },
+      E.stripSecret(editProduction, 2),
+    );
+    assert.equal(await page.locator(".action-dock .dock-undo").count(), 0);
+    await page.locator(".action-dock .dock-edit-production").click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "editProduction",
     });
     assert.deepEqual(errors, [], `No browser errors at ${width}`);
     console.log(

@@ -88,11 +88,18 @@ test("Builder selection can be undone before purchase", () => {
   assert.deepEqual(E.move(chosen, { type: "undo" }, 0), s);
 });
 
-test("BGS supports undo after choosing every available role, without a clock increment", async () => {
+test("BGS role undo preserves the active seats and grants no clock increment", async () => {
   const host = await import("../bgs/engine.js");
   const start = host.init(3, [], {}, "undo-all-roles");
   for (const role of host.legal(start, 0).filter((m) => m.type === "role")) {
     const chosen = host.move(start, role, 0);
+    if (
+      JSON.stringify(host.currentPlayers(start)) !==
+      JSON.stringify(host.currentPlayers(chosen))
+    ) {
+      assert.equal(host.canUndo(chosen, 0), false, role.id);
+      continue;
+    }
     assert.equal(host.canUndo(chosen, 0), true, role.id);
     const undone = host.move(chosen, { type: "undo" }, 0);
     assert.equal(host.isLiveUpdate(undone), true);
@@ -113,35 +120,39 @@ test("a later seat can withdraw its placement without undoing another seat", () 
   const start = recruit();
   let s = E.move(start, { type: "assign", ...E.autoAssignment(start, 1) }, 1);
   s = E.move(s, { type: "assign", ...E.autoAssignment(s, 2) }, 2);
-  assert.equal(E.canUndo(s, 1), true);
-  assert.equal(E.canMoveOutOfTurn(s, { type: "undo" }, 1), true);
-  const restored = E.move(s, { type: "undo" }, 1);
+  assert.equal(E.canEditPlacement(s, 1), true);
+  assert.equal(E.canMoveOutOfTurn(s, { type: "editPlacement" }, 1), true);
+  const restored = E.move(s, { type: "editPlacement" }, 1);
   assert.deepEqual(restored.players[1], start.players[1]);
   assert.deepEqual(restored.players[2], s.players[2]);
   assert.deepEqual(E.currentPlayers(restored), [0, 1]);
   assert.equal(restored.history.length, s.history.length - 1);
   assert.deepEqual(E.replay(restored), restored);
-  assert.equal(E.canUndo(restored, 1), false);
+  assert.equal(E.canEditPlacement(restored, 1), false);
   const firstDone = E.move(
     restored,
     { type: "assign", ...E.autoAssignment(restored, 0) },
     0,
   );
-  assert.equal(E.canUndo(firstDone, 2), true, "seat 1 still precedes seat 2");
+  assert.equal(
+    E.canEditPlacement(firstDone, 2),
+    true,
+    "seat 1 still precedes seat 2",
+  );
   const finished = E.move(
     firstDone,
     { type: "assign", ...E.autoAssignment(firstDone, 1) },
     1,
   );
-  assert.equal(E.canUndo(finished, 2), false);
+  assert.equal(E.canEditPlacement(finished, 2), false);
 });
 
 test("an earlier seat cannot withdraw after only later seats remain", () => {
   const start = recruit();
   const s = E.move(start, { type: "assign", ...E.autoAssignment(start, 0) }, 0);
-  assert.equal(E.canUndo(s, 0), false);
-  assert.equal(E.canMoveOutOfTurn(s, { type: "undo" }, 0), false);
-  assert.throws(() => E.move(s, { type: "undo" }, 0));
+  assert.equal(E.canEditPlacement(s, 0), false);
+  assert.equal(E.canMoveOutOfTurn(s, { type: "editPlacement" }, 0), false);
+  assert.throws(() => E.move(s, { type: "editPlacement" }, 0));
 });
 
 test("withdrawing and re-confirming placement do not award another clock increment", async () => {
@@ -150,7 +161,7 @@ test("withdrawing and re-confirming placement do not award another clock increme
   for (let i = 0; i < 3; i++) {
     s = host.move(s, { type: "assign", ...E.autoAssignment(s, 2) }, 2);
     assert.equal(host.isLiveUpdate(s), i > 0);
-    s = host.move(s, { type: "undo" }, 2);
+    s = host.move(s, { type: "editPlacement" }, 2);
     assert.equal(host.isLiveUpdate(s), true);
     assert.deepEqual(s.undoResubmitSeats, [2]);
     assert.equal(host.stripSecret(s, 2).undoResubmitSeats, undefined);
@@ -162,8 +173,8 @@ test("placement undo never retracts a revealed achievement or Festival reward", 
   const start = recruit();
   const s = E.move(start, { type: "assign", ...E.autoAssignment(start, 2) }, 2);
   s.players[2].achievements = [{ id: "revealed", completed: true }];
-  assert.equal(E.canUndo(s, 2), false);
+  assert.equal(E.canEditPlacement(s, 2), false);
   s.players[2].achievements = [];
   s.festivals = [{ id: "claimed", claimed: 2 }];
-  assert.equal(E.canUndo(s, 2), false);
+  assert.equal(E.canEditPlacement(s, 2), false);
 });

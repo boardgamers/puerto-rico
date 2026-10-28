@@ -595,5 +595,7 @@
   "metadata.rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins.",
   "smugglerRaidHelp": "从一艘船上拿取至多3份货物；其余归还供应区。",
   "smugglerPlunderHelp": "将交易所所有货物归还供应区；每份获得1胜利点。",
-  "smugglerPoachHelp": "拿取至多3名多余工人并立即放置。"
+  "smugglerPoachHelp": "拿取至多3名多余工人并立即放置。",
+  "editPlacement": "修改放置",
+  "editProduction": "修改生产"
 }

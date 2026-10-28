@@ -595,5 +595,7 @@
   "metadata.rules": "Alege un rol: toți îi efectuează acțiunea, iar tu primești un privilegiu. Plantează, recrutează, construiește, produce, vinde și expediază. Câștigă cele mai multe puncte din expedieri, clădiri și bonusuri.",
   "smugglerRaidHelp": "Ia până la 3 mărfuri de pe o navă; returnează restul în rezervă.",
   "smugglerPlunderHelp": "Returnează toate mărfurile din casa de comerț în rezervă; câștigă 1 PV pentru fiecare.",
-  "smugglerPoachHelp": "Ia până la 3 muncitori excedentari și plasează-i imediat."
+  "smugglerPoachHelp": "Ia până la 3 muncitori excedentari și plasează-i imediat.",
+  "editPlacement": "Modifică plasarea",
+  "editProduction": "Modifică producția"
 }

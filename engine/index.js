@@ -1386,13 +1386,76 @@ function placementUndoState(s, p) {
     return null;
   return candidate;
 }
+function productionEditState(s, p) {
+  if (s.tutorial || s.finished || s.puertoma || s.tasks[0]?.kind !== "produce")
+    return null;
+  const index = s.history.findLastIndex((h) => h.p === p);
+  if (
+    index < (s.roleHistoryStart ?? 0) ||
+    !["produce", "produceBonus", "pass"].includes(
+      s.history[index]?.move.type,
+    ) ||
+    s.history
+      .slice(index + 1)
+      .some((h) => !["produce", "produceBonus", "pass"].includes(h.move.type))
+  )
+    return null;
+  const before = replay(s, index + 1);
+  const task = playerTask(before, p);
+  if (
+    !["produce", "produceBonus"].includes(task?.kind) ||
+    task.p !== p ||
+    parallelProductionTasks(before).length < 2
+  )
+    return null;
+  const rank = (seat) => (seat - s.owner + s.players.length) % s.players.length;
+  if (
+    task.kind === "produce" &&
+    !s.tasks.some((t) => t.kind === "produce" && rank(t.p) < rank(p))
+  )
+    return null;
+  let candidate;
+  try {
+    candidate = replay({
+      ...s,
+      history: s.history.filter((_, i) => i !== index),
+    });
+  } catch {
+    return null;
+  } // A later choice depends on this one: keep it committed.
+  if (
+    s.players.some(
+      (a, i) =>
+        i !== p && JSON.stringify(a) !== JSON.stringify(candidate.players[i]),
+    )
+  )
+    return null;
+  const reveals = (state) =>
+    JSON.stringify([
+      state.players.map((a) =>
+        (a.achievements ?? []).filter((c) => c.completed),
+      ),
+      state.festivals,
+      state.bag,
+      state.random,
+    ]);
+  return reveals(candidate) === reveals(s) ? candidate : null;
+}
+export function canEditProduction(s, p) {
+  return !!productionEditState(s, p);
+}
+export function canEditPlacement(s, p) {
+  return !!placementUndoState(s, p);
+}
 export function canUndo(s, p) {
   if (s.tutorial) return false;
-  if (placementUndoState(s, p)) return true;
   const last = s.history.at(-1);
-  if (!last || last.p !== p || s.finished) return false;
+  if (!last || last.p !== p || s.finished || !currentPlayers(s).includes(p))
+    return false;
   const before = replay(s, logLength(s) - 1);
   return (
+    JSON.stringify(currentPlayers(before).slice().sort()) ===
+      JSON.stringify(currentPlayers(s).slice().sort()) &&
     !s.players.some((a, i) =>
       (a.achievements ?? []).some(
         (c) =>
@@ -1417,9 +1480,19 @@ export function canUndo(s, p) {
   );
 }
 export function move(state, m, p) {
+  if (m?.type === "editProduction") {
+    const edited = productionEditState(state, p);
+    assert(edited, "This production can no longer be edited");
+    return edited;
+  }
+  if (m?.type === "editPlacement") {
+    const edited = placementUndoState(state, p);
+    assert(edited, "This placement can no longer be edited");
+    return edited;
+  }
   if (m?.type === "undo") {
     assert(canUndo(state, p), "This move can no longer be undone");
-    return placementUndoState(state, p) ?? replay(state, logLength(state) - 1);
+    return replay(state, logLength(state) - 1);
   }
   return resolveForcedActions(applyMove(state, m, p));
 }
@@ -1986,6 +2059,8 @@ export function currentPlayer(s) {
 export function canMoveOutOfTurn(s, m, p) {
   return (
     (m?.type === "undo" && canUndo(s, p)) ||
+    (m?.type === "editPlacement" && canEditPlacement(s, p)) ||
+    (m?.type === "editProduction" && canEditProduction(s, p)) ||
     (m?.type === "bohio" && legal(s, p).some((x) => sameMove(x, m)))
   );
 }
@@ -2083,6 +2158,8 @@ export function stripSecret(state, p) {
     }
   // Logs contain only public moves; historical earned points are public even though totals are concealed.
   s.canUndo = Number.isInteger(p) && canUndo(state, p);
+  s.canEditPlacement = Number.isInteger(p) && canEditPlacement(state, p);
+  s.canEditProduction = Number.isInteger(p) && canEditProduction(state, p);
   s.currentPlayers = currentPlayers(state);
   const ownTask = Number.isInteger(p) ? playerTask(state, p) : null;
   if (ownTask && ownTask.p === p && ownTask !== state.tasks[0]) {
