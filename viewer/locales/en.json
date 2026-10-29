@@ -595,7 +595,8 @@
   "metadata.rules": "Choose a role: all players perform its action, and you receive a privilege. Plant, recruit, build, produce, trade and ship. Most points from shipping, buildings and bonuses wins.",
   "smugglerRaidHelp": "Take up to 3 goods from one ship; return the rest to the supply.",
   "smugglerPlunderHelp": "Return all trading-house goods to the supply; gain 1 VP per good.",
-  "smugglerPoachHelp": "Take up to 3 surplus workers and place them immediately.",
+  "smugglerPoachHelp": "Leave one person per player in the recruitment pool. Take up to 3 of the rest and place them immediately; discard the remainder.",
   "editPlacement": "Edit placement",
-  "editProduction": "Edit production"
+  "editProduction": "Edit production",
+  "ruleWorkerPool": "After Recruiter, refill the pool from the supply: one person per empty building worker slot across all players, with a minimum of one per player. Plantation slots do not count. If available, one of these people is a citizen."
 }

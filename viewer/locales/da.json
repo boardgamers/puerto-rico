@@ -595,7 +595,8 @@
   "metadata.rules": "Vælg en rolle: alle udfører handlingen, og du får et privilegium. Plant, rekrutter, byg, producer, handl og afskib. Flest point fra afskibning, bygninger og bonusser vinder.",
   "smugglerRaidHelp": "Tag op til 3 varer fra ét skib; læg resten tilbage i forsyningen.",
   "smugglerPlunderHelp": "Læg alle handelshusets varer tilbage i forsyningen; få 1 sejrspoint pr. vare.",
-  "smugglerPoachHelp": "Tag op til 3 overskydende arbejdere, og placér dem straks.",
+  "smugglerPoachHelp": "Lad én person pr. spiller blive i rekrutteringspuljen. Tag op til 3 af de øvrige og placér dem straks; kassér resten.",
   "editPlacement": "Redigér placering",
-  "editProduction": "Redigér produktion"
+  "editProduction": "Redigér produktion",
+  "ruleWorkerPool": "Efter Rekruttereren fyldes puljen fra forsyningen: én person pr. tom arbejderplads i alle spilleres bygninger, dog mindst én pr. spiller. Plantagepladser tæller ikke. Hvis muligt er én af disse personer en borger."
 }

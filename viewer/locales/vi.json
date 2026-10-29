@@ -595,7 +595,8 @@
   "metadata.rules": "Chọn vai trò: mọi người thực hiện hành động, bạn nhận đặc quyền. Trồng trọt, tuyển người, xây dựng, sản xuất, buôn bán và giao hàng. Ai có nhiều điểm nhất từ giao hàng, tòa nhà và thưởng sẽ thắng.",
   "smugglerRaidHelp": "Lấy tối đa 3 hàng hóa từ một tàu; trả số còn lại về kho chung.",
   "smugglerPlunderHelp": "Trả toàn bộ hàng hóa trong nhà giao dịch về kho chung; nhận 1 điểm chiến thắng cho mỗi hàng hóa.",
-  "smugglerPoachHelp": "Lấy tối đa 3 công nhân dư và bố trí ngay.",
+  "smugglerPoachHelp": "Để lại một người cho mỗi người chơi trong nhóm chờ tuyển. Lấy tối đa 3 người còn lại và bố trí ngay; loại bỏ số dư còn lại.",
   "editPlacement": "Sửa cách bố trí",
-  "editProduction": "Sửa sản xuất"
+  "editProduction": "Sửa sản xuất",
+  "ruleWorkerPool": "Sau bước Tuyển mộ, bổ sung nhóm chờ tuyển từ kho chung: một người cho mỗi ô công nhân trống trong công trình của tất cả người chơi, tối thiểu một người cho mỗi người chơi. Không tính các ô đồn điền. Nếu còn, một trong những người này là công dân."
 }

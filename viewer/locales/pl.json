@@ -595,7 +595,8 @@
   "metadata.rules": "Wybierz rolę: wszyscy wykonują jej akcję, a ty otrzymujesz przywilej. Sadź, werbuj, buduj, produkuj, handluj i wysyłaj. Wygrywa najwięcej punktów za wysyłkę, budynki i premie.",
   "smugglerRaidHelp": "Weź do 3 towarów z jednego statku; resztę zwróć do zasobów.",
   "smugglerPlunderHelp": "Zwróć wszystkie towary z domu handlowego do zasobów; zdobądź 1 PZ za każdy towar.",
-  "smugglerPoachHelp": "Weź do 3 nadmiarowych robotników i natychmiast ich rozmieść.",
+  "smugglerPoachHelp": "Pozostaw w puli rekrutacji po jednej osobie na gracza. Weź do 3 z pozostałych i natychmiast je umieść; odrzuć resztę.",
   "editPlacement": "Zmień rozmieszczenie",
-  "editProduction": "Zmień produkcję"
+  "editProduction": "Zmień produkcję",
+  "ruleWorkerPool": "Po Rekruterze uzupełnij pulę z zasobów ogólnych: jedna osoba na każde puste miejsce robotnika w budynkach wszystkich graczy, co najmniej jedna na gracza. Miejsca na plantacjach się nie liczą. Jeśli jest dostępny, jedną z tych osób jest obywatel."
 }

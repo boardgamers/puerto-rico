@@ -42,6 +42,8 @@ export function rulesPages() {
               `- **${t(role)}:** ${t.roleAction(role)}${t.rolePrivilege(role) ? ` **${t("privilege")}:** ${t.rolePrivilege(role)}` : ""}`,
           )
           .join("\n"),
+        section("recruiter", t("ruleWorkerPool")),
+        section("smuggler", t("smugglerPoachHelp")),
         section(
           "ruleProductionTitle",
           t("productionIntro"),

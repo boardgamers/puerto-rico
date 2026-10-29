@@ -595,7 +595,8 @@
   "metadata.rules": "Scegli un ruolo: tutti eseguono la sua azione e tu ricevi un privilegio. Pianta, recluta, costruisci, produci, commercia e spedisci. Vince chi ottiene più punti da spedizioni, edifici e bonus.",
   "smugglerRaidHelp": "Prendi fino a 3 merci da una nave; rimetti le altre nella riserva.",
   "smugglerPlunderHelp": "Rimetti tutte le merci dell’emporio nella riserva; ottieni 1 PV per merce.",
-  "smugglerPoachHelp": "Prendi fino a 3 lavoratori in eccedenza e collocali subito.",
+  "smugglerPoachHelp": "Lascia una persona per giocatore nella riserva da reclutare. Prendi fino a 3 delle altre e piazzale subito; scarta le restanti.",
   "editPlacement": "Modifica collocazione",
-  "editProduction": "Modifica produzione"
+  "editProduction": "Modifica produzione",
+  "ruleWorkerPool": "Dopo il Reclutatore, riempi la riserva da reclutare dalla riserva generale: una persona per ogni posto lavoratore vuoto negli edifici di tutti i giocatori, almeno una per giocatore. I posti nelle piantagioni non contano. Se disponibile, una di queste persone è un cittadino."
 }

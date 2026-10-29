@@ -1099,7 +1099,7 @@ export function mountGame(
             )
             .join("")}<li><b>${t("capture")}</b></li></ul>`
         : `<p>${t.roleActionHtml(id)}</p>`
-    }${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
+    }${id === "recruiter" ? `<p>${t("ruleWorkerPool")}</p>` : ""}${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
   }
   function confirmRole(m) {
     const warning = state.roleWarnings?.[m.id];
@@ -1271,7 +1271,11 @@ export function mountGame(
     const extras = [
       citizens ? section("citizen", "citizens", paragraph("ruleCitizens")) : "",
       smuggler
-        ? section("smuggler", "smuggler", paragraph("ruleSmuggler"))
+        ? section(
+            "smuggler",
+            "smuggler",
+            paragraph("ruleSmuggler") + paragraph("smugglerPoachHelp"),
+          )
         : "",
       adventurer
         ? section("adventurer", "adventurer", paragraph("ruleAdventurer"))
@@ -1293,6 +1297,7 @@ export function mountGame(
     return `<div class="rules-content">
       ${section("vp", "ruleGoalTitle", paragraph("ruleGoal"))}
       ${section("governor", "ruleRoundTitle", `<ol class="rules-round">${roundSteps.map(([title, text]) => `<li><strong>${t(title)}</strong><p>${text}</p></li>`).join("")}</ol>${paragraph(smuggler || adventurer ? "ruleOptional" : "ruleOptionalBase")}`)}
+      ${section("recruiter", "recruiter", paragraph("ruleWorkerPool"))}
       ${section("sugar", "ruleProductionTitle", `${paragraph("ruleProductionIntro")}<ol class="rules-chain">${chain.map(([role, text]) => `<li>${icon(role, 28)}<div><strong>${t(role)}</strong><p>${t.html(text)}</p></div></li>`).join("")}</ol>${paragraph("ruleProduction")}${paragraph("ruleActivation")}`)}
       ${section("ship", "ruleGoodsTitle", `<div class="rules-goods"><div><h4>${icon("coin")}${t("ruleSellTitle")}</h4>${paragraph("ruleSell")}</div><div><h4>${icon("vp")}${t("ruleShipTitle")}</h4>${paragraph("ruleShip")}</div></div>${paragraph("ruleShipLimits")}`)}
       <aside class="rules-tip"><strong>${t("ruleTimingTitle")}</strong>${paragraph("ruleTiming")}</aside>

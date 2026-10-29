@@ -595,7 +595,8 @@
   "metadata.rules": "Kies een rol: iedereen voert de actie uit en jij krijgt een privilege. Plant, rekruteer, bouw, produceer, handel en verscheep. De meeste punten uit verscheping, gebouwen en bonussen winnen.",
   "smugglerRaidHelp": "Neem maximaal 3 goederen van één schip; leg de rest terug in de voorraad.",
   "smugglerPlunderHelp": "Leg alle goederen uit het handelshuis terug in de voorraad; ontvang 1 overwinningspunt per goed.",
-  "smugglerPoachHelp": "Neem maximaal 3 overtollige arbeiders en plaats ze onmiddellijk.",
+  "smugglerPoachHelp": "Laat één persoon per speler in de wervingspool. Neem maximaal 3 van de overige personen en plaats ze meteen; verwijder de rest.",
   "editPlacement": "Plaatsing wijzigen",
-  "editProduction": "Productie wijzigen"
+  "editProduction": "Productie wijzigen",
+  "ruleWorkerPool": "Vul na de Werver de pool vanuit de voorraad: één persoon per lege arbeidersplaats in de gebouwen van alle spelers, met een minimum van één per speler. Plantageplaatsen tellen niet mee. Indien beschikbaar is één van deze personen een burger."
 }
