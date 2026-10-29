@@ -169,7 +169,7 @@ export function mountGame(
   ) =>
     Number.isFinite(n)
       ? `<button type="button" class="score-button" data-score="${i}" title="${esc(t("scoreDetails"))}" aria-label="${esc(`${t("scoreDetails")} · ${state.players[i].name} : ${n}`)}">${scoreToken(n)}</button>`
-      : `<span title="${esc(t("scoreHidden"))}">${metric("vp", "?")}</span>`;
+      : `<span class="score-hidden" title="${esc(t("scoreHidden"))}">${metric("vp", "?")}</span>`;
   let chatView;
   function configureChat() {
     if (!chat) return;
