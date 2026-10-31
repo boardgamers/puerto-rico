@@ -44,7 +44,13 @@ export function viewerLifecycle(ctx, ui, chat) {
       if (replaying || pending)
         return Promise.reject(Error("Move unavailable"));
       return new Promise((resolve, reject) => {
-        pending = { resolve, reject, move: m, player: playerIndex };
+        pending = {
+          resolve,
+          reject,
+          move: m,
+          player: playerIndex,
+          historyLength: live?.historyLength,
+        };
         timer = setTimeout(() => {
           settle(Error("No confirmation received. Please try again."));
           ctx.fetchState();
@@ -55,22 +61,28 @@ export function viewerLifecycle(ctx, ui, chat) {
     chat,
     onState(s) {
       // BGS returns the raw saved engine state after the game ends.
-      if (s.finished && Array.isArray(s.history)) s = stripSecret(s, playerIndex);
+      if (s.finished && Array.isArray(s.history))
+        s = stripSecret(s, playerIndex);
       live = s;
-      const awaitingPlacement =
+      const awaitingMove =
         pending &&
-        ((pending.move.type === "assign" &&
-          s.tasks.some((t) => t.kind === "assign" && t.p === pending.player)) ||
+        ((["recruit", "recruitBonus"].includes(pending.move.type) &&
+          Number.isInteger(pending.historyLength) &&
+          s.historyLength <= pending.historyLength) ||
+          (pending.move.type === "assign" &&
+            s.tasks.some(
+              (t) => t.kind === "assign" && t.p === pending.player,
+            )) ||
           (pending.move.type === "orderedPlacement" && !s.placementOrdered));
       if (!replaying) {
         position = Math.max(1, s.historyLength);
-        ui.render(s, !!awaitingPlacement);
+        ui.render(s, !!awaitingMove);
       } else {
         // An undo or branch replacement may shorten the host history.
         if (position > s.historyLength) seek(s.historyLength);
         info();
       }
-      if (!awaitingPlacement) settle();
+      if (!awaitingMove) settle();
     },
     onThumbnail: () => ui.thumbnail(),
     onPlayer: (p) => {

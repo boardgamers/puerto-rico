@@ -90,7 +90,7 @@ for (const seed of ["ledger-one", "ledger-two", "ledger-three"])
               ].includes(e.type) &&
               (e.kind ?? "w") === kind
             )
-              n++;
+              n += e.amount ?? 1;
             if (kind === "w")
               n +=
                 (e.reward?.workers ?? 0) +

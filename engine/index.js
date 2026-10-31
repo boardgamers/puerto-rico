@@ -796,7 +796,19 @@ function phaseLegal(s, t) {
     case "assembly":
       return [{ type: "assembly" }, pass];
     case "recruitBonus":
-      return [...(s.workerSupply > 0 ? [{ type: "recruitBonus" }] : []), pass];
+      return [
+        ...(s.workerSupply > 0
+          ? [
+              {
+                type: "recruitBonus",
+                ...(!a.puertoma && Math.min(t.remaining, s.workerSupply) > 1
+                  ? { amount: Math.min(t.remaining, s.workerSupply) }
+                  : {}),
+              },
+            ]
+          : []),
+        pass,
+      ];
     case "villa":
       return [
         ...(s.citizenSupply + s.workerSupply > 0 ? [{ type: "villa" }] : []),
@@ -1622,6 +1634,12 @@ function applyMove(state, m, p, historical = false) {
   } else
     assert(
       legal(s, p).some((x) => sameMove(x, m)) ||
+        // Older clients and recorded games claimed the privilege one worker at a time.
+        (t.kind === "recruitBonus" &&
+          m.type === "recruitBonus" &&
+          m.amount === undefined &&
+          Object.keys(m).length === 1 &&
+          s.workerSupply > 0) ||
         // Preserve already-recorded payments from before mandatory quarry discounts.
         (historical &&
           t.kind === "build" &&
@@ -1733,10 +1751,14 @@ function applyMove(state, m, p, historical = false) {
       assert(gainPerson(s, p, s.citizenSupply ? "c" : "w"));
       next();
       break;
-    case "recruitBonus":
-      assert(gainPerson(s, p));
-      if (--t.remaining === 0) next();
+    case "recruitBonus": {
+      const amount = m.amount ?? 1;
+      for (let i = 0; i < amount; i++) assert(gainPerson(s, p));
+      extra.amount = amount;
+      t.remaining -= amount;
+      if (t.remaining === 0) next();
       break;
+    }
     case "recruit":
       s.register[m.kind]--;
       a.reserve[m.kind]++;

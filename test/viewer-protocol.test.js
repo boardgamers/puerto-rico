@@ -138,3 +138,30 @@ test("finished BGS saves are converted to a complete public viewer state", async
   assert.equal(state.historyLength, E.logLength(raw));
   assert.equal(state.history, undefined);
 });
+
+test("duplicate recruitment snapshots cannot release a pending move", async () => {
+  const { viewer } = fixture();
+  viewer.onPlayer({ index: 0 });
+  const before = { historyLength: 8, tasks: [{ kind: "recruit", p: 0 }] };
+  viewer.onState(before);
+  let done = false;
+  const request = viewer.move({ type: "recruit", kind: "w" }).then(() => {
+    done = true;
+  });
+  viewer.onMoveResult({ ok: true });
+  viewer.onState(before);
+  await Promise.resolve();
+  assert.equal(done, false);
+  await assert.rejects(
+    viewer.move({ type: "recruit", kind: "w" }),
+    /unavailable/,
+  );
+  viewer.onState({ ...before, historyLength: 9 });
+  await request;
+  assert.equal(done, true);
+  // A later turn can legitimately offer the same recruitment choice again.
+  const next = viewer.move({ type: "recruit", kind: "c" });
+  viewer.onState({ historyLength: 10, tasks: [{ kind: "assign", p: 0 }] });
+  await next;
+  viewer.destroy();
+});

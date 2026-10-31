@@ -115,7 +115,7 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
         case "villa":
         case "bonusAssign":
         case "poachWorker":
-          text = `${t("journalRecruit")} ${metric(e.kind === "c" ? "citizen" : "worker", 1)}${target(e)}`;
+          text = `${t("journalRecruit")} ${metric(e.kind === "c" ? "citizen" : "worker", e.amount ?? 1)}${target(e)}`;
           break;
         case "bohio":
           text = `${t("journalMoveWorker")} ${metric(e.kind === "c" ? "citizen" : "worker", 1)}${target(e)}`;
