@@ -511,7 +511,14 @@ function startRole(s, id, p, captured = false) {
   const coins = role.coins;
   role.coins = 0;
   role.taken = p;
-  if (s.captured?.id === id && !captured) s.players[s.captured.p].coins += 3;
+  if (s.captured?.id === id && !captured) {
+    s.players[s.captured.p].coins += 3;
+    event(s, "income", s.captured.p, {
+      coins: 3,
+      source: "smuggler",
+      capturedRole: id,
+    });
+  }
   if (s.captured?.id === id) s.captured = null;
   s.role = id.startsWith("adventurer") ? "adventurer" : id;
   s.owner = p;
@@ -1200,7 +1207,10 @@ function settle(s) {
     }
     if (t.kind === "captainStart") {
       s.tasks.shift();
-      if (t.p === s.owner && active(a, "lighthouse")) a.coins++;
+      if (t.p === s.owner && active(a, "lighthouse")) {
+        a.coins++;
+        event(s, "income", t.p, { coins: 1, source: "lighthouse" });
+      }
       if (active(a, "pensionOffice") && citizens(a))
         s.tasks.unshift({
           kind: "pension",

@@ -74,7 +74,7 @@ export function journalContent(state, t, { automatedSetup = false } = {}) {
           text = `${t("ability")} ${e.level} · ${esc(t(`ability.${e.id}`))}`;
           break;
         case "income":
-          text = t("journalGains");
+          text = `${e.source ? `${name(e.source)}${e.capturedRole ? ` · ${name(e.capturedRole)}` : ""} · ` : ""}${t("journalGains")}`;
           break;
         case "estate":
           text = `${t(e.id === "quarry" ? "journalQuarry" : e.id === "forest" ? "journalForest" : "journalEstate")} ${icon(e.id, 22)} ${name(e.id)}`;
