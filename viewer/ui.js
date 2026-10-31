@@ -1157,16 +1157,30 @@ export function mountGame(
     return `<button data-festival="${i}" class="festival ${claimed ? "claimed" : ""}"><span class="festival-heading"><span class="festival-emblem">${icon(claimed ? "check" : glyph, 25)}</span><strong>${t(f.id)}</strong>${icon("help", 15)}</span><span class="festival-condition">${festivalCondition(f, true)}</span><span class="festival-card-bottom"><span class="festival-reward" title="${esc(t("reward"))}"><span class="festival-reward-symbol" role="img" aria-label="${esc(t("reward"))}">${icon("reward", 17)}</span><span>${festivalReward(f)}</span></span>${claimed ? `<span class="festival-claimed">${icon("check", 14)}${esc(state.players[f.claimed].name)}</span>` : festivalReserved(f, true)}</span></button>`;
   }
   function festivalCondition(f, compact = false) {
+    const player = state.players[seat];
+    // Claimed cards describe the won objective, not the viewer's current progress.
+    const progress = f.claimed === undefined && player;
     const targets = (ids, amounts, fields = false) => {
       const counts = {};
       ids.forEach((id, i) => {
         counts[id] = (counts[id] ?? 0) + (amounts?.[i] ?? f.amount ?? 1);
       });
       return `<span class="festival-targets">${Object.entries(counts)
-        .map(
-          ([id, n]) =>
-            `<span>${icon(fields ? `field-${id}` : id, 20)}<b>${n}</b> ${esc(t(id))}</span>`,
-        )
+        .map(([id, n]) => {
+          let owned;
+          if (progress && fields)
+            owned = player.estates.filter((e) => e.id === id).length;
+          else if (progress && ["produce", "farmProduce"].includes(f.goal))
+            owned =
+              state.role === "craftsman"
+                ? (state.production?.[seat]?.[id] ?? 0)
+                : 0;
+          else if (progress && f.goal === "ship")
+            owned =
+              state.role === "captain" ? (state.shipped?.[seat]?.[id] ?? 0) : 0;
+          const complete = owned !== undefined && owned >= n;
+          return `<span${complete ? ' class="requirement-complete"' : ""}>${icon(fields ? `field-${id}` : id, 20)}<b>${owned === undefined ? n : `${owned}/${n}`}</b> ${esc(t(id))}${complete ? icon("check", 14) : ""}</span>`;
+        })
         .join("")}</span>`;
     };
     const goods = targets(f.targets.goods, f.amounts);
