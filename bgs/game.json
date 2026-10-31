@@ -19,7 +19,6 @@
     "replayable": true,
     "thumbnail": true,
     "chat": true,
-    "integratedControls": ["chat"],
     "dependencies": {
       "scripts": [],
       "stylesheets": []
