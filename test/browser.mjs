@@ -383,12 +383,20 @@ try {
     assert.equal(await overflow(), false);
     await page.screenshot({ path: `.local/qa/${width}-role-picker.png` });
     await page.keyboard.press("Escape");
+    // Even safe roles require confirmation; cancelling must not submit a move.
+    await page.locator('.shared-board [data-role-id="recruiter"]').click();
+    assert.equal(await page.locator(".action-dock [data-confirm-role]").count(), 1);
+    assert.equal(await page.locator("dialog[open]").count(), 0);
+    assert.deepEqual(await page.evaluate(() => played), []);
+    await page.locator("[data-cancel-role]").click();
+    assert.deepEqual(await page.evaluate(() => played), []);
     const craftsman = page.locator('[data-role-id="craftsman"]');
     assert.equal(await craftsman.locator(".role-warning").count(), 1);
     await craftsman.click();
-    assert.equal(await page.locator("[data-confirm-role]").count(), 1);
+    assert.equal(await page.locator(".action-dock [data-confirm-role]").count(), 1);
+    assert.equal(await page.locator("dialog[open]").count(), 0);
     assert.deepEqual(await page.evaluate(() => played), []);
-    await page.locator(".modal-body [data-close]").click();
+    await page.locator("[data-cancel-role]").click();
     assert.deepEqual(await page.evaluate(() => played), []);
     await craftsman.click();
     // A newer game state invalidates an open warning; it must not send a stale choice.
@@ -422,6 +430,7 @@ try {
         `.pr-modal [data-move="${encodeURIComponent(JSON.stringify(m))}"]`,
       )
       .click();
+    await page.locator(".action-dock [data-confirm-role]").click();
     assert.deepEqual(await page.evaluate(() => played.at(-1)), m);
     let s = E.move(original, m, 0);
     while (s.tasks[0].kind !== "recruit") s = E.moveAI(s);

@@ -705,7 +705,7 @@ export function mountGame(
             : state.role),
       acting = allowed(),
       warning = m && acting ? state.roleWarnings?.[r.id] : null;
-    return `<button data-role-id="${r.id}" class="role ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="role-coins">${metric("coin", r.coins)}</span>` : ""}</span><b>${t(r.id)}</b>${r.id === "recruiter" && m ? `<span class="role-recruits">${recruitmentCount(recruitmentShares(state, seat)[seat])}${recruitmentBonus(state, seat) ? ` <span title="${esc(t("privilege"))}">+${metric("worker", recruitmentBonus(state, seat))}</span>` : ""}</span>` : ""}${selected ? playerMarker(r.taken) : ""}</button>`;
+    return `<button data-role-id="${r.id}" class="role ${roleConfirmation?.move.id === r.id ? "role-pending" : ""} ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="role-coins">${metric("coin", r.coins)}</span>` : ""}</span><b>${t(r.id)}</b>${r.id === "recruiter" && m ? `<span class="role-recruits">${recruitmentCount(recruitmentShares(state, seat)[seat])}${recruitmentBonus(state, seat) ? ` <span title="${esc(t("privilege"))}">+${metric("worker", recruitmentBonus(state, seat))}</span>` : ""}</span>` : ""}${selected ? playerMarker(r.taken) : ""}</button>`;
   }
   function recruitmentPreview() {
     const shares = recruitmentShares(state, seat);
@@ -869,6 +869,11 @@ export function mountGame(
   function bottom() {
     if (state.finished)
       return `<div class="action-dock"><strong>${t("finished")}</strong><button class="primary" data-scores>${t("finalScore")}</button></div>`;
+    if (roleConfirmation && isTurn()) {
+      const m = roleConfirmation.move;
+      const warning = state.roleWarnings?.[m.id];
+      return `<div class="action-dock"><div class="dock-prompt" aria-live="polite">${icon(m.id, 26)}<strong>${t(m.id)}</strong>${warning ? `<small>${icon("warning", 16)} ${t.html(warning.reason)}</small>` : ""}</div><div class="dock-controls"><button type="button" data-cancel-role>${t("chooseAnotherRole")}</button><button type="button" class="primary" data-confirm-role>${icon("check")} ${t("confirm")}${rewardPreview(m)}</button></div></div>`;
+    }
     const can = isTurn(),
       task = state.tasks[0],
       pass = state.legal.find((m) => m.type === "pass" && !m.decline?.length);
@@ -1102,22 +1107,9 @@ export function mountGame(
     }${id === "recruiter" ? `<p>${t("ruleWorkerPool")}</p>` : ""}${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
   }
   function confirmRole(m) {
-    const warning = state.roleWarnings?.[m.id];
-    if (!warning) return false;
-    show(
-      t("roleWarningTitle"),
-      `
-      <div class="role-warning-heading">${icon(m.id, 36)}<strong>${t(m.id)}</strong></div>
-      <p>${t.html(warning.reason)}</p>
-      ${warning.coins ? `<p class="role-warning-gain">${t("roleCoinsStill")} ${metric("coin", warning.coins)}</p>` : ""}
-      ${warning.bonuses.length ? `<div class="role-warning-bonuses"><small>${t("roleBonusesStill")}</small>${warning.bonuses.map((b) => `<div>${t(b.building)} ${b.coins ? metric("coin", b.coins) : ""}${b.vp ? metric("vp", b.vp) : ""}</div>`).join("")}</div>` : ""}
-      ${m.id !== "smuggler" ? `<p class="role-warning-note">${t("roleWarningOthers")}</p>` : ""}
-      <div class="action-choices"><button type="button" class="primary" data-close>${t("chooseAnotherRole")}</button><button type="button" data-confirm-role>${t("chooseRoleAnyway")}</button></div>
-    `,
-      "role-warning",
-    );
+    hide(modal);
     roleConfirmation = { move: m, seat, historyLength: state.historyLength };
-    body.querySelector("[data-close]").focus();
+    render();
     return true;
   }
   function rolesHelp() {
@@ -1468,6 +1460,11 @@ export function mountGame(
       )
     )
       return;
+    if (el.hasAttribute("data-cancel-role")) {
+      roleConfirmation = null;
+      render();
+      return;
+    }
     if (el.hasAttribute("data-confirm-role")) {
       const confirmation = roleConfirmation;
       if (

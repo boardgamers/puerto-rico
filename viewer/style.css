@@ -2875,3 +2875,8 @@ body:has(.pr-game) {
 
 .pr-game .vp-supply-status { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .pr-game .final-round-badge { color: #f0ca79; background: #e1b25a1a; border-radius: 5px; padding: 4px 7px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+
+.pr-game .role.role-pending {
+  outline: 2px solid var(--gold);
+  outline-offset: -2px;
+}
