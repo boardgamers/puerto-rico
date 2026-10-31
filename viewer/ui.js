@@ -1107,6 +1107,10 @@ export function mountGame(
     }${id === "recruiter" ? `<p>${t("ruleWorkerPool")}</p>` : ""}${id === "trader" ? `<div class="trade-prices"><small>${t("baseSalePrices")}</small><div>${GOODS.map((good, price) => `<span title="${esc(t(good))}">${icon(good, 22)}${icon("arrow", 14)}${metric("coin", price)}</span>`).join("")}</div></div>` : ""}</div>${privilege ? `<div class="role-privilege"><small>${t(solo ? "roleNote" : "privilege")}</small><p>${t.rolePrivilegeHtml(id)}</p></div>` : ""}</article>`;
   }
   function confirmRole(m) {
+    // Normal roles already have an action to confirm (and can be undone).
+    // Adventurer pays immediately; keep its confirmation and existing warnings.
+    if (!m.id.startsWith("adventurer") && !state.roleWarnings?.[m.id])
+      return false;
     hide(modal);
     roleConfirmation = { move: m, seat, historyLength: state.historyLength };
     render();
