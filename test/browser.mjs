@@ -48,6 +48,35 @@ try {
       },
       E.stripSecret(original, 0),
     );
+    // The previous Smuggler chooser cannot choose it again, even in the final round.
+    const blockedSmuggler = structuredClone(original);
+    blockedSmuggler.smuggler = 0;
+    blockedSmuggler.endReason = "points";
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(blockedSmuggler, 0),
+    );
+    assert.equal(
+      await page.locator('[data-role-id="smuggler"]').isDisabled(),
+      true,
+    );
+    assert.equal(
+      await page.locator('[data-role-id="planter"]').isEnabled(),
+      true,
+    );
+    blockedSmuggler.smuggler = 1;
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(blockedSmuggler, 0),
+    );
+    assert.equal(
+      await page.locator('[data-role-id="smuggler"]').isEnabled(),
+      true,
+    );
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(original, 0),
+    );
     await page.locator('.offer[data-plantation-info="quarry"]').click();
     assert.match(await page.locator(".modal-body").innerText(), /carrière/i);
     assert.equal(await page.evaluate(() => played.length), 0);
