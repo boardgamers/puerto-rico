@@ -73,8 +73,94 @@ test("suggested assignment, production and storage do not hide custom choices", 
       { id: "fruit", w: 0, c: 0 },
     ];
     s.players[0].goods.corn = 2;
+    s.players[0].goods.coffee = 2;
     const r = start(s);
     assert.equal(r.tasks[0].kind, kind);
+  }
+});
+
+test("single-type storage respects automation settings and occupied storage buildings", () => {
+  for (const autoForcedActions of [false, true]) {
+    for (const autoStore of [false, true]) {
+      for (const [building, amount, kept] of [
+        [null, 1, 1],
+        [null, 2, 1],
+        ["smallWarehouse", 6, 6],
+        ["largeWarehouse", 6, 6],
+        ["storehouse", 6, 4],
+      ]) {
+        const s = fixture([{ kind: "store", p: 0 }, boundary]);
+        s.players[0].settings = { autoForcedActions, autoStore };
+        s.players[0].goods.coffee = amount;
+        s.supply.coffee -= amount;
+        if (building) s.players[0].buildings = [{ id: building, w: 1, c: 0 }];
+        const resolved = autoForcedActions || (autoStore && amount === kept);
+        const r = start(s);
+        assert.equal(r.tasks[0].kind, resolved ? "role" : "store");
+        assert.equal(r.players[0].goods.coffee, resolved ? kept : amount);
+        assert.equal(
+          r.supply.coffee,
+          s.supply.coffee + (resolved ? amount - kept : 0),
+        );
+        assert.equal(
+          r.history.filter((h) => h.move.type === "store").length,
+          Number(resolved),
+        );
+        assert.equal(s.players[0].goods.coffee, amount, "input is unchanged");
+      }
+    }
+  }
+});
+
+test("Captain automatically stores one of two coffee with all settings enabled", () => {
+  let s = E.init(3, [], {}, "captain-coffee-storage");
+  s.players[0].settings = {
+    autoForcedActions: true,
+    autoProduce: true,
+    autoStore: true,
+  };
+  s.players[0].goods.coffee = 2;
+  s.supply.coffee -= 2;
+  // No ship can take coffee; the remaining choice comes at storage.
+  s.ships.forEach((ship, i) => {
+    ship.good = ["corn", "fruit", "sugar"][i];
+    ship.amount = 1;
+    s.supply[ship.good]--;
+  });
+  s = E.move(s, { type: "role", id: "captain" }, 0);
+  s = E.move(s, { type: "pass" }, 1);
+  const supplyBefore = s.supply.coffee;
+  s = E.move(s, { type: "pass" }, 2);
+  assert.equal(s.tasks[0].kind, "role");
+  assert.equal(s.players[0].goods.coffee, 1);
+  assert.equal(s.supply.coffee, supplyBefore + 1);
+  const stored = s.history.filter((h) => h.move.type === "store");
+  assert.equal(stored.length, 1);
+  assert.equal(stored[0].p, 0);
+  assert.equal(stored[0].move.goods.coffee, 1);
+  assert.equal(s.events.findLast((e) => e.type === "store").lost.coffee, 1);
+});
+
+test("storage automation preserves mixed-goods and Bohío choices", () => {
+  for (const alternative of ["goods", "bohio"]) {
+    const s = fixture([{ kind: "store", p: 0 }, boundary]);
+    s.players[0].settings = {
+      autoForcedActions: true,
+      autoProduce: true,
+      autoStore: true,
+    };
+    s.players[0].goods.coffee = 2;
+    if (alternative === "goods") s.players[0].goods.corn = 2;
+    else {
+      s.players[0].buildings = [{ id: "bohio", w: 1, c: 0 }];
+      s.players[0].estates = [{ id: "corn", w: 0, c: 0 }];
+    }
+    const r = start(s);
+    assert.equal(r.tasks[0].kind, "store");
+    assert.deepEqual(r.players[0].goods, s.players[0].goods);
+    assert.equal(r.history.length, s.history.length + 1);
+    if (alternative === "bohio")
+      assert(E.legal(r).some((m) => m.type === "bohio"));
   }
 });
 

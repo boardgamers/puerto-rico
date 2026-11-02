@@ -1182,7 +1182,10 @@ function forcedAction(s, t, a) {
       )
         return m;
     }
-    if (m.type === "store" && !GOODS.some((g) => a.goods[g])) return m;
+    // With only one goods type, keep the maximum that fits; excess crates
+    // are interchangeable. Multiple types still require a storage choice.
+    if (m.type === "store" && GOODS.filter((g) => a.goods[g]).length <= 1)
+      return m;
   }
   if (
     t.kind === "produce" &&
