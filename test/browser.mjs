@@ -77,6 +77,9 @@ try {
       (s) => host.emit("state", s),
       E.stripSecret(original, 0),
     );
+    const idleSlot = await page.locator("span.worker-slot").first().boundingBox();
+    assert.equal(idleSlot.width, 32);
+    assert.equal(idleSlot.height, 32);
     await page.locator('.offer[data-plantation-info="quarry"]').click();
     assert.match(await page.locator(".modal-body").innerText(), /carrière/i);
     assert.equal(await page.evaluate(() => played.length), 0);
@@ -553,6 +556,9 @@ try {
     s.players[0].reserve = { w: 1, c: 0 };
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     await page.locator("[data-confirm-assign]").waitFor({ state: "visible" });
+    const activeSlot = await page.locator("[data-slot]").first().boundingBox();
+    assert.equal(activeSlot.width, idleSlot.width, "placement keeps slot width");
+    assert.equal(activeSlot.height, idleSlot.height, "placement keeps slot height");
     const reserveCount = page.locator(
       '.player-strip [data-player="0"] .player-card-reserve .metric',
     );
