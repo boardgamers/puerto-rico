@@ -723,8 +723,10 @@ body:has(.pr-game) {
   border-top: 3px solid var(--foliage);
   background-image: linear-gradient(110deg, #c6b3760d, transparent 60%);
 }
-.pr-game .player-board.panel {
-  padding-block-start: 4px;
+@media (max-width: 760px) {
+  .pr-game .player-board.panel {
+    padding-block-start: 4px;
+  }
 }
 .pr-game .player-board > .board-player-header {
   display: grid;
