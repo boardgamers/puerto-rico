@@ -25,6 +25,17 @@ await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
 const browser = await chromium.launch();
 const errors = [];
 let state = engine.init(5, [], {}, "locale-mobile");
+const playerNames = [
+  "María Fernanda de la Cruz",
+  "Alexandria Montgomery-Wellington",
+  "Nguyễn Thị Minh Phương",
+  "نام طولانی بازیکن چهارم",
+  'Long player name <&> "five"',
+];
+state.players.forEach((player, seat) => {
+  player.name = playerNames[seat];
+});
+state.players[4].goods.corn = 1;
 state = engine.stripSecret(state, 0);
 const page = await browser.newPage({
   viewport: { width: 320, height: 640 },
@@ -37,6 +48,8 @@ try {
   await page.goto(`http://127.0.0.1:${server.address().port}`);
   await page.evaluate((s) => {
     window.host = puertorico.launch("#game");
+    window.played = [];
+    host.on("move", (move) => played.push(move));
     host.emit("player", { index: 0 });
     host.emit("avatars", ["/avatar.svg", "/avatar.svg"]);
     host.emit("preferences", {
@@ -103,6 +116,20 @@ try {
         `${label}: dialog width`,
       );
   };
+  const boardTabs = page.locator(".board-player-tabs");
+  const boardTab = (seat) =>
+    boardTabs.locator(`button[data-board-player="${seat}"]`);
+  const tabFullyVisible = (tab) =>
+    tab.evaluate((button) => {
+      const row = button.parentElement;
+      const rowBounds = row.getBoundingClientRect();
+      const tabBounds = button.getBoundingClientRect();
+      const left = rowBounds.left + row.clientLeft;
+      return (
+        tabBounds.left >= left - 1 &&
+        tabBounds.right <= left + row.clientWidth + 1
+      );
+    });
   for (const locale of supportedLocales) {
     await page.evaluate((locale) => {
       host.emit("preferences", { locale, colorBlind: true });
@@ -115,6 +142,74 @@ try {
       locale === "fa" ? "rtl" : "ltr",
     );
     await fits(`${locale}: five-player board`);
+    assert.equal(await boardTabs.getAttribute("role"), "group");
+    assert.equal(await boardTabs.getAttribute("aria-label"), t("players"));
+    assert.equal(await boardTabs.getByRole("button").count(), 5);
+    assert.equal(await boardTab(0).getAttribute("aria-pressed"), "true");
+    assert.ok(
+      await boardTabs.evaluate((row) => row.scrollWidth > row.clientWidth),
+      `${locale}: five long names scroll within the tab row`,
+    );
+    const rowBox = await boardTabs.boundingBox();
+    for (let seat = 0; seat < playerNames.length; seat++) {
+      const tab = boardTab(seat);
+      assert.equal(await tab.getAttribute("title"), playerNames[seat]);
+      assert.equal(
+        await tab.locator(":scope > span:last-child").textContent(),
+        playerNames[seat],
+      );
+      assert.equal(await tab.locator(".player-marker").count(), 1);
+      const tabBox = await tab.boundingBox();
+      assert.ok(tabBox.height >= 44, `${locale}: touch-sized player tab`);
+      assert.ok(tabBox.width >= 88, `${locale}: player name remains readable`);
+      const clearance = rowBox.y + rowBox.height - tabBox.y - tabBox.height;
+      assert.ok(
+        clearance >= 2 - 1 && clearance <= 7,
+        `${locale}: compact scrollbar clearance below the tab border`,
+      );
+    }
+    await boardTab(4).click();
+    assert.equal(await boardTab(4).getAttribute("aria-pressed"), "true");
+    assert.equal(await boardTabs.locator('[aria-pressed="true"]').count(), 1);
+    assert.equal(
+      await page.locator(".player-board").getAttribute("aria-label"),
+      state.players[4].name,
+    );
+    assert.equal(
+      await page.locator('.player-strip [data-player="4"].selected').count(),
+      1,
+    );
+    assert.equal(await page.locator(".board-player-goods .metric").count(), 5);
+    assert.ok(
+      await tabFullyVisible(boardTab(4)),
+      `${locale}: selected fifth tab is fully visible`,
+    );
+    // Force the selected tab offscreen and return to the page top. Rendering
+    // must reveal it within the row without bringing the board into view.
+    await boardTabs.evaluate((row) => {
+      row.scrollLeft = 0;
+      scrollTo(0, 0);
+    });
+    assert.equal(await tabFullyVisible(boardTab(4)), false);
+    const beforeRender = await page.evaluate(() => scrollY);
+    state.players[4].goods.corn++;
+    await page.evaluate((s) => host.emit("state", s), state);
+    assert.ok(
+      await tabFullyVisible(boardTab(4)),
+      `${locale}: rendering reveals the selected fifth tab`,
+    );
+    assert.ok(
+      Math.abs((await page.evaluate(() => scrollY)) - beforeRender) < 2,
+      `${locale}: rendering the selected tab never scrolls the page`,
+    );
+    assert.equal(await boardTab(4).getAttribute("aria-pressed"), "true");
+    assert.equal(
+      await page.locator(".board-player-goods .metric").first().innerText(),
+      String(state.players[4].goods.corn),
+    );
+    await fits(`${locale}: long selected player name`);
+    await boardTab(0).click();
+    assert.deepEqual(await page.evaluate(() => played), []);
     for (const selector of [".festival-section", ".production-overview"]) {
       assert.equal(
         await page.locator(selector).getAttribute("open"),
@@ -167,7 +262,7 @@ try {
     scrollTo(0, 0);
   });
   const session = await page.context().newCDPSession(page);
-  const swipe = async (x, y, distance) => {
+  const swipe = async (x, y, dx, dy) => {
     await session.send("Input.dispatchTouchEvent", {
       type: "touchStart",
       touchPoints: [{ x, y }],
@@ -175,7 +270,7 @@ try {
     for (let step = 1; step <= 8; step++) {
       await session.send("Input.dispatchTouchEvent", {
         type: "touchMove",
-        touchPoints: [{ x, y: y - (distance * step) / 8 }],
+        touchPoints: [{ x: x + (dx * step) / 8, y: y + (dy * step) / 8 }],
       });
       await page.waitForTimeout(20);
     }
@@ -185,14 +280,82 @@ try {
     });
     await page.waitForTimeout(100);
   };
-  const disabled = page.locator('.offer[data-plantation-info]').first();
+  for (const locale of ["fr", "fa"]) {
+    await page.evaluate((locale) => {
+      host.emit("preferences", { locale });
+      const row = document.querySelector(".board-player-tabs");
+      row.scrollLeft = 0;
+      scrollTo(0, scrollY + row.getBoundingClientRect().top - 260);
+    }, locale);
+    await page.waitForTimeout(100);
+    const rowBox = await boardTabs.boundingBox();
+    const beforeSwipe = await page.evaluate(() => ({
+      y: scrollY,
+      left: document.querySelector(".board-player-tabs").scrollLeft,
+      selected: document.querySelector(
+        '.board-player-tabs [aria-pressed="true"]',
+      ).dataset.boardPlayer,
+      moves: played.length,
+    }));
+    const rtl = locale === "fa";
+    await swipe(
+      rowBox.x + (rtl ? 20 : rowBox.width - 20),
+      rowBox.y + rowBox.height / 2,
+      (rowBox.width - 40) * (rtl ? 1 : -1),
+      0,
+    );
+    assert.ok(
+      Math.abs(
+        (await boardTabs.evaluate((row) => row.scrollLeft)) - beforeSwipe.left,
+      ) > 40,
+      `${locale}: a native horizontal swipe scrolls the player tabs`,
+    );
+    assert.equal(
+      await boardTabs
+        .locator('[aria-pressed="true"]')
+        .getAttribute("data-board-player"),
+      beforeSwipe.selected,
+      `${locale}: swiping does not select a different board`,
+    );
+    assert.equal(await page.evaluate(() => played.length), beforeSwipe.moves);
+    assert.ok(
+      Math.abs((await page.evaluate(() => scrollY)) - beforeSwipe.y) < 2,
+      `${locale}: horizontal swiping does not move the page vertically`,
+    );
+    await fits(`${locale}: horizontally scrolled tabs`);
+    await page.waitForTimeout(200);
+    const beforeVerticalSwipe = await page.evaluate(() => scrollY);
+    await swipe(
+      rowBox.x + rowBox.width / 2,
+      rowBox.y + rowBox.height / 2,
+      0,
+      -160,
+    );
+    assert.ok(
+      (await page.evaluate(() => scrollY)) > beforeVerticalSwipe,
+      `${locale}: player tabs still allow native vertical page scrolling`,
+    );
+    assert.equal(
+      await boardTabs
+        .locator('[aria-pressed="true"]')
+        .getAttribute("data-board-player"),
+      beforeSwipe.selected,
+    );
+    assert.equal(await page.evaluate(() => played.length), beforeSwipe.moves);
+  }
+  await page.evaluate(() => {
+    host.emit("preferences", { locale: "fr" });
+    scrollTo(0, 0);
+  });
+  const disabled = page.locator(".offer[data-plantation-info]").first();
   await disabled.scrollIntoViewIfNeeded();
   const box = await disabled.boundingBox();
   const before = await page.evaluate(() => scrollY);
   await swipe(
     box.x + box.width / 2,
     Math.min(540, box.y + box.height / 2),
-    180,
+    0,
+    -180,
   );
   assert.ok(
     (await page.evaluate(() => scrollY)) > before,
@@ -205,7 +368,8 @@ try {
   await swipe(
     modalBox.x + modalBox.width / 2,
     modalBox.y + modalBox.height * 0.8,
-    modalBox.height * 0.5,
+    0,
+    -modalBox.height * 0.5,
   );
   assert.ok(
     (await body.evaluate((el) => el.scrollTop)) > 0,

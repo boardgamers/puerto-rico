@@ -77,7 +77,10 @@ try {
       (s) => host.emit("state", s),
       E.stripSecret(original, 0),
     );
-    const idleSlot = await page.locator("span.worker-slot").first().boundingBox();
+    const idleSlot = await page
+      .locator("span.worker-slot")
+      .first()
+      .boundingBox();
     assert.equal(idleSlot.width, 32);
     assert.equal(idleSlot.height, 32);
     await page.locator('.offer[data-plantation-info="quarry"]').click();
@@ -248,6 +251,14 @@ try {
     resourceCards.players[0].goods.corn = 2;
     resourceCards.players[0].reserve = { w: 2, c: 1 };
     resourceCards.players[1].goods.sugar = 3;
+    resourceCards.players[1].goods.coffee = 1;
+    resourceCards.players[1].coins = 7;
+    resourceCards.players[1].reserve = { w: 3, c: 2 };
+    resourceCards.players[1].estates = [
+      { id: "fruit", w: 1, c: 0 },
+      { id: "tobacco", w: 0, c: 0 },
+    ];
+    resourceCards.players[1].buildings = [{ id: "smallFruit", w: 1, c: 0 }];
     await page.evaluate(
       (s) => host.emit("state", s),
       E.stripSecret(resourceCards, 0),
@@ -274,11 +285,11 @@ try {
         .boundingBox();
       assert.equal(reserveBox.y, goodsBox.y, "reserve shares the stock row");
     }
-    assert.equal(
+    assert.deepEqual(
       await page
         .locator('.player-strip [data-player="1"] .player-card-goods .metric')
-        .innerText(),
-      "3",
+        .allTextContents(),
+      ["3", "1"],
     );
     assert.equal(
       await page
@@ -286,7 +297,131 @@ try {
         .count(),
       0,
     );
-    assert.equal(await page.locator(".player-board .inventory").count(), 0);
+    // Inspect another board without returning to the top player strip.
+    const boardTabs = page.locator(".board-player-tabs");
+    const boardTab = (seat) =>
+      boardTabs.locator(`button[data-board-player="${seat}"]`);
+    assert.equal(await boardTabs.getAttribute("role"), "group");
+    assert.equal(await boardTabs.getAttribute("aria-label"), "Joueurs");
+    assert.equal(await boardTabs.getByRole("button").count(), 3);
+    assert.deepEqual(
+      await boardTabs.locator("button").evaluateAll((buttons) =>
+        buttons.map((button) => ({
+          name: button.querySelector(":scope > span:last-child").textContent,
+          title: button.title,
+          pressed: button.getAttribute("aria-pressed"),
+          markers: button.querySelectorAll(".player-marker").length,
+        })),
+      ),
+      resourceCards.players.map((p, seat) => ({
+        name: p.name,
+        title: p.name,
+        pressed: String(seat === 0),
+        markers: 1,
+      })),
+    );
+    assert.equal(
+      await page.locator(".player-board").getAttribute("aria-label"),
+      resourceCards.players[0].name,
+    );
+    await page.evaluate(() => {
+      const board = document.querySelector(".player-board");
+      scrollTo(0, scrollY + board.getBoundingClientRect().top - 100);
+    });
+    const beforeSwitch = await page.evaluate(() => scrollY);
+    const beforeInspect = await page.evaluate(() => played.length);
+    await boardTab(1).click();
+    assert.equal(await boardTab(1).getAttribute("aria-pressed"), "true");
+    assert.equal(await boardTab(0).getAttribute("aria-pressed"), "false");
+    assert.equal(
+      await page.locator(".player-board").getAttribute("aria-label"),
+      resourceCards.players[1].name,
+    );
+    assert.ok(
+      Math.abs((await page.evaluate(() => scrollY)) - beforeSwitch) < 2,
+      "switching at the board preserves scrolling position",
+    );
+    assert.equal(await page.locator('[data-player="1"].selected').count(), 1);
+    assert.deepEqual(
+      await page.locator(".board-player-resources > .metric").allTextContents(),
+      ["7", "3", "2"],
+      "board resources belong to the selected player",
+    );
+    assert.deepEqual(
+      await page.locator(".board-player-goods .metric").allTextContents(),
+      ["0", "0", "3", "0", "1"],
+      "all stock types are visible, including zeroes",
+    );
+    assert.equal(
+      await page.locator(".board-player-resources .score-hidden").count(),
+      1,
+    );
+    assert.equal(
+      await page.locator(".board-player-resources [data-score]").count(),
+      0,
+    );
+    assert.equal(
+      await page.locator('.player-board [data-building="smallFruit"]').count(),
+      1,
+    );
+    assert.equal(
+      await page.locator(".player-board .estate.tobacco").count(),
+      1,
+    );
+    assert.equal(
+      await boardTab(1).evaluate((el) => el === document.activeElement),
+      true,
+    );
+    if (width <= 760) {
+      assert.ok(
+        (await page.locator(".player-summary").innerText()).includes(
+          resourceCards.players[0].name,
+        ),
+      );
+      await page.screenshot({
+        path: `.local/qa/${width}-board-player-switcher.png`,
+      });
+    }
+    // Live updates must not reset the board under inspection.
+    resourceCards.players[1].goods.coffee = 2;
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(resourceCards, 0),
+    );
+    assert.equal(await boardTab(1).getAttribute("aria-pressed"), "true");
+    assert.deepEqual(
+      await page.locator(".board-player-goods .metric").allTextContents(),
+      ["0", "0", "3", "0", "2"],
+    );
+    assert.ok(
+      Math.abs((await page.evaluate(() => scrollY)) - beforeSwitch) < 2,
+      "live updates preserve scrolling position",
+    );
+    // These are ordinary toggle buttons: Tab moves focus, Enter selects a board.
+    await boardTab(1).focus();
+    await page.keyboard.press("Tab");
+    assert.equal(
+      await boardTab(2).evaluate((el) => el === document.activeElement),
+      true,
+    );
+    assert.equal(await boardTab(1).getAttribute("aria-pressed"), "true");
+    await page.keyboard.press("Enter");
+    assert.equal(await boardTab(2).getAttribute("aria-pressed"), "true");
+    assert.equal(await boardTabs.locator('[aria-pressed="true"]').count(), 1);
+    assert.ok(
+      Math.abs((await page.evaluate(() => scrollY)) - beforeSwitch) < 2,
+      "keyboard board switching preserves scrolling position",
+    );
+    await boardTab(0).click();
+    assert.equal(await page.evaluate(() => played.length), beforeInspect);
+    assert.equal(
+      await page.locator('.board-player-resources [data-score="0"]').count(),
+      1,
+    );
+    assert.deepEqual(
+      await page.locator(".board-player-goods .metric").allTextContents(),
+      ["2", "0", "0", "0", "0"],
+    );
     const scoreState = structuredClone(resourceCards);
     scoreState.players[0].vp = 4;
     scoreState.players[0].buildings = [{ id: "smallSugar", w: 0, c: 0 }];
@@ -306,6 +441,11 @@ try {
       0,
     );
     await page.locator('[data-player="1"] .player-name').click();
+    assert.equal(
+      await boardTab(1).getAttribute("aria-pressed"),
+      "true",
+      "top strip also updates the board tabs",
+    );
     await page.locator('.player-strip [data-score="0"]').press("Enter");
     assert.equal(await page.locator(".score-detail").count(), 1);
     assert.match(
@@ -557,8 +697,16 @@ try {
     await page.evaluate((s) => host.emit("state", s), E.stripSecret(s, 0));
     await page.locator("[data-confirm-assign]").waitFor({ state: "visible" });
     const activeSlot = await page.locator("[data-slot]").first().boundingBox();
-    assert.equal(activeSlot.width, idleSlot.width, "placement keeps slot width");
-    assert.equal(activeSlot.height, idleSlot.height, "placement keeps slot height");
+    assert.equal(
+      activeSlot.width,
+      idleSlot.width,
+      "placement keeps slot width",
+    );
+    assert.equal(
+      activeSlot.height,
+      idleSlot.height,
+      "placement keeps slot height",
+    );
     const reserveCount = page.locator(
       '.player-strip [data-player="0"] .player-card-reserve .metric',
     );
@@ -577,6 +725,29 @@ try {
       await reserveCount.innerText(),
       "0",
       "the card follows the draft allocation",
+    );
+    assert.equal(
+      await page
+        .locator('.board-player-resources > .metric[title^="Ouvriers"]')
+        .innerText(),
+      "0",
+    );
+    const movesBeforeBoardSwitch = await page.evaluate(() => played.length);
+    await boardTab(1).click();
+    assert.equal(
+      await page.locator(".player-board [data-slot]").count(),
+      0,
+      "opponent slots stay read-only",
+    );
+    await boardTab(0).click();
+    assert.equal(
+      await page.locator('[data-slot="e0:0"].w').count(),
+      1,
+      "inspection preserves unfinished placement",
+    );
+    assert.equal(
+      await page.evaluate(() => played.length),
+      movesBeforeBoardSwitch,
     );
     assert.equal(
       await page

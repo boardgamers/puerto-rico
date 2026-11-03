@@ -665,9 +665,13 @@ export function mountGame(
     };
     return `<h3>${t("countryside")} <small>${a.estates.filter((x) => (!x.vpArea && x.id !== "quarry") || !a.puertoma).length}/${a.puertoma ? 10 : 12}</small></h3><div class="estates">${a.estates.map((x, i) => `<article class="estate ${x.id}" title="${esc(t(x.id))}">${icon(GOODS.includes(x.id) ? `field-${x.id}` : x.id, 36)}<span class="estate-name">${t(x.id)}</span>${x.id !== "forest" ? peopleSlots(`e${i}`, x, a.puertoma ? (x.vpArea ? 0 : estateCapacity(x.id)) : 1) : ""}</article>`).join("")}${Array.from({ length: Math.max(0, (a.puertoma ? 10 : 12) - a.estates.length) }, () => '<span class="estate empty-estate"></span>').join("")}</div><h3>${t("city")} <small>${a.puertoma ? a.buildings.length : citySize(a)}/${a.puertoma ? 8 : 12}</small></h3><div class="city-grid">${a.buildings.map((x, i) => `<article class="owned-building ${B[x.id].size === 2 ? "expanded" : ""}"><button type="button" data-building="${x.id}" class="building-face" title="${esc(x.id === "monument" ? t(x.id) : t.effect(x.id))}">${buildingPictogram(x.id, 28)}<span class="owned-building-name">${t(x.id)}</span>${effectBadge(i)}</button><div class="owned-building-bottom">${a.puertoma ? `<small>${t("level")} ${x.level}</small>` : peopleSlots(`b${i}`, x, B[x.id].workers)}${pointsBadge(B[x.id].vp)}</div></article>`).join("")}${a.buildings.length ? "" : `<div class="empty-city">${town}<span>${t("emptyCity")}</span></div>`}</div>`;
   }
+  function boardPlayerHeader(a) {
+    const reserve = playerReserve(a, view);
+    return `<header class="board-player-header"><div class="board-player-tabs" role="group" aria-label="${esc(t("players"))}">${state.players.map((p, i) => `<button type="button" data-board-player="${i}" aria-pressed="${i === view}" title="${esc(p.name)}">${playerMarker(i, true)}<span>${esc(p.name)}</span></button>`).join("")}</div><div class="board-player-resources">${metric("coin", a.coins)}${scoreButton(view)}${!a.puertoma ? `${metric("worker", reserve.w, "reserveWorkers")}${state.expansions.includes("citizens") ? metric("citizen", reserve.c, "reserveCitizens") : ""}` : ""}</div><div class="board-player-goods" role="group" aria-label="${esc(t("stockLabel"))}">${GOODS.map((g) => metric(g, a.goods[g])).join("")}</div></header>`;
+  }
   function playerBoard() {
     const a = state.players[view];
-    return `<section class="player-board panel" id="own-board"><header><h2>${playerMarker(view, true)}${esc(a.name)}</h2></header>${productionOverview(a)}${playerAreas(a)}${achievements(a)}${puertomaBoard(a)}<button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
+    return `<section class="player-board panel" id="own-board" aria-label="${esc(a.name)}">${boardPlayerHeader(a)}${productionOverview(a)}${playerAreas(a)}${achievements(a)}${puertomaBoard(a)}<button class="mobile-market-launch" data-market>${icon("building")} ${t("market")}</button></section>`;
   }
   function achievements(a) {
     if (!a.achievements) return "";
@@ -1045,6 +1049,16 @@ export function mountGame(
         return !from.isEqualNode(to);
       },
     });
+    // Reveal the selected tab horizontally without scrolling the board/page.
+    const tabs = content.querySelector(".board-player-tabs"),
+      selectedTab = tabs.querySelector('[aria-pressed="true"]');
+    if (selectedTab) {
+      const row = tabs.getBoundingClientRect(),
+        tab = selectedTab.getBoundingClientRect();
+      if (tab.left < row.left + 4) tabs.scrollLeft += tab.left - row.left - 4;
+      else if (tab.right > row.right - 4)
+        tabs.scrollLeft += tab.right - row.right + 4;
+    }
     if (pending)
       for (const button of content.querySelectorAll(".action-dock button"))
         button.disabled = true;
@@ -1384,9 +1398,9 @@ export function mountGame(
         );
       return;
     }
-    const card = event.target.closest("[data-player]");
+    const card = event.target.closest("[data-player], [data-board-player]");
     if (card) {
-      view = Number(card.dataset.player);
+      view = Number(card.dataset.player ?? card.dataset.boardPlayer);
       render();
       return;
     }
