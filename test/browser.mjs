@@ -956,6 +956,32 @@ try {
       (s) => host.emit("state", s),
       E.stripSecret(buildingChoice, 0),
     );
+    if (width <= 760) {
+      assert.equal(
+        await page.locator(".board-layout > .building-market").isVisible(),
+        false,
+        "Builder does not replace the mobile board with an inline market",
+      );
+      assert.equal(
+        await page.locator(".player-board").isVisible(),
+        true,
+        "Builder preserves the player board and its tabs",
+      );
+      assert.equal(await page.locator(".board-player-tabs").count(), 1);
+      assert.equal(await page.locator(".action-dock [data-market]").isVisible(), true);
+      await page.locator(".player-board").scrollIntoViewIfNeeded();
+      const beforeMarketScroll = await page.evaluate(() => scrollY);
+      await page.locator(".action-dock [data-market]").click();
+      assert.equal(await page.locator(".pr-modal").isVisible(), true);
+      assert.equal(await page.locator(".pr-modal .building-market").isVisible(), true);
+      await page.keyboard.press("Escape");
+      assert.equal(await page.locator(".pr-modal").isVisible(), false);
+      assert.ok(
+        Math.abs((await page.evaluate(() => scrollY)) - beforeMarketScroll) < 2,
+        "closing the market restores the mobile board scroll position",
+      );
+      assert.equal(await page.locator(".board-player-tabs").count(), 1);
+    }
     const passBounds = await page.locator(".dock-pass").boundingBox();
     assert.ok(
       Math.abs(

@@ -1853,13 +1853,6 @@ body:has(.pr-game) {
     width: 100%;
     margin-top: 12px;
   }
-  .pr-game.is-building .board-layout > .building-market {
-    display: block;
-    order: 1;
-  }
-  .pr-game.is-building .action-panel {
-    display: none;
-  }
   .pr-game .modal-body .building-market {
     display: block;
     padding: 0;
