@@ -1467,7 +1467,10 @@ function productionEditState(s, p, checkpoint) {
     ]);
   return reveals(candidate) === reveals(s) ? candidate : null;
 }
-export function canEditProduction(s, p, checkpoint) {
+export function canEditProduction(s, p) {
+  return canEditProductionFromCheckpoint(s, p);
+}
+function canEditProductionFromCheckpoint(s, p, checkpoint) {
   return !!productionEditState(s, p, checkpoint);
 }
 export function canEditPlacement(s, p) {
@@ -2159,7 +2162,12 @@ export function rankings(s) {
       ).length,
   );
 }
-export function stripSecret(state, p, previous, checkpoint) {
+// BGS supplies an engine context as the third argument. Never interpret that
+// public protocol argument as a replay state or checkpoint.
+export function stripSecret(state, p, _context) {
+  return stripSecretForLog(state, p);
+}
+function stripSecretForLog(state, p, previous, checkpoint) {
   // The authoritative move history is needed for replay, but never belongs in a
   // viewer frame. Exclude it before cloning every frame of a long log slice.
   const { history: _history, ...visible } = state;
@@ -2201,7 +2209,8 @@ export function stripSecret(state, p, previous, checkpoint) {
   s.canUndo = Number.isInteger(p) && canUndoFromPrevious(state, p, previous);
   s.canEditPlacement = Number.isInteger(p) && canEditPlacement(state, p);
   s.canEditProduction =
-    Number.isInteger(p) && canEditProduction(state, p, checkpoint);
+    Number.isInteger(p) &&
+    canEditProductionFromCheckpoint(state, p, checkpoint);
   s.currentPlayers = currentPlayers(state);
   const ownTask = Number.isInteger(p) ? playerTask(state, p) : null;
   if (ownTask && ownTask.p === p && ownTask !== state.tasks[0]) {
@@ -2269,7 +2278,7 @@ export function logSlice(
       checkpoint = position;
     // A preceding frame is already available after the first step. Reuse it
     // when computing undo availability rather than replaying from move zero.
-    frames.push(stripSecret(position, player, previous, checkpoint));
+    frames.push(stripSecretForLog(position, player, previous, checkpoint));
     const h = s.history[i];
     if (h && i < end) {
       previous = position;

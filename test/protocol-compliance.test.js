@@ -43,6 +43,15 @@ test("BGS required engine methods and history boundaries conform to the protocol
   assert.deepEqual(s, before);
 });
 
+test("BGS context passed to stripSecret does not become a replay checkpoint", () => {
+  let s = host.init(3, [], {}, "strip-context");
+  s = host.move(s, { type: "role", id: "builder" }, 0);
+  assert.equal(host.canUndo(s, 0), true);
+  const context = { now: Date.now(), gameId: "protocol-check" };
+  assert.deepEqual(host.stripSecret(s, 0, context), host.stripSecret(s, 0));
+  assert.equal(host.stripSecret(s, 0, context).canUndo, true);
+});
+
 test("historical views keep private state out of player and spectator payloads", () => {
   const s = host.init(3, [], {}, "protocol-privacy");
   for (const player of [undefined, 0, 1]) {
