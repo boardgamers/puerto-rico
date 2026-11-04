@@ -1411,7 +1411,7 @@ function placementUndoState(s, p) {
     return null;
   return candidate;
 }
-function productionEditState(s, p) {
+function productionEditState(s, p, checkpoint) {
   if (s.tutorial || s.finished || s.puertoma || s.tasks[0]?.kind !== "produce")
     return null;
   const index = s.history.findLastIndex((h) => h.p === p);
@@ -1425,7 +1425,7 @@ function productionEditState(s, p) {
       .some((h) => !["produce", "produceBonus", "pass"].includes(h.move.type))
   )
     return null;
-  const before = replay(s, index + 1);
+  const before = replayFromCheckpoint(s, index + 1, checkpoint);
   const task = playerTask(before, p);
   if (
     !["produce", "produceBonus"].includes(task?.kind) ||
@@ -1441,10 +1441,11 @@ function productionEditState(s, p) {
     return null;
   let candidate;
   try {
-    candidate = replay({
-      ...s,
-      history: s.history.filter((_, i) => i !== index),
-    });
+    candidate = replayFromCheckpoint(
+      { ...s, history: s.history.filter((_, i) => i !== index) },
+      s.history.length,
+      checkpoint,
+    );
   } catch {
     return null;
   } // A later choice depends on this one: keep it committed.
@@ -1466,18 +1467,21 @@ function productionEditState(s, p) {
     ]);
   return reveals(candidate) === reveals(s) ? candidate : null;
 }
-export function canEditProduction(s, p) {
-  return !!productionEditState(s, p);
+export function canEditProduction(s, p, checkpoint) {
+  return !!productionEditState(s, p, checkpoint);
 }
 export function canEditPlacement(s, p) {
   return !!placementUndoState(s, p);
 }
 export function canUndo(s, p) {
+  return canUndoFromPrevious(s, p);
+}
+function canUndoFromPrevious(s, p, previous) {
   if (s.tutorial) return false;
   const last = s.history.at(-1);
   if (!last || last.p !== p || s.finished || !currentPlayers(s).includes(p))
     return false;
-  const before = replay(s, logLength(s) - 1);
+  const before = previous ?? replay(s, logLength(s) - 1);
   return (
     JSON.stringify(currentPlayers(before).slice().sort()) ===
       JSON.stringify(currentPlayers(s).slice().sort()) &&
@@ -2155,11 +2159,13 @@ export function rankings(s) {
       ).length,
   );
 }
-export function stripSecret(state, p) {
-  const s = clone(state);
+export function stripSecret(state, p, previous, checkpoint) {
+  // The authoritative move history is needed for replay, but never belongs in a
+  // viewer frame. Exclude it before cloning every frame of a long log slice.
+  const { history: _history, ...visible } = state;
+  const s = clone(visible);
   delete s.random;
   delete s.config;
-  delete s.history;
   delete s.pendingMessages;
   delete s.liveUndo;
   delete s.placementUndoSeats;
@@ -2192,9 +2198,10 @@ export function stripSecret(state, p) {
         );
     }
   // Logs contain only public moves; historical earned points are public even though totals are concealed.
-  s.canUndo = Number.isInteger(p) && canUndo(state, p);
+  s.canUndo = Number.isInteger(p) && canUndoFromPrevious(state, p, previous);
   s.canEditPlacement = Number.isInteger(p) && canEditPlacement(state, p);
-  s.canEditProduction = Number.isInteger(p) && canEditProduction(state, p);
+  s.canEditProduction =
+    Number.isInteger(p) && canEditProduction(state, p, checkpoint);
   s.currentPlayers = currentPlayers(state);
   const ownTask = Number.isInteger(p) ? playerTask(state, p) : null;
   if (ownTask && ownTask.p === p && ownTask !== state.tasks[0]) {
@@ -2225,6 +2232,21 @@ export function replay(s, options = {}) {
   });
   return r;
 }
+// Only the current logSlice call supplies a checkpoint from its own prefix.
+// No cached raw state is stored in game data or exposed to the viewer.
+function replayFromCheckpoint(s, to, checkpoint) {
+  if (!checkpoint || checkpoint.history.length > to - 1) return replay(s, to);
+  let r = checkpoint;
+  for (let i = checkpoint.history.length; i < to - 1; i++)
+    r = applyMove(r, s.history[i].move, s.history[i].p, true);
+  if (r === checkpoint) r = clone(r);
+  r.players.forEach((p, i) => {
+    p.name = s.players[i].name;
+    p.bot = s.players[i].bot;
+    if (s.players[i].settings) p.settings = clone(s.players[i].settings);
+  });
+  return r;
+}
 export function logSlice(
   s,
   { player, start = 0, end = logLength(s) - 1 } = {},
@@ -2232,11 +2254,27 @@ export function logSlice(
   assert(integer(start) && integer(end), "Invalid replay range");
   const frames = [];
   if (start > Math.min(end, logLength(s) - 1)) return { frames };
+  // The common move response and last-position seek need no reconstruction.
+  if (start === logLength(s) - 1) {
+    frames.push(stripSecret(s, player));
+    return { frames };
+  }
   let position = replay(s, Math.max(1, start + 1));
+  let previous;
+  let checkpoint;
   for (let i = Math.max(0, start); i <= Math.min(end, logLength(s) - 1); i++) {
-    frames.push(stripSecret(position, player));
+    // Keep just the start of this role to accelerate production-edit checks.
+    // The checkpoint stays inside this call; branches use the ordinary replay.
+    if (position.history.length === position.roleHistoryStart + 1)
+      checkpoint = position;
+    // A preceding frame is already available after the first step. Reuse it
+    // when computing undo availability rather than replaying from move zero.
+    frames.push(stripSecret(position, player, previous, checkpoint));
     const h = s.history[i];
-    if (h && i < end) position = applyMove(position, h.move, h.p, true);
+    if (h && i < end) {
+      previous = position;
+      position = applyMove(position, h.move, h.p, true);
+    }
   }
   return { frames };
 }

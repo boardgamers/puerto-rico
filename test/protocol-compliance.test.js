@@ -117,6 +117,22 @@ test("long pass sequences keep the journal bounded without losing deterministic 
   assert.equal(s.events.length, E.JOURNAL_LIMIT);
   assert.deepEqual(E.replay(s), s);
   assert.deepEqual(E.replay(s, { to: 1 }), initial);
+  const before = structuredClone(s);
+  // Long BGS log requests must retain all historical frames even though the
+  // visible journal is capped. Compare the reused predecessor against replay.
+  const frames = E.logSlice(s, { player: 0 }).frames;
+  assert.equal(frames.length, 451);
+  for (const i of [0, 1, 50, 199, 200, 300, 400, 449, 450])
+    assert.deepEqual(
+      frames[i],
+      E.stripSecret(E.replay(s, { to: i + 1 }), 0),
+      `frame ${i}`,
+    );
+  assert.deepEqual(E.logSlice(s, { player: 0, start: 450, end: 450 }).frames, [
+    frames[450],
+  ]);
+  assert.deepEqual(E.logSlice(s, { start: 450 }).frames, [E.stripSecret(s)]);
+  assert.deepEqual(s, before);
 });
 
 test("untrusted oversized moves and invalid seats cannot be retained in the game log", () => {

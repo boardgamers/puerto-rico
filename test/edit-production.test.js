@@ -27,6 +27,10 @@ test("early production can be edited without retracting another producer's choic
   s = produce(s, 0);
   assert.equal(E.canUndo(s, 1), false);
   assert.equal(E.canEditProduction(s, 1), true);
+  const frames = E.logSlice(s, { player: 1 }).frames;
+  assert.equal(frames.at(-1).canEditProduction, true);
+  for (let i = 0; i < frames.length; i++)
+    assert.deepEqual(frames[i], E.stripSecret(E.replay(s, { to: i + 1 }), 1));
   const edited = E.move(s, { type: "editProduction" }, 1);
   assert.deepEqual(edited.players[0], s.players[0]);
   assert.deepEqual(edited.players[1], start.players[1]);
