@@ -968,12 +968,18 @@ try {
         "Builder preserves the player board and its tabs",
       );
       assert.equal(await page.locator(".board-player-tabs").count(), 1);
-      assert.equal(await page.locator(".action-dock [data-market]").isVisible(), true);
+      assert.equal(
+        await page.locator(".action-dock [data-market]").isVisible(),
+        true,
+      );
       await page.locator(".player-board").scrollIntoViewIfNeeded();
       const beforeMarketScroll = await page.evaluate(() => scrollY);
       await page.locator(".action-dock [data-market]").click();
       assert.equal(await page.locator(".pr-modal").isVisible(), true);
-      assert.equal(await page.locator(".pr-modal .building-market").isVisible(), true);
+      assert.equal(
+        await page.locator(".pr-modal .building-market").isVisible(),
+        true,
+      );
       await page.keyboard.press("Escape");
       assert.equal(await page.locator(".pr-modal").isVisible(), false);
       assert.ok(
@@ -1418,6 +1424,10 @@ try {
       { type: "assign", ...E.autoAssignment(parallel, 0) },
       0,
     );
+    // A concurrent state can also change our presentation or scoring metadata.
+    // Neither change affects the workers or slots we are still choosing.
+    parallel.players[2].coins++;
+    parallel.players[2].name = "Renamed during placement";
     await page.evaluate(
       (s) => host.emit("state", s),
       E.stripSecret(parallel, 2),
@@ -1426,6 +1436,12 @@ try {
       await page.locator('.pr-modal [data-slot="e1:0"].w').count(),
       1,
       "another placement preserves our draft and editor",
+    );
+    await page.evaluate(() => host.emit("player", { index: 2 }));
+    assert.equal(
+      await page.locator('.pr-modal [data-slot="e1:0"].w').count(),
+      1,
+      "repeating the same BGS player notification preserves the open draft",
     );
     await page.keyboard.press("Escape");
     await page.screenshot({ path: `.local/qa/${width}-placement-dock.png` });

@@ -311,6 +311,15 @@ export function mountGame(
     }
     hide(d);
   }
+  // Opponents can update our coins, score, or name while we place workers.
+  // Only changes to actual slots or available workers invalidate the draft.
+  function assignmentInputs(a) {
+    return JSON.stringify([
+      a.estates.map(({ id, w, c }) => [id, w, c]),
+      a.buildings.map(({ id, w, c }) => [id, w, c]),
+      [a.reserve.w, a.reserve.c],
+    ]);
+  }
   function draftInit() {
     const task =
         state.tasks[0]?.kind === "assign"
@@ -319,7 +328,7 @@ export function mountGame(
           : state.tasks[0],
       key =
         task?.kind === "assign" && task.p === seat
-          ? `assign:${state.round}:${state.roleHistoryStart}:${seat}:${JSON.stringify(state.players[seat])}`
+          ? `assign:${state.round}:${state.roleHistoryStart}:${seat}:${assignmentInputs(state.players[seat])}`
           : `${state.historyLength}:${task?.kind}:${task?.p}`;
     if (key === draftKey) return;
     draftKey = key;
@@ -717,7 +726,8 @@ export function mountGame(
             ? state.events.filter((e) => e.type === "role").at(-1)?.id
             : state.role),
       acting = allowed(),
-      unavailable = acting && state.tasks[0]?.kind === "role" && !selected && !m,
+      unavailable =
+        acting && state.tasks[0]?.kind === "role" && !selected && !m,
       warning = m && acting ? state.roleWarnings?.[r.id] : null;
     return `<button data-role-id="${r.id}" ${unavailable ? "disabled" : ""} class="role ${roleConfirmation?.move.id === r.id ? "role-pending" : ""} ${selected ? "taken" : ""} ${current ? "current" : ""} ${m ? "available" : ""}" ${current ? 'aria-current="step"' : ""} ${selected ? `title="${esc(t(r.id))} · ${esc(state.players[r.taken].name)}${current ? ` · ${esc(t("currentRole"))}` : ""}"` : warning ? `title="${esc(t(warning.reason))}" aria-label="${esc(t(r.id))} — ${esc(t(warning.reason))}"` : ""} ${m && acting ? `data-move="${encode(m)}"` : `data-role="${r.id}"`}>${current ? `<small class="role-status">${t("currentRole")}</small>` : ""}${warning ? `<span class="role-warning" aria-hidden="true">${icon("warning", 15)}</span>` : ""}<span class="role-icon">${icon(r.id === "adventurer2" ? "adventurer" : r.id, 32)}${r.coins ? `<span class="role-coins">${metric("coin", r.coins)}</span>` : ""}</span><b>${t(r.id)}</b>${r.id === "recruiter" && m ? `<span class="role-recruits">${recruitmentCount(recruitmentShares(state, seat)[seat])}${recruitmentBonus(state, seat) ? ` <span title="${esc(t("privilege"))}">+${metric("worker", recruitmentBonus(state, seat))}</span>` : ""}</span>` : ""}${selected ? playerMarker(r.taken) : ""}</button>`;
   }
@@ -1694,9 +1704,11 @@ export function mountGame(
       render();
     },
     setPlayer(p) {
-      seat = p;
-      view = p ?? 0;
-      draftKey = "";
+      if (seat !== p) {
+        seat = p;
+        view = p ?? 0;
+        draftKey = "";
+      }
       render();
     },
     setEnabled(value) {
