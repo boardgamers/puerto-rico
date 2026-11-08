@@ -1628,6 +1628,7 @@ function applyMove(state, m, p, historical = false) {
   const custom = {
     assign: "assign",
     bonusAssignAll: "bonusAssign",
+    poachAll: "poach",
     produce: "produce",
     store: "store",
     smallWharf: "ship",
@@ -2056,6 +2057,39 @@ function applyMove(state, m, p, historical = false) {
         remaining: Math.min(3, total(s.register) - s.players.length),
       };
       break;
+    case "poachAll": {
+      assert(
+        Array.isArray(m.placements) &&
+          m.placements.length <=
+            Math.min(
+              3,
+              t.remaining,
+              Math.max(0, total(s.register) - s.players.length),
+            ),
+        "Too many poached workers",
+      );
+      for (const placement of m.placements) {
+        assert(placement && typeof placement === "object");
+        const { kind, target } = placement;
+        assert(
+          ["w", "c"].includes(kind) && s.register[kind] > 0,
+          "Unavailable register worker",
+        );
+        assert(destinations(a).includes(target), "Invalid poach slot");
+        s.register[kind]--;
+        tileRef(a, target)[kind]++;
+        t.remaining--;
+        event(s, "poachWorker", p, {
+          kind,
+          target,
+          targetId: tileRef(a, target).id,
+          phase: t.kind,
+        });
+      }
+      // Confirmation ends placement even if the player chose fewer than the limit.
+      endPoach(s, t);
+      break;
+    }
     case "poachWorker":
       s.register[m.kind]--;
       tileRef(a, m.target)[m.kind]++;
@@ -2086,7 +2120,7 @@ function applyMove(state, m, p, historical = false) {
     default:
       assert(false);
   }
-  if (!["role", "plant", "bonusAssignAll"].includes(m.type))
+  if (!["role", "plant", "bonusAssignAll", "poachAll"].includes(m.type))
     if (!["achievementChoose", "achievementDraft"].includes(m.type))
       event(s, m.type, p, { ...m, ...extra });
   s.history.push({ p, move: clone(m) });

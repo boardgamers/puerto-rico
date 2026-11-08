@@ -343,6 +343,10 @@ export function mountGame(
     }
     if (enabled && seat === task?.p && task?.kind === "bonusAssign")
       draft = { targets: [] };
+    if (enabled && seat === task?.p && task?.kind === "poach") {
+      draft = { placements: [] };
+      tool = state.register.w ? "w" : "c";
+    }
     if (enabled && seat === task?.p && task?.kind === "store")
       draft = autoStorage(state, seat);
   }
@@ -551,6 +555,8 @@ export function mountGame(
         .join("")}</div>`;
     if (task.kind === "assign")
       return `<div class="placement-editor">${assignmentTools()}${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
+    if (task.kind === "poach")
+      return `<div class="placement-editor"><div class="assignment-tools">${["w", "c"].map((k) => `<button data-tool="${k}" class="${tool === k ? "selected" : ""}" aria-pressed="${tool === k}" aria-label="${esc(t(k === "w" ? "workers" : "citizens"))}">${metric(k === "w" ? "worker" : "citizen", poachRemaining(k))}</button>`).join("")}<span>${draft.placements.length} / ${poachLimit()}</span></div>${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
     if (task.kind === "bonusAssign")
       return `<div class="placement-editor"><div class="assignment-tools">${metric("worker", task.remaining - draft.targets.length)}</div>${playerAreas(state.players[seat])}</div><footer class="action-editor-footer">${confirmation()}</footer>`;
     if (task.kind === "store")
@@ -586,7 +592,27 @@ export function mountGame(
       )
       .join("")}</div>`;
   }
+  function poachRemaining(kind) {
+    return (
+      state.register[kind] -
+      draft.placements.filter((x) => x.kind === kind).length
+    );
+  }
+  function poachLimit() {
+    return Math.min(
+      3,
+      state.tasks[0].remaining,
+      Math.max(0, state.register.w + state.register.c - state.players.length),
+    );
+  }
   function peopleSlots(key, x, n = 1) {
+    const poach = draft && state.tasks[0]?.kind === "poach" && view === seat;
+    const placements = poach
+      ? draft.placements
+          .map((x, index) => ({ ...x, index }))
+          .filter((x) => x.target === key)
+      : [];
+
     const bonus =
       draft && state.tasks[0]?.kind === "bonusAssign" && view === seat;
     const added = bonus
@@ -602,6 +628,10 @@ export function mountGame(
         ? draft[key[0] === "e" ? "estates" : "buildings"][Number(key.slice(1))]
         : { ...x, w: x.w + added };
     return `<div class="worker-slots">${Array.from({ length: n }, (_, i) => {
+      if (poach && i >= x.w + x.c) {
+        const placed = placements[i - x.w - x.c];
+        return `<button type="button" class="worker-slot ${placed?.kind ?? ""}" data-poach-slot="${key}" data-poach-index="${placed?.index ?? ""}" ${!allowed() || (!placed && (draft.placements.length >= poachLimit() || poachRemaining(tool) <= 0)) ? "disabled" : ""} aria-label="${esc(`${t(placed?.kind === "c" ? "citizens" : placed ? "workers" : "empty")} · ${t(x.id)}`)}">${placed ? icon(placed.kind === "c" ? "citizen" : "worker", 20) : "+"}</button>`;
+      }
       const k = i < values.c ? "c" : i < values.c + values.w ? "w" : null;
       const unavailable =
         editable && !k && (tool === "erase" || remaining()[tool] === 0);
@@ -870,6 +900,8 @@ export function mountGame(
         valid = assigned === Math.min(capacity, assigned + rest.w + rest.c);
       confirm = `<button class="primary" data-confirm-assign ${valid ? "" : "disabled"}>${icon("check")} ${t("confirm")}</button>`;
     }
+    if (task.kind === "poach")
+      confirm = `<button class="primary" data-confirm-poach>${icon("check")} ${t("confirm")}</button>`;
     if (task.kind === "bonusAssign") {
       const a = state.players[seat];
       const spaces =
@@ -912,6 +944,7 @@ export function mountGame(
           "plant",
           "assign",
           "bonusAssign",
+          "poach",
           "store",
           "achievementChoose",
           "achievementDraft",
@@ -924,6 +957,7 @@ export function mountGame(
             plant: "plantationChoices",
             assign: "editAssignment",
             bonusAssign: "editAssignment",
+            poach: "editAssignment",
             store: "editStorage",
             achievementChoose: "achievements",
             achievementDraft: "achievements",
@@ -937,7 +971,7 @@ export function mountGame(
         : "";
     const confirm = confirmation();
     const passControl =
-      pass && can
+      pass && can && task.kind !== "poach"
         ? moveButton(
             pass,
             t(task?.kind === "trade" && task.acted ? "finish" : "pass"),
@@ -990,7 +1024,7 @@ export function mountGame(
   }
   function openActions() {
     if (!allowed()) return;
-    if (["assign", "bonusAssign"].includes(state.tasks[0].kind)) {
+    if (["assign", "bonusAssign", "poach"].includes(state.tasks[0].kind)) {
       view = seat;
       render();
     }
@@ -1559,6 +1593,24 @@ export function mountGame(
           .map((m) => moveButton(m, moveLabel(m), m.id))
           .join("")}</div>`,
       );
+      return;
+    }
+    if (el.dataset.poachSlot) {
+      if (el.dataset.poachIndex !== "")
+        draft.placements.splice(Number(el.dataset.poachIndex), 1);
+      else if (
+        draft.placements.length < poachLimit() &&
+        poachRemaining(tool) > 0
+      )
+        draft.placements.push({ kind: tool, target: el.dataset.poachSlot });
+      render();
+      return;
+    }
+    if (el.hasAttribute("data-confirm-poach")) {
+      send({
+        type: "poachAll",
+        placements: draft.placements.map((x) => ({ ...x })),
+      });
       return;
     }
     if (el.dataset.bonusSlot) {

@@ -1526,6 +1526,83 @@ try {
       type: "bonusAssignAll",
       targets: ["e1", "b0"],
     });
+    const poachPlacement = structuredClone(bonusPlacement);
+    poachPlacement.tasks = [{ kind: "poach", p: 0, remaining: 3 }];
+    poachPlacement.register = { w: 5, c: 1 };
+    poachPlacement.players[0].buildings = [{ id: "largeSugar", w: 0, c: 1 }];
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(poachPlacement, 0),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    const beforePoach = await page.evaluate(() => played.length);
+    assert.equal(
+      await page.locator('.placement-editor [data-poach-slot="e0"]').count(),
+      0,
+    );
+    assert.equal(
+      await page.locator('.placement-editor [data-poach-slot="b0"]').count(),
+      2,
+    );
+    await page.locator('.placement-editor [data-tool="c"]').click();
+    await page.locator('.placement-editor [data-poach-slot="e1"]').click();
+    assert.ok(
+      await page
+        .locator('.placement-editor [data-poach-slot="b0"]')
+        .first()
+        .isDisabled(),
+      "citizen supply exhausted",
+    );
+    await page.locator('.placement-editor [data-poach-slot="e1"]').click();
+    assert.ok(
+      await page
+        .locator('.placement-editor [data-poach-slot="b0"]')
+        .first()
+        .isEnabled(),
+      "draft removal returns citizen",
+    );
+    await page
+      .locator('.placement-editor [data-poach-slot="b0"]')
+      .first()
+      .click();
+    await page.locator('.placement-editor [data-tool="w"]').click();
+    await page.locator('.placement-editor [data-poach-slot="e1"]').click();
+    await page
+      .locator('.placement-editor [data-poach-slot="b0"]')
+      .last()
+      .click();
+    assert.equal(
+      await page.locator('.placement-editor [data-poach-index="2"]').count(),
+      1,
+    );
+    await page.locator('.placement-editor [data-poach-index="2"]').click();
+    assert.equal(
+      await page.evaluate(() => played.length),
+      beforePoach,
+      "poach edits remain local",
+    );
+    await page.locator(".pr-modal [data-confirm-poach]").click();
+    assert.equal(await page.evaluate(() => played.length), beforePoach + 1);
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "poachAll",
+      placements: [
+        { kind: "c", target: "b0" },
+        { kind: "w", target: "e1" },
+      ],
+    });
+    // Confirming zero is also an explicit early stop, not sequential pass/placement sends.
+    poachPlacement.tasks[0].remaining = 2;
+    poachPlacement.history.push({ p: 0, move: { type: "pass" } });
+    await page.evaluate(
+      (s) => host.emit("state", s),
+      E.stripSecret(poachPlacement, 0),
+    );
+    await page.locator(".action-dock [data-actions]").click();
+    await page.locator(".pr-modal [data-confirm-poach]").click();
+    assert.deepEqual(await page.evaluate(() => played.at(-1)), {
+      type: "poachAll",
+      placements: [],
+    });
     let undoPlacement = E.init(3, [], {}, "browser-placement-undo");
     undoPlacement = E.move(undoPlacement, { type: "role", id: "recruiter" }, 0);
     undoPlacement = E.move(undoPlacement, { type: "recruitBonus" }, 0);
