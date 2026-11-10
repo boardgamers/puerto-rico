@@ -165,3 +165,37 @@ test("duplicate recruitment snapshots cannot release a pending move", async () =
   await next;
   viewer.destroy();
 });
+
+test("analysis full-history responses render the requested frame, not frame zero", () => {
+  const { viewer, calls } = fixture();
+  viewer.onState({ historyLength: 5 });
+  viewer.onReplayStart();
+  viewer.onReplayTo(4);
+  const frames = Array.from({ length: 5 }, (_, i) => ({
+    historyLength: i + 1,
+  }));
+  viewer.onLog({ start: 0, data: { frames } });
+  assert.deepEqual(calls.at(-1), ["render", frames[3]]);
+  viewer.destroy();
+});
+
+test("lightweight live notifications fetch state without settling pending submissions", async () => {
+  const { viewer, calls } = fixture();
+  viewer.onPlayer({ index: 0 });
+  viewer.onState({ historyLength: 2, tasks: [{ kind: "role", p: 0 }] });
+  let done = false;
+  const request = viewer.move({ type: "role", id: "builder" }).then(() => {
+    done = true;
+  });
+  viewer.onLog({
+    start: 2,
+    data: { log: [{ index: 2, simple: "Move 2" }], frames: [] },
+  });
+  assert.deepEqual(calls.at(-1), ["fetchState", undefined]);
+  await Promise.resolve();
+  assert.equal(done, false);
+  viewer.onState({ historyLength: 3, tasks: [{ kind: "build", p: 0 }] });
+  await request;
+  assert.equal(done, true);
+  viewer.destroy();
+});

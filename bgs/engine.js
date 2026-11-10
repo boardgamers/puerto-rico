@@ -3,6 +3,31 @@ import * as game from "../engine/index.js";
 import en from "../viewer/locales/en.json" with { type: "json" };
 import { RELEASE } from "../release-config.js";
 
+// An omitted end is a live notification, not a historical seek. Keep one
+// lightweight entry per requested index for platform log consumers (index zero
+// is the initial position), without exposing raw moves/private choices. The
+// viewer fetches authoritative seat-filtered state on receipt; never replay here.
+export function logSlice(s, { player, start = 0, end } = {}, _context) {
+  if (end !== undefined) return game.logSlice(s, { player, start, end });
+  if (!Number.isSafeInteger(start) || start < 0)
+    throw Object.assign(new Error("Invalid replay range"), {
+      name: "InvalidMoveError",
+    });
+  const log = [];
+  for (let index = start; index < game.logLength(s); index++)
+    log.push({ index, simple: index === 0 ? "Game started" : `Move ${index}` });
+  return { log, frames: [] };
+}
+
+// The platform's default analysisView omits end. Analysis history navigation
+// needs frames, unlike live notifications, so explicitly request full history.
+export function analysisView(s, { player } = {}, _context) {
+  return {
+    state: game.stripSecret(s, player),
+    log: game.logSlice(s, { player, start: 0, end: game.logLength(s) - 1 }),
+  };
+}
+
 const solo = (s) => s.options.hostedSolo === true;
 function checkSeat(s, p) {
   if (solo(s) && p !== 0)

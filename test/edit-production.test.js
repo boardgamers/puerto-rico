@@ -1,6 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as E from "../engine/index.js";
+
+// Only the current frame carries edit affordances; older views are read-only.
+function historicalView(state, player, current = false) {
+  const view = E.stripSecret(state, player);
+  if (!current) {
+    view.canEditPlacement = false;
+    view.canEditProduction = false;
+  }
+  return view;
+}
+
 import * as host from "../bgs/engine.js";
 function fixture() {
   let s = E.init(3, [], {}, "production-edit");
@@ -27,10 +38,14 @@ test("early production can be edited without retracting another producer's choic
   s = produce(s, 0);
   assert.equal(E.canUndo(s, 1), false);
   assert.equal(E.canEditProduction(s, 1), true);
+  assert.equal(E.stripSecret(s, 1).canEditProduction, true);
   const frames = E.logSlice(s, { player: 1 }).frames;
   assert.equal(frames.at(-1).canEditProduction, true);
   for (let i = 0; i < frames.length; i++)
-    assert.deepEqual(frames[i], E.stripSecret(E.replay(s, { to: i + 1 }), 1));
+    assert.deepEqual(
+      frames[i],
+      historicalView(E.replay(s, { to: i + 1 }), 1, i === frames.length - 1),
+    );
   const edited = E.move(s, { type: "editProduction" }, 1);
   assert.deepEqual(edited.players[0], s.players[0]);
   assert.deepEqual(edited.players[1], start.players[1]);

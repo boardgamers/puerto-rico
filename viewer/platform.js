@@ -115,9 +115,11 @@ export function viewerLifecycle(ctx, ui, chat) {
       if (live) ui.render(live);
     },
     onLog(log) {
-      // Late responses for a previous seek must not replace the current frame.
-      if (replaying && log.start === position - 1 && log.data?.frames?.[0])
-        ui.render(log.data.frames[0]);
+      // Analysis returns full history from zero, while live replay requests
+      // return a slice. Only render a response containing the requested index;
+      // late responses for a different seek must not replace the current frame.
+      const frame = log.data?.frames?.[position - 1 - log.start];
+      if (replaying && frame) ui.render(frame);
       else if (!replaying) ctx.fetchState();
     },
     destroy() {

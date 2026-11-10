@@ -2,6 +2,16 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import * as E from "../engine/index.js";
 
+// Only the current frame carries edit affordances; older views are read-only.
+function historicalView(state, player, current = false) {
+  const view = E.stripSecret(state, player);
+  if (!current) {
+    view.canEditPlacement = false;
+    view.canEditProduction = false;
+  }
+  return view;
+}
+
 function freeze(value) {
   if (value && typeof value === "object" && !Object.isFrozen(value)) {
     Object.values(value).forEach(freeze);
@@ -23,7 +33,10 @@ test("replay and log frames own their data and preserve live metadata at every b
   assert.deepEqual(replayed, s);
   const frames = E.logSlice(s, { player: 0, start: n - 3, end: n + 5 }).frames;
   for (let i = 0; i < 3; i++) {
-    assert.deepEqual(frames[i], E.stripSecret(E.replay(s, n - 2 + i), 0));
+    assert.deepEqual(
+      frames[i],
+      historicalView(E.replay(s, n - 2 + i), 0, i === 2),
+    );
     assert.equal(frames[i].players[0].name, "Renamed");
     assert.equal(frames[i].players[1].bot, true);
     assert.deepEqual(frames[i].players[2].settings, s.players[2].settings);

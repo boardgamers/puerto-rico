@@ -2,6 +2,17 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { inspectEngine } from "@boardgamers/protocol/engine";
 import * as E from "../engine/index.js";
+
+// Only the current frame carries edit affordances; older views are read-only.
+function historicalView(state, player, current = false) {
+  const view = E.stripSecret(state, player);
+  if (!current) {
+    view.canEditPlacement = false;
+    view.canEditProduction = false;
+  }
+  return view;
+}
+
 import * as host from "../bgs/engine.js";
 import { tokenSources } from "../viewer/score.js";
 
@@ -33,7 +44,7 @@ test("BGS required engine methods and history boundaries conform to the protocol
   for (let i = 0; i < frames.length; i++)
     assert.deepEqual(
       frames[i],
-      host.stripSecret(host.replay(s, { to: count - 2 + i }), 0),
+      historicalView(host.replay(s, { to: count - 2 + i }), 0, i === 2),
     );
   assert.deepEqual(host.replay(s), s);
   assert.deepEqual(host.logSlice(s, { start: count, end: count }).frames, []);
@@ -49,14 +60,22 @@ test("BGS context passed to stripSecret does not become a replay checkpoint", ()
   assert.equal(host.canUndo(s, 0), true);
   const context = { now: Date.now(), gameId: "protocol-check" };
   assert.deepEqual(host.stripSecret(s, 0, context), host.stripSecret(s, 0));
-  assert.equal(host.stripSecret(s, 0, context).canUndo, true);
+  assert.equal("canUndo" in host.stripSecret(s, 0, context), false);
+  // This role would previously replay its predecessor for canUndo. Stripping
+  // the view must work even when reconstruction is deliberately unavailable.
+  assert.doesNotThrow(() =>
+    host.stripSecret({ ...s, config: null }, 0, context),
+  );
 });
 
 test("historical views keep private state out of player and spectator payloads", () => {
   const s = host.init(3, [], {}, "protocol-privacy");
   for (const player of [undefined, 0, 1]) {
-    const view = host.logSlice(s, { player, start: host.logLength(s) - 1 })
-      .frames[0];
+    const view = host.logSlice(s, {
+      player,
+      start: host.logLength(s) - 1,
+      end: host.logLength(s) - 1,
+    }).frames[0];
     for (const field of ["history", "config", "random", "bag", "discard"])
       assert.equal(view[field], undefined);
     view.players.forEach((p, seat) => {
@@ -128,28 +147,32 @@ test("long pass sequences keep the journal bounded without losing deterministic 
   assert.deepEqual(E.replay(s, { to: 1 }), initial);
   const before = structuredClone(s);
   // Long BGS log requests must retain all historical frames even though the
-  // visible journal is capped. Compare the reused predecessor against replay.
+  // visible journal is capped. Compare each display frame against replay.
   const frames = E.logSlice(s, { player: 0 }).frames;
   assert.equal(frames.length, 451);
   for (const i of [0, 1, 50, 199, 200, 300, 400, 449, 450])
     assert.deepEqual(
       frames[i],
-      E.stripSecret(E.replay(s, { to: i + 1 }), 0),
+      historicalView(E.replay(s, { to: i + 1 }), 0, i === 450),
       `frame ${i}`,
     );
   assert.deepEqual(E.logSlice(s, { player: 0, start: 450, end: 450 }).frames, [
     frames[450],
   ]);
   assert.deepEqual(E.logSlice(s, { start: 450 }).frames, [E.stripSecret(s)]);
-  // A late slice must include an exact first frame (including undo), not just
-  // exact later frames. Seat 2 exercises the first-frame predecessor path.
+  // A late slice must include an exact first frame (including privacy), not just
+  // exact later frames. Include every player and spectators.
   for (const player of [undefined, 0, 1, 2]) {
     for (const start of [448, 449]) {
       const late = E.logSlice(s, { player, start, end: 450 }).frames;
       assert.deepEqual(
         late,
         Array.from({ length: 451 - start }, (_, offset) =>
-          E.stripSecret(E.replay(s, { to: start + offset + 1 }), player),
+          historicalView(
+            E.replay(s, { to: start + offset + 1 }),
+            player,
+            start + offset === 450,
+          ),
         ),
       );
     }
@@ -200,4 +223,87 @@ test("host settings changes never resolve virtual opponents or advance a replay 
   expected.players[0].settings = { autoForcedActions: true };
   assert.deepEqual(next, expected);
   assert.deepEqual(s, before);
+});
+
+test("BGS live slices preserve indices without replay, cloning, or private payloads", () => {
+  // Access traps prove that even full live history does not inspect positions
+  // or raw moves. Private choices must never enter the notification payload.
+  const s = { history: new Array(4) };
+  for (const key of ["config", "players", "random", "bag", "tasks"])
+    Object.defineProperty(s, key, {
+      get() {
+        throw Error(`read ${key}`);
+      },
+    });
+  for (let i = 0; i < 4; i++)
+    Object.defineProperty(s.history, i, {
+      get() {
+        throw Error("read private move");
+      },
+    });
+  const originalClone = globalThis.structuredClone;
+  globalThis.structuredClone = () => {
+    throw Error("cloned live state");
+  };
+  try {
+    const expected = Array.from({ length: 5 }, (_, index) => ({
+      index,
+      simple: index ? `Move ${index}` : "Game started",
+    }));
+    assert.deepEqual(host.logSlice(s), { log: expected, frames: [] });
+    for (const start of [0, 1, 3, 4, 5, 10])
+      assert.deepEqual(host.logSlice(s, { start, player: 0 }, { now: 1 }), {
+        log: expected.slice(start),
+        frames: [],
+      });
+    for (const start of [-1, 0.5, NaN, Infinity, "0", null, 2 ** 53])
+      assert.throws(() => host.logSlice(s, { start }), {
+        name: "InvalidMoveError",
+        message: "Invalid replay range",
+      });
+    for (const end of [-1, 0.5, NaN, Infinity, "0", null, 2 ** 53])
+      assert.throws(() => host.logSlice(s, { end }), {
+        name: "InvalidMoveError",
+      });
+    assert.deepEqual(host.logSlice(s, { start: 5, end: 4 }), { frames: [] });
+    assert.throws(() => host.logSlice(s, { start: 0, end: 0 }), /read config/);
+  } finally {
+    globalThis.structuredClone = originalClone;
+  }
+});
+
+test("BGS analysis supplies explicit historical frames rather than live notifications", () => {
+  let s = host.init(3, [], {}, "analysis-view-log");
+  for (let i = 0; i < 8; i++) s = host.moveAI(s);
+  const before = structuredClone(s);
+  for (const player of [undefined, 0, 1]) {
+    const view = host.analysisView(s, { player }, { now: 1 });
+    assert.deepEqual(view.state, host.stripSecret(s, player));
+    assert.equal(view.log.frames.length, host.logLength(s));
+    assert.deepEqual(
+      view.log,
+      host.logSlice(s, { player, start: 0, end: host.logLength(s) - 1 }),
+    );
+  }
+  assert.deepEqual(s, before);
+});
+
+test("current placement views retain edit eligibility while older frames are read-only", () => {
+  let s = E.init(3, [], {}, "placement-view-edit");
+  s = E.move(s, { type: "role", id: "recruiter" }, 0);
+  s = E.move(s, { type: "recruitBonus" }, 0);
+  s = E.move(s, { type: "assign", ...E.autoAssignment(s, 1) }, 1);
+  assert.equal(E.stripSecret(s, 1).canEditPlacement, true);
+  const index = E.logLength(s) - 1;
+  s = E.move(s, { type: "assign", ...E.autoAssignment(s, 2) }, 2);
+  assert.equal(E.stripSecret(s, 1).canEditPlacement, true);
+  const old = host.logSlice(s, { player: 1, start: index, end: index })
+    .frames[0];
+  assert.equal(old.canEditPlacement, false);
+  assert.equal(old.canEditProduction, false);
+  assert.equal("canUndo" in old, false);
+  assert.deepEqual(
+    host.logSlice(s, { player: 1, start: index + 1, end: index + 1 }).frames[0],
+    E.stripSecret(s, 1),
+  );
 });
