@@ -1603,6 +1603,23 @@ try {
       type: "poachAll",
       placements: [],
     });
+    // Legacy engine undo remains compatible, but live hosted games expose
+    // only choice editing, even where a role selection could be undone.
+    const chosenRole = E.move(
+      E.init(3, [], {}, "browser-no-live-undo"),
+      { type: "role", id: "builder" },
+      0,
+    );
+    assert.equal(E.canUndo(chosenRole, 0), true);
+    await page.evaluate(
+      (s) => {
+        host.emit("player", { index: 0 });
+        host.emit("state", s);
+      },
+      E.stripSecret(chosenRole, 0),
+    );
+    assert.equal(await page.locator(".dock-undo").count(), 0);
+    assert.equal(await page.locator('[data-local="undo"]').count(), 0);
     let undoPlacement = E.init(3, [], {}, "browser-placement-undo");
     undoPlacement = E.move(undoPlacement, { type: "role", id: "recruiter" }, 0);
     undoPlacement = E.move(undoPlacement, { type: "recruitBonus" }, 0);

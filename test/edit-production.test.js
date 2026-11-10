@@ -36,6 +36,16 @@ test("early production can be edited without retracting another producer's choic
   assert.deepEqual(edited.players[1], start.players[1]);
   assert.equal(edited.history.length, s.history.length - 1);
   assert.deepEqual(E.replay(edited), edited);
+  const original = structuredClone(s);
+  for (let i = 0; i < 20; i++) {
+    const reopened = E.move(s, { type: "editProduction" }, 1);
+    assert.equal(reopened.history.length, original.history.length - 1);
+    assert.deepEqual(reopened.players[0], original.players[0]);
+    s = produce(reopened, 1);
+    assert.equal(s.history.length, original.history.length);
+    assert.deepEqual(s.players, original.players);
+    assert.deepEqual(E.replay(s), s);
+  }
 });
 test("early Craftsman bonus is editable and re-confirmation adds no time", () => {
   let s = produce(fixture(), 2);

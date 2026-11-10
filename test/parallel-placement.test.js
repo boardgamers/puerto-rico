@@ -40,7 +40,10 @@ test("Smuggler selection can be undone before handing control away, without grow
   assert.equal(E.canUndo(s, 0), true);
   assert.equal(E.canUndo(s, 1), false);
   for (let i = 0; i < 10; i++) {
+    const active = E.currentPlayers(s);
     s = E.move(s, { type: "undo" }, 0);
+    assert.deepEqual(E.currentPlayers(s), active);
+    assert.equal(s.history.length, 0);
     assert.deepEqual(s, start);
     s = E.move(s, { type: "role", id: "smuggler" }, 0);
     assert.equal(s.history.length, 1);

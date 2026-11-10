@@ -141,6 +141,19 @@ test("long pass sequences keep the journal bounded without losing deterministic 
     frames[450],
   ]);
   assert.deepEqual(E.logSlice(s, { start: 450 }).frames, [E.stripSecret(s)]);
+  // A late slice must include an exact first frame (including undo), not just
+  // exact later frames. Seat 2 exercises the first-frame predecessor path.
+  for (const player of [undefined, 0, 1, 2]) {
+    for (const start of [448, 449]) {
+      const late = E.logSlice(s, { player, start, end: 450 }).frames;
+      assert.deepEqual(
+        late,
+        Array.from({ length: 451 - start }, (_, offset) =>
+          E.stripSecret(E.replay(s, { to: start + offset + 1 }), player),
+        ),
+      );
+    }
+  }
   assert.deepEqual(s, before);
 });
 

@@ -1611,7 +1611,11 @@ function applyMove(state, m, p, historical = false) {
       (currentPlayers(state).includes(p) || canMoveOutOfTurn(state, m, p)),
     "It is not your turn",
   );
-  const s = clone(state),
+  // Historical transitions only receive private states constructed by replay
+  // (or this logSlice call). Entries are append-only and each incoming move is
+  // cloned below. Copy the array, not its entire growing prefix: no public
+  // input history is shared, and predecessor/checkpoint arrays remain stable.
+  const s = historical ? cloneReplayPosition(state) : clone(state),
     t = playerTask(s, p),
     a = s.players[p],
     extra = { phase: t.kind, beforeCoins: s.players[p].coins };
@@ -2260,6 +2264,10 @@ function stripSecretForLog(state, p, previous, checkpoint) {
 export function logLength(s) {
   return s.history.length + 1;
 }
+function cloneReplayPosition(state) {
+  const { history, ...position } = state;
+  return { ...clone(position), history: history.slice() };
+}
 export function replay(s, options = {}) {
   const to =
     typeof options === "number" ? options : (options.to ?? logLength(s));
@@ -2302,8 +2310,17 @@ export function logSlice(
     frames.push(stripSecret(s, player));
     return { frames };
   }
-  let position = replay(s, Math.max(1, start + 1));
-  let previous;
+  // Reconstruct the predecessor as part of the same prefix pass. Otherwise
+  // the first frame's canUndo check replays that entire prefix a second time.
+  let previous = start > 0 ? replay(s, start) : undefined;
+  let position = previous
+    ? applyMove(
+        previous,
+        s.history[start - 1].move,
+        s.history[start - 1].p,
+        true,
+      )
+    : replay(s, 1);
   let checkpoint;
   for (let i = Math.max(0, start); i <= Math.min(end, logLength(s) - 1); i++) {
     // Keep just the start of this role to accelerate production-edit checks.

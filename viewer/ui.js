@@ -988,8 +988,10 @@ export function mountGame(
             "quiet dock-order",
           )
         : "";
+    // Live hosted games only reopen eligible independent choices. Keep the
+    // legacy undo affordance for local play and analysis, not live role rewind.
     const undo =
-      state.canUndo && enabled
+      (localControls || preferences.analysis) && state.canUndo && enabled
         ? moveButton({ type: "undo" }, t("undo"), "undo", "quiet dock-undo")
         : "";
     const edit =
