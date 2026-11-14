@@ -62,6 +62,11 @@ Further playtesting remains welcome. The Festival marker interpretation is noted
 
 `pnpm publish:bgs` builds the bundles, packages only the self-contained engine and its manifest, checks complete 1–5-player games from the extracted package, and uploads the engine/viewer to BGS. The script reads the admin token from `~/.bgs` without logging it, preserves the existing game/request identity, requires an already public version, and verifies the public/listed flags and CDN bytes. Metadata snapshots and package artifacts stay in ignored `.local/release/`.
 
+For an engine-only update that must preserve the deployed viewer and live metadata,
+run `BGS_ENGINE_ONLY=1 pnpm publish:bgs`. This still builds and tests the extracted
+engine tarball, but uploads only the engine and verifies its installer-generated
+achievement manifest, public/listed status, and unchanged viewer/setup metadata.
+
 The hosted bundle has no local preview controls or runtime asset dependencies. Global BGS locale and color-blind preferences are handled by the viewer; expansion switches remain internal. Four playable tutorial chapters are registered.
 
 Enable “Show everyone’s VP” at game creation to reveal accumulated VP tokens to all players and spectators. It is off by default; uncompleted Achievement cards remain private. For a separate local preview with visible VP, add `&showVP=true` to the URL.
