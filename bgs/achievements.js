@@ -4,7 +4,7 @@ import { BUILDINGS, GOODS, ROLES } from "../engine/catalog.js";
 
 /** @type {import('@boardgamers/protocol/engine').AchievementManifest} */
 const manifest = {
-  revision: 1,
+  revision: 2,
   achievements: [
     ["island-victory", "Island victory", "Win a multiplayer game outright."],
     [
@@ -60,7 +60,12 @@ const manifest = {
       "Versatile governor",
       "Choose each of the six core roles at least once in a completed game.",
     ],
-  ].map(([id, name, description]) => ({ id, name, description })),
+  ].map(([id, name, description]) => ({
+    id,
+    name,
+    description,
+    icon: { type: "asset", key: `achievement-${id}` },
+  })),
 };
 
 /** @returns {import('@boardgamers/protocol/engine').AchievementManifest} */

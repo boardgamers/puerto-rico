@@ -25,7 +25,7 @@ const has = (s, id, seat = 0) =>
 test("official schemas, stable manifest, real completed fixtures, replay and purity", () => {
   const manifest = host.achievementDefinitions();
   achievementManifestSchema.parse(manifest);
-  assert.equal(manifest.revision, 1);
+  assert.equal(manifest.revision, 2);
   assert.equal(manifest.achievements.length, 14);
   assert(
     !manifest.achievements.some(({ id }) =>

@@ -1,0 +1,162 @@
+{
+  "game": "puerto-rico",
+  "revision": 2,
+  "engineVersion": "0.3.20",
+  "generatorSha256": "5fd48ae65be656bd6d05e07425726fed1b3a30e5e25d8da15bfea9964165902a",
+  "assets": [
+    {
+      "id": "island-victory",
+      "key": "achievement-island-victory",
+      "svg": "achievement-island-victory.svg",
+      "png": "achievement-island-victory.png",
+      "svgSha256": "a2307d0d801519727856feb7202bf957ceb807955b1aae261c9215356599c1dc",
+      "pngSha256": "6a7b8b930d29545ffe27e6132f1ca1fce9ab1bb64f125b142a48935d911be1dd",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "puertoma-normal",
+      "key": "achievement-puertoma-normal",
+      "svg": "achievement-puertoma-normal.svg",
+      "png": "achievement-puertoma-normal.png",
+      "svgSha256": "cf9eecd4e527fe05c2f7de7eabb0d42126d2802f4891bad6d8cb17f8cc4101c0",
+      "pngSha256": "6f4a612cce07b352baaf96d0d4cd080ba0aace850a13e9300e60f076fc8c60fe",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "all-festival-objectives",
+      "key": "achievement-all-festival-objectives",
+      "svg": "achievement-all-festival-objectives.svg",
+      "png": "achievement-all-festival-objectives.png",
+      "svgSha256": "c0e5ec1f33e61484d23dbb1f96cb0ba0d8d8a812df2bb9a1307736b1c62dca6c",
+      "pngSha256": "63088659f4855ee44feb2826f426ac9b96f8692cd6702e42866c5a6bebce5ca6",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "all-personal-achievements",
+      "key": "achievement-all-personal-achievements",
+      "svg": "achievement-all-personal-achievements.svg",
+      "png": "achievement-all-personal-achievements.png",
+      "svgSha256": "47c56d4f5d93c998d68c441413346d740031a770bd52d9bbcf1edc6c02b89d26",
+      "pngSha256": "112f324d4c562863646f372bed7f6396654b7ff612b3c73697e32b89e64fb576",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "festival-claim",
+      "key": "achievement-festival-claim",
+      "svg": "achievement-festival-claim.svg",
+      "png": "achievement-festival-claim.png",
+      "svgSha256": "edb8242eee6d7ddcbdb2d5a520fb8dcb6d21b4e918cd92ad54d652e0e9748fb9",
+      "pngSha256": "d3db2d3e2e143d90946ed757093efac90db4b8766b5dd33f987573c9e6d10514",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "personal-achievement",
+      "key": "achievement-personal-achievement",
+      "svg": "achievement-personal-achievement.svg",
+      "png": "achievement-personal-achievement.png",
+      "svgSha256": "c7af3900b8007809a1d358f40fd03bdc5d1d247a3f724bdde00cf6b03d94054e",
+      "pngSha256": "dd24fc28323e1914487229509578a95425823a0e14f2f4aa8e8f4eac0400b330",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "fifty-points",
+      "key": "achievement-fifty-points",
+      "svg": "achievement-fifty-points.svg",
+      "png": "achievement-fifty-points.png",
+      "svgSha256": "7ddc8c9a50823577129d3dee3ed0d419d5c337d3b8743f2636e9e3962dd9ae76",
+      "pngSha256": "df48e86ed24c0d56be921c0c0ba78cfd73ef5e0105d0c7b89b1829a1b257d1a4",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "seventy-points",
+      "key": "achievement-seventy-points",
+      "svg": "achievement-seventy-points.svg",
+      "png": "achievement-seventy-points.png",
+      "svgSha256": "5dc4f24399d01da4945a195df9d28e5fb50e0e98a9a7a88935071ad11fd41e65",
+      "pngSha256": "8995fc38884021b8ee91918c5b43c16375927b4517091adf1649a9173874c903",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "full-city",
+      "key": "achievement-full-city",
+      "svg": "achievement-full-city.svg",
+      "png": "achievement-full-city.png",
+      "svgSha256": "39ecbe3e250a098ea4a20475cc08bd45a95a594d5061aea431eaa46316d50ea9",
+      "pngSha256": "2d38a4d85c25fdf79b4c716a83b7bb420c7541a8ad00c251eed9737d87f3a70a",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "full-island",
+      "key": "achievement-full-island",
+      "svg": "achievement-full-island.svg",
+      "png": "achievement-full-island.png",
+      "svgSha256": "d820eab15039a575ca054894c54881fd4044cc8f2e34292c61c043fadc205fe5",
+      "pngSha256": "9b25a52646c99ac36940887ccb5f8dd203657f5f942882b916973f1db8c0c3e4",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "expanded-city",
+      "key": "achievement-expanded-city",
+      "svg": "achievement-expanded-city.svg",
+      "png": "achievement-expanded-city.png",
+      "svgSha256": "7952be6ec0f00c3b08161bf419ba0aca2e57ae58d3504305b5d302eff1c53a1a",
+      "pngSha256": "0cd2972cfcd94390f3a39efb3bbf48c74ea783489c4d23103b06cf10b1fde660",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "five-crop-estates",
+      "key": "achievement-five-crop-estates",
+      "svg": "achievement-five-crop-estates.svg",
+      "png": "achievement-five-crop-estates.png",
+      "svgSha256": "a1466b9100c0b031772adc1c369eeeaa259e60a14a6e617e0dfd6639d0e2ef0f",
+      "pngSha256": "3e3fd3b26a6e60fdbd393ffe4af330a81e954a2c4cff4ecb4b09906ea91fe6cf",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "twenty-coins",
+      "key": "achievement-twenty-coins",
+      "svg": "achievement-twenty-coins.svg",
+      "png": "achievement-twenty-coins.png",
+      "svgSha256": "c9842932e0020fee33f0f6e82476ad7171454e1b4abb8cb3ddaf2523a0a18515",
+      "pngSha256": "125c68d884a0fb510a2bc8afdeabb1cc10abf5178b26e0d3a8d6b268ce9ac10a",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    },
+    {
+      "id": "six-core-roles",
+      "key": "achievement-six-core-roles",
+      "svg": "achievement-six-core-roles.svg",
+      "png": "achievement-six-core-roles.png",
+      "svgSha256": "a59a76379c2e16bbc3a260ea11ee6277f09f8ff00ce847ba7ae344a3fe671fb6",
+      "pngSha256": "26d2ffca5a628a6b1597ec6281537ea2ab5de6f80c8eeb6022ba45aad2e442a5",
+      "width": 256,
+      "height": 256,
+      "provenance": "Original geometry in scripts/achievement-art.py; CC0-1.0"
+    }
+  ]
+}
