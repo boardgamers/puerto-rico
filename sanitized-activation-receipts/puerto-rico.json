@@ -1,0 +1,369 @@
+{
+  "schema": 1,
+  "game": "puerto-rico",
+  "status": "activated-and-verified",
+  "sourceCommit": "a5bbb7a0512a99037328f0b16e35a1dd6f73bc8e",
+  "envelopeSha256": "22fe1c17db2aa2fb8cad25a18d44017a0f5009f81c5476a24f2129141ff95008",
+  "privateReceiptSha256": "c973a69b484f8181dad6fb8f1876d22a0190ee728e877a77db536a5f254a1c03",
+  "assets": {
+    "achievement-all-festival-objectives": {
+      "sourceSha256": "63088659f4855ee44feb2826f426ac9b96f8692cd6702e42866c5a6bebce5ca6",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-all-festival-objectives/654bb0b70c2d77bd/achievement-all-festival-objectives.webp",
+      "sha256": "654bb0b70c2d77bd7761417ef3f13c0d07dafcbfbde4ef63aafb022880ceea4f",
+      "size": 6416,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.540Z",
+      "metadataPreserved": true
+    },
+    "achievement-all-personal-achievements": {
+      "sourceSha256": "112f324d4c562863646f372bed7f6396654b7ff612b3c73697e32b89e64fb576",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-all-personal-achievements/de342c26df5d0107/achievement-all-personal-achievements.webp",
+      "sha256": "de342c26df5d010714ef8ccc4542f27d63bb05aca709c7c875d6bbcf4e7231cf",
+      "size": 6974,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.566Z",
+      "metadataPreserved": true
+    },
+    "achievement-expanded-city": {
+      "sourceSha256": "0cd2972cfcd94390f3a39efb3bbf48c74ea783489c4d23103b06cf10b1fde660",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-expanded-city/d3f8568fc948c484/achievement-expanded-city.webp",
+      "sha256": "d3f8568fc948c484b72a5eaeacf0a7f884dfd4b6548262737a323cc32abb39d8",
+      "size": 5826,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.593Z",
+      "metadataPreserved": true
+    },
+    "achievement-festival-claim": {
+      "sourceSha256": "d3db2d3e2e143d90946ed757093efac90db4b8766b5dd33f987573c9e6d10514",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-festival-claim/701c7e3c7ff587fd/achievement-festival-claim.webp",
+      "sha256": "701c7e3c7ff587fdd97b4fa119eeeec9cfe4be84ca1672eb5a78f783c51682b3",
+      "size": 6096,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.619Z",
+      "metadataPreserved": true
+    },
+    "achievement-fifty-points": {
+      "sourceSha256": "df48e86ed24c0d56be921c0c0ba78cfd73ef5e0105d0c7b89b1829a1b257d1a4",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-fifty-points/a7b56ac7a757ac5b/achievement-fifty-points.webp",
+      "sha256": "a7b56ac7a757ac5b79f83bbf10e1a2efbd5330847d164e78d7502d827e0861ec",
+      "size": 6456,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.645Z",
+      "metadataPreserved": true
+    },
+    "achievement-five-crop-estates": {
+      "sourceSha256": "3e3fd3b26a6e60fdbd393ffe4af330a81e954a2c4cff4ecb4b09906ea91fe6cf",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-five-crop-estates/1236311d150c23a1/achievement-five-crop-estates.webp",
+      "sha256": "1236311d150c23a11cad87aeeb79585b3d08b937568eac63a9d47b150564c3cc",
+      "size": 7894,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.672Z",
+      "metadataPreserved": true
+    },
+    "achievement-full-city": {
+      "sourceSha256": "2d38a4d85c25fdf79b4c716a83b7bb420c7541a8ad00c251eed9737d87f3a70a",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-full-city/b6eec641713fd975/achievement-full-city.webp",
+      "sha256": "b6eec641713fd9754f60882dbfaf488e0354fae10b1ff146ed798356da3107d7",
+      "size": 7684,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.697Z",
+      "metadataPreserved": true
+    },
+    "achievement-full-island": {
+      "sourceSha256": "9b25a52646c99ac36940887ccb5f8dd203657f5f942882b916973f1db8c0c3e4",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-full-island/fbb4587b6bf6abb3/achievement-full-island.webp",
+      "sha256": "fbb4587b6bf6abb345737e86302b5b5df26816bdb52837271abfef1cedca2f55",
+      "size": 9956,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.725Z",
+      "metadataPreserved": true
+    },
+    "achievement-island-victory": {
+      "sourceSha256": "6a7b8b930d29545ffe27e6132f1ca1fce9ab1bb64f125b142a48935d911be1dd",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-island-victory/0700bb977e840c77/achievement-island-victory.webp",
+      "sha256": "0700bb977e840c77958091e552d705e0fca76f36b7cba6717738bab5d0946bdf",
+      "size": 7158,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.751Z",
+      "metadataPreserved": true
+    },
+    "achievement-personal-achievement": {
+      "sourceSha256": "dd24fc28323e1914487229509578a95425823a0e14f2f4aa8e8f4eac0400b330",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-personal-achievement/e6325e2fe7856e6c/achievement-personal-achievement.webp",
+      "sha256": "e6325e2fe7856e6c3a29b1b113c77b6635b752ae2b98b65c568f10b5fdb823de",
+      "size": 5902,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.844Z",
+      "metadataPreserved": true
+    },
+    "achievement-puertoma-normal": {
+      "sourceSha256": "6f4a612cce07b352baaf96d0d4cd080ba0aace850a13e9300e60f076fc8c60fe",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-puertoma-normal/c90e6b1bc3cbb5ab/achievement-puertoma-normal.webp",
+      "sha256": "c90e6b1bc3cbb5aba298eb621fd8452028f76ee5bc2e00e7171bb652053ea26f",
+      "size": 7430,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.872Z",
+      "metadataPreserved": true
+    },
+    "achievement-seventy-points": {
+      "sourceSha256": "8995fc38884021b8ee91918c5b43c16375927b4517091adf1649a9173874c903",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-seventy-points/3c100229a441d2d1/achievement-seventy-points.webp",
+      "sha256": "3c100229a441d2d1a0cf0a72a4bb9e4784254c65d32ef5fa931b53ee202a65f0",
+      "size": 7524,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:45.903Z",
+      "metadataPreserved": true
+    },
+    "achievement-six-core-roles": {
+      "sourceSha256": "26d2ffca5a628a6b1597ec6281537ea2ab5de6f80c8eeb6022ba45aad2e442a5",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-six-core-roles/49779249ffacac9c/achievement-six-core-roles.webp",
+      "sha256": "49779249ffacac9cdfaf0ea0c88674e5564f4ccb3424b0637ec05c11cf7cf67b",
+      "size": 10856,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:46.000Z",
+      "metadataPreserved": true
+    },
+    "achievement-twenty-coins": {
+      "sourceSha256": "125c68d884a0fb510a2bc8afdeabb1cc10abf5178b26e0d3a8d6b268ce9ac10a",
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/achievements/puerto-rico/achievement-twenty-coins/d857593c9669c0c0/achievement-twenty-coins.webp",
+      "sha256": "d857593c9669c0c0d9a604ad4d5402f670031a8eb5dff01521a5b2e53049db4a",
+      "size": 7380,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:46.029Z",
+      "metadataPreserved": true
+    }
+  },
+  "preserved": {
+    "pictogram": {
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/assets/puerto-rico/pictogram/105366dc77deedaf/pictogram.webp",
+      "sha256": "105366dc77deedaf8cc79399ce9c8ad510d0d12d48baebcb080b4f2c67d38a0d",
+      "size": 8880,
+      "format": "webp",
+      "width": 256,
+      "height": 256,
+      "verifiedAt": "2026-11-14T12:45:46.058Z"
+    },
+    "screenshot-release-board": {
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/assets/puerto-rico/screenshot-release-board/e92a9b5fecce59b2/screenshot-release-board.webp",
+      "sha256": "e92a9b5fecce59b2432e0dfa651fb7fccb677936d6d70da30e8280cce7644452",
+      "size": 82214,
+      "format": "webp",
+      "width": 1440,
+      "height": 1000,
+      "verifiedAt": "2026-11-14T12:45:46.129Z"
+    },
+    "screenshot-release-buildings": {
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/assets/puerto-rico/screenshot-release-buildings/035962b9ee1100a9/screenshot-release-buildings.webp",
+      "sha256": "035962b9ee1100a9a199caca63edaa918d469999a312e1e421f4fa5e1e0cc8ab",
+      "size": 67484,
+      "format": "webp",
+      "width": 1440,
+      "height": 1000,
+      "verifiedAt": "2026-11-14T12:45:46.193Z"
+    },
+    "screenshot-release-mobile": {
+      "url": "https://s3.fr-par.scw.cloud/bgs-assets/assets/puerto-rico/screenshot-release-mobile/29703497f1ccc05f/screenshot-release-mobile.webp",
+      "sha256": "29703497f1ccc05f7f6f7f3d9eca9b3e1313e65ecabd9db4420196253f8d2a4a",
+      "size": 35860,
+      "format": "webp",
+      "width": 390,
+      "height": 844,
+      "verifiedAt": "2026-11-14T12:45:46.296Z"
+    }
+  },
+  "planSha256": "e07bf1407eea63f8810ccbb442f3df8b1bb22304e26bacee2b2cf55a9118f6cc",
+  "activationReceiptSha256": "930af617e5c0dc59e7b6da92aede2fbec12dc988be5aa28e5fac16364b8028c6",
+  "tgzSha256": "b759b525e766e9da5b30c32af142f966e3dbcedd39318e7c1e396d5cf33d5fbe",
+  "package": {
+    "name": "@boardgamers/puerto-rico",
+    "version": "0.3.20",
+    "url": "https://s3.fr-par.scw.cloud/bgs-assets/games/puerto-rico/1/engine/b759b525e766e9da/boardgamers-puerto-rico-0.3.20.tgz"
+  },
+  "hostedPackage": {
+    "url": "https://s3.fr-par.scw.cloud/bgs-assets/games/puerto-rico/1/engine/b759b525e766e9da/boardgamers-puerto-rico-0.3.20.tgz",
+    "size": 37306,
+    "sha256": "b759b525e766e9da5b30c32af142f966e3dbcedd39318e7c1e396d5cf33d5fbe"
+  },
+  "manifest": {
+    "revision": 2,
+    "achievements": [
+      {
+        "id": "island-victory",
+        "name": "Island victory",
+        "description": "Win a multiplayer game outright.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-island-victory"
+        }
+      },
+      {
+        "id": "puertoma-normal",
+        "name": "Puertoma: normal",
+        "description": "Win outright against both Puertomas on normal difficulty.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-puertoma-normal"
+        }
+      },
+      {
+        "id": "all-festival-objectives",
+        "name": "Festival sweep",
+        "description": "Finish having personally claimed every active Festival objective (at least one).",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-all-festival-objectives"
+        }
+      },
+      {
+        "id": "all-personal-achievements",
+        "name": "Personal perfection",
+        "description": "Finish with every card in your active personal Achievement set completed (at least one).",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-all-personal-achievements"
+        }
+      },
+      {
+        "id": "festival-claim",
+        "name": "Festival participant",
+        "description": "Finish having claimed at least one Festival objective.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-festival-claim"
+        }
+      },
+      {
+        "id": "personal-achievement",
+        "name": "Personal milestone",
+        "description": "Finish with at least one completed personal Achievement card.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-personal-achievement"
+        }
+      },
+      {
+        "id": "fifty-points",
+        "name": "Fifty points",
+        "description": "Finish with at least 50 total points.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-fifty-points"
+        }
+      },
+      {
+        "id": "seventy-points",
+        "name": "Seventy points",
+        "description": "Finish with at least 70 total points.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-seventy-points"
+        }
+      },
+      {
+        "id": "full-city",
+        "name": "Full city",
+        "description": "Finish with all 12 city spaces built.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-full-city"
+        }
+      },
+      {
+        "id": "full-island",
+        "name": "Full island",
+        "description": "Finish with all 12 island spaces occupied.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-full-island"
+        }
+      },
+      {
+        "id": "expanded-city",
+        "name": "Expanded city",
+        "description": "Finish with at least two expanded (two-space) buildings.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-expanded-city"
+        }
+      },
+      {
+        "id": "five-crop-estates",
+        "name": "Five-crop estates",
+        "description": "Finish owning an estate for each of the five crops.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-five-crop-estates"
+        }
+      },
+      {
+        "id": "twenty-coins",
+        "name": "Treasury",
+        "description": "Finish with at least 20 coins.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-twenty-coins"
+        }
+      },
+      {
+        "id": "six-core-roles",
+        "name": "Versatile governor",
+        "description": "Choose each of the six core roles at least once in a completed game.",
+        "icon": {
+          "type": "asset",
+          "key": "achievement-six-core-roles"
+        }
+      }
+    ]
+  },
+  "verification": {
+    "publicCatalog": true,
+    "allAssets": true,
+    "unchangedMetadata": true
+  },
+  "sourceDelivery": {
+    "reviewer": "sub-1794658441879-3438f071",
+    "approval": "approved source and exact engine package per issue 595 coordination",
+    "verifiedAt": "2026-11-14T12:59:56.401639+00:00",
+    "publicInfoUrl": "https://boardgamers.space/api/boardgame/puerto-rico/info/latest",
+    "publicGetVerification": {
+      "packageAndManifest": true,
+      "newAchievementAssets": 14,
+      "preservedAssets": 4,
+      "allAssetBytesAndHashes": true,
+      "hostedAndOriginalPackageHash": true
+    },
+    "preservation": {
+      "viewerSettingsVisibility": "Unchanged by source delivery; activation receipt attests unchanged metadata. Public catalog remains public.",
+      "productionWrites": false,
+      "repacked": false
+    }
+  }
+}
