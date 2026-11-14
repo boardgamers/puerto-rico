@@ -1,4 +1,5 @@
 export * from "../engine/index.js";
+export { achievementDefinitions, achievements } from "./achievements.js";
 import * as game from "../engine/index.js";
 import en from "../viewer/locales/en.json" with { type: "json" };
 import { RELEASE } from "../release-config.js";

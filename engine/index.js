@@ -2274,6 +2274,7 @@ export function replay(s, options = {}) {
     p.bot = s.players[i].bot;
     if (s.players[i].settings) p.settings = clone(s.players[i].settings);
   });
+  if (s.analysis) r.analysis = true;
   return r;
 }
 export function logSlice(
@@ -2317,6 +2318,7 @@ export function canLaunchAnalysisMode(s) {
 }
 export function createAnalysis(s, { to = logLength(s) } = {}) {
   const n = replay(s, to);
+  n.analysis = true;
   n.players.forEach((p) => {
     p.bot = false;
     p.settings = { autoForcedActions: false };

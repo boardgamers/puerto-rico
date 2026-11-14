@@ -1,6 +1,6 @@
 {
   "name": "@boardgamers/puerto-rico",
-  "version": "0.3.18",
+  "version": "0.3.19",
   "private": true,
   "type": "module",
   "description": "Puerto Rico 1897 Special Edition for Boardgamers Space",
@@ -16,7 +16,7 @@
     "publish:gallery": "node scripts/publish-gallery.mjs"
   },
   "dependencies": {
-    "@boardgamers/protocol": "file:vendor/boardgamers-protocol-0.11.0.tgz",
+    "@boardgamers/protocol": "0.11.0",
     "@noble/hashes": "2.0.1",
     "morphdom": "2.7.8"
   },

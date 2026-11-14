@@ -2,4 +2,4 @@ allowBuilds:
   esbuild: true
 
 minimumReleaseAgeExclude:
-  - "@boardgamers/protocol@0.8.1"
+  - "@boardgamers/protocol@0.8.1 || 0.11.0"
