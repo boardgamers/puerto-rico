@@ -7,11 +7,11 @@ const manifest = {
   revision: 1,
   achievements: [
     ["island-victory", "Island victory", "Win a multiplayer game outright."],
-    ...["easy", "normal", "hard"].map((level) => [
-      `puertoma-${level}`,
-      `Puertoma: ${level}`,
-      `Win outright against both Puertomas on ${level} difficulty.`,
-    ]),
+    [
+      "puertoma-normal",
+      "Puertoma: normal",
+      "Win outright against both Puertomas on normal difficulty.",
+    ],
     [
       "all-festival-objectives",
       "Festival sweep",
@@ -119,11 +119,10 @@ export function achievements(s) {
       if (condition) earned.push(id);
     };
     award("island-victory", !s.puertoma && outcome === "win");
-    for (const level of ["easy", "normal", "hard"])
-      award(
-        `puertoma-${level}`,
-        solo && s.puertoma.difficulty === level && outcome === "win",
-      );
+    award(
+      "puertoma-normal",
+      solo && s.puertoma.difficulty === "normal" && outcome === "win",
+    );
     const festivals = festival ? (s.festivals ?? []) : [];
     const cards = s.expansions.includes("achievements")
       ? (a.achievements ?? [])

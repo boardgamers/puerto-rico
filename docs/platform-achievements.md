@@ -32,9 +32,7 @@ final inventories.
 | ID | Requirement at a completed game |
 | --- | --- |
 | island-victory | Outright multiplayer win |
-| puertoma-easy | Outright hosted solo win on easy |
 | puertoma-normal | Outright hosted solo win on normal |
-| puertoma-hard | Outright hosted solo win on hard |
 | all-festival-objectives | Personally claim all active Festival objectives |
 | all-personal-achievements | Complete all owned personal cards |
 | festival-claim | Claim at least one Festival |
@@ -72,9 +70,11 @@ use normal human rules, not Puertoma rules.
 Outcomes compare all players' final total, then coins plus crates. Shared best
 results are draws, not outright-win badges. Hosted solo returns **only seat 0**,
 but explicitly compares against both virtual Puertomas. Hosted creation currently
-fixes **normal** difficulty. Easy/hard badges are reserved for genuine supported
-engine configurations; they are not selectable in the released host, and no
-picker has been added. Ordinary multiplayer never earns a solo badge.
+fixes **normal** difficulty. The 14-badge MVP therefore includes only the normal
+solo victory badge. Easy/hard are supported by the core engine but absent from
+the manifest because hosted creation does not expose them. Adding a new setup
+option is outside this badge change; no picker has been added. Ordinary
+multiplayer never earns a solo badge.
 
 Tests: `test/platform-achievements.test.js` plays real completed multiplayer and
 hosted solo games, validates official runtime schemas, checks deterministic

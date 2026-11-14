@@ -26,7 +26,12 @@ test("official schemas, stable manifest, real completed fixtures, replay and pur
   const manifest = host.achievementDefinitions();
   achievementManifestSchema.parse(manifest);
   assert.equal(manifest.revision, 1);
-  assert.equal(manifest.achievements.length, 16);
+  assert.equal(manifest.achievements.length, 14);
+  assert(
+    !manifest.achievements.some(({ id }) =>
+      ["puertoma-easy", "puertoma-hard"].includes(id),
+    ),
+  );
   for (const s of [completed, solo]) {
     const before = structuredClone(s);
     const results = host.achievements(s);
@@ -36,7 +41,7 @@ test("official schemas, stable manifest, real completed fixtures, replay and pur
     assert.deepEqual(s, before);
   }
   manifest.achievements.length = 0;
-  assert.equal(host.achievementDefinitions().achievements.length, 16);
+  assert.equal(host.achievementDefinitions().achievements.length, 14);
 });
 
 test("all means this seat's entire nonempty active set, not the table or the deck", () => {
@@ -107,7 +112,12 @@ test("solo outcomes explicitly compare both virtual opponents including tie brea
     s.players[0].vp = 1000;
     assert.equal(host.achievements(s).length, 1);
     assert.equal(host.achievements(s)[0].outcome, "win");
-    assert(has(s, `puertoma-${difficulty}`));
+    assert.equal(has(s, "puertoma-normal"), difficulty === "normal");
+    assert(!has(s, "puertoma-easy"));
+    assert(!has(s, "puertoma-hard"));
+    achievementResultsSchema(host.achievementDefinitions(), 1).parse(
+      host.achievements(s),
+    );
     assert(!has(s, "island-victory"));
     s.players[1].vp = 2000;
     assert.equal(host.achievements(s)[0].outcome, "loss");
